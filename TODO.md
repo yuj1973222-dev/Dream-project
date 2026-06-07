@@ -91,8 +91,11 @@ Deferred work. Keep this list short and move completed items out.
 - `LEESEOLCRAFTING_DESIGN.md` exists and 0.1.0 has been implemented/deployed.
 - `ANVIL_REPAIR_IMPACT_REVIEW.md` exists. Current recommendation: do not block
   vanilla anvil repair in LeeSeolCrafting 1.0.
-- `ADVANCED_ENCHANTMENTS_BALANCE_REVIEW.md` exists. High-risk enchantments need
-  detailed per-enchant value review before any config change.
+- `ADVANCED_ENCHANTMENTS_BALANCE_REVIEW.md` exists. 2026-06-08 follow-up reviewed
+  live `enchantments.yml`, group prices, enchantment-table access, and Jobs/Crafting
+  overlap. No live config was changed. Next decision: apply the PVP safety patch
+  first, or wait for player-online Jobs/Crafting verification before changing
+  AdvancedEnchantments values.
 - `LEESEOLJOBS_DESIGN.md` exists and 0.1.0 has been implemented/deployed.
 - `LEESEOLRANKS_RANKUP_EXPANSION_DESIGN.md` exists and 0.1.0 requirements expansion
   has been implemented/deployed.
