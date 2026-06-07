@@ -1,0 +1,173 @@
+features:
+  vault-provider: true
+  economy-commands: true
+  shops: true
+  npcs: true
+  server-menu: true
+
+storage:
+  balances-file: "/opt/minecraft/shared/economy/balances.properties"
+
+currency:
+  name: "원"
+  starting-balance: 10000
+
+messages:
+  prefix: "&b[경제] &f"
+  no-permission: "&c권한이 없습니다."
+  player-only: "게임 안에서만 사용할 수 있습니다."
+  invalid-amount: "&c금액은 1 이상의 숫자로 입력해주세요."
+  balance: "&f현재 보유 금액: &e%amount%"
+  balance-other: "&f%player%님의 보유 금액: &e%amount%"
+  paid-sender: "&f%player%님에게 &e%amount%&f 원 보냈습니다."
+  paid-receiver: "&f%player%님에게 &e%amount%&f 원 받았습니다."
+  not-enough-money: "&c돈이 부족합니다. 필요 금액: &e%amount%"
+  player-not-found: "&c플레이어를 찾을 수 없습니다."
+  reloaded: "&aLeeSeolEconomy 설정을 다시 불러왔습니다."
+  shop-disabled: "&c현재 이 서버에서는 상점 기능이 꺼져 있습니다."
+  shop-not-found: "&c상점을 찾을 수 없습니다: &e%shop%"
+  inventory-full: "&c인벤토리 공간이 부족합니다."
+  buy-success: "&a%item% &fx%amount% 구매 완료: &e%price%"
+  sell-success: "&a%item% &fx%amount% 판매 완료: &e%price%"
+  sell-missing-items: "&c판매할 아이템이 부족합니다."
+  npc-created: "&a상점 NPC를 생성했습니다: &e%id%"
+  npc-removed: "&a상점 NPC를 제거했습니다: &e%id%"
+  npc-not-found: "&c상점 NPC를 찾을 수 없습니다: &e%id%"
+  server-menu-opened: "&f서버 이동 메뉴를 열었습니다."
+  server-moving: "&a%server% 서버로 이동합니다."
+
+shops:
+  default-shop: "general"
+  general:
+    title: "&0LeeSeol 상점"
+    size: 27
+    filler:
+      enabled: true
+      material: BLACK_STAINED_GLASS_PANE
+      name: " "
+    items:
+      oak_logs:
+        slot: 10
+        material: OAK_LOG
+        amount: 16
+        buy: 500
+        sell: 150
+        name: "&f참나무 원목 &7x16"
+        lore:
+          - "&7좌클릭 구매: &e500원"
+          - "&7우클릭 판매: &a150원"
+      iron_ingots:
+        slot: 12
+        material: IRON_INGOT
+        amount: 8
+        buy: 1200
+        sell: 400
+        name: "&f철 주괴 &7x8"
+        lore:
+          - "&7좌클릭 구매: &e1,200원"
+          - "&7우클릭 판매: &a400원"
+      bread:
+        slot: 14
+        material: BREAD
+        amount: 16
+        buy: 300
+        sell: 60
+        name: "&f빵 &7x16"
+        lore:
+          - "&7좌클릭 구매: &e300원"
+          - "&7우클릭 판매: &a60원"
+      diamond:
+        slot: 16
+        material: DIAMOND
+        amount: 1
+        buy: 5000
+        sell: 1800
+        name: "&b다이아몬드"
+        lore:
+          - "&7좌클릭 구매: &e5,000원"
+          - "&7우클릭 판매: &a1,800원"
+
+npcs:
+  lobby_shop:
+    enabled: true
+    shop: "general"
+    world: "world"
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+    type: VILLAGER
+    skin: ""
+    name: "&e상점"
+
+server-menu:
+  title: "&0서버 메뉴"
+  # Deployment scripts set this to lobby or survival on each backend.
+  local-server: "survival"
+  size: 27
+  shortcut:
+    enabled: true
+    require-sneak: true
+    cooldown-millis: 700
+  external-menu:
+    enabled: false
+    # Enable this after DeluxeMenus is installed and the menu id is finalized.
+    # Example: "dm open pixiestudios_gamemenu1 %player%"
+    open-command: ""
+  blocked-worlds:
+    dungeon:
+      bypass-permission: "leeseoldungeon.menu-bypass"
+      message: "&c던전 월드에서는 서버 이동 메뉴를 사용할 수 없습니다."
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+  items:
+    lobby:
+      slot: 10
+      server: "lobby"
+      material: SNOWBALL
+      name: "&#9ADBF5로비"
+      lore:
+        - "&7상점과 안내가 있는 대기 공간"
+        - "&e클릭해서 이동"
+    auction:
+      slot: 13
+      command: "auction"
+      material: GOLD_INGOT
+      name: "&#FFD166경매장"
+      lore:
+        - "&7아이템을 맡기고 경매에 입찰합니다."
+        - "&7관리자가 열었을 때만 입찰 가능합니다."
+        - "&e클릭해서 열기"
+    survival:
+      slot: 16
+      server: "survival"
+      material: GRASS_BLOCK
+      name: "&#9BE7A1야생"
+      lore:
+        - "&7채집, 건축, 탐험을 하는 메인 월드"
+        - "&e클릭해서 이동"
+    admin_newworld:
+      slot: 21
+      server: "newworld"
+      permission: "leeseoldungeon.admin"
+      material: COMPASS
+      name: "&#B9E6FF신세계"
+      lore:
+        - "&c관리자 전용"
+        - "&7추후 데이터팩과 전용 맵을 넣을 신세계 서버"
+        - "&e클릭해서 이동"
+    admin_dungeon:
+      slot: 23
+      command: "dungeon enter"
+      permission: "leeseoldungeon.admin"
+      local-servers:
+        - "survival"
+      material: ENDER_EYE
+      name: "&#C7B9FF던전"
+      lore:
+        - "&c관리자 전용"
+        - "&7야생 서버 내부의 던전 월드로 이동합니다."
+        - "&e클릭해서 이동"

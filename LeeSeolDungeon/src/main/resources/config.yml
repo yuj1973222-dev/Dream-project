@@ -1,0 +1,94 @@
+server:
+  # survival, dungeon, both. Multi-world mode uses both on the survival Paper server.
+  role: "both"
+
+dungeon-world:
+  enabled: true
+  name: "dungeon"
+  return-world: "world"
+  environment: "NORMAL"
+  type: "NORMAL"
+  generate-structures: true
+  seed: ""
+  spawn:
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+  return-spawn:
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
+inventory-sync:
+  # Same Paper process means player inventory/health are already shared by Minecraft itself.
+  enabled: false
+  data-file: "/opt/minecraft/shared/dungeon/inventories.yml"
+  load-delay-ticks: 10
+  save-on-quit: false
+  save-before-portal-transfer: false
+  sync-ender-chest: true
+  sync-health-food-exp: true
+
+return-random:
+  enabled: true
+  data-file: "/opt/minecraft/shared/dungeon/returns.yml"
+  radius: 50
+  delay-ticks: 30
+  max-attempts: 50
+
+portal-triggers:
+  enabled: true
+  cooldown-seconds: 3
+  portals: {}
+
+dungeon-protection:
+  enabled: true
+  worlds:
+    - "dungeon"
+  allow-admin-bypass: true
+  block-break: false
+  block-place: false
+  buckets: false
+  explosions: false
+  mob-griefing-block-change: false
+
+loot-chests:
+  enabled: true
+  roll-interval-seconds: 300
+  default-chance: 0.25
+  default-respawn-seconds: 1800
+  replace-existing: false
+  refill-existing-chest: false
+  spots: {}
+  loot-tables:
+    default:
+      contents: []
+
+messages:
+  prefix: "&#B9E6FF[던전] &f"
+  no-permission: "&c권한이 없습니다."
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  reloaded: "&aLeeSeolDungeon 설정을 다시 불러왔습니다."
+  dungeon-entered: "&a던전 월드로 이동했습니다."
+  dungeon-exited: "&a던전에서 나왔습니다."
+  target-world-missing: "&c대상 월드를 찾을 수 없습니다: &f%world%"
+  portal-pos1: "&a포탈 pos1 설정: &f%pos%"
+  portal-pos2: "&a포탈 pos2 설정: &f%pos%"
+  portal-created: "&a포탈을 저장했습니다. &f%id% &7-> &f%target%"
+  portal-removed: "&a포탈을 제거했습니다: &f%id%"
+  portal-missing-selection: "&c먼저 /dungeon portal pos1, /dungeon portal pos2 를 설정해주세요."
+  chest-table-opened: "&a상자 보상 테이블을 엽니다: &f%table%"
+  chest-table-saved: "&a상자 보상 테이블을 저장했습니다: &f%table%"
+  chest-spot-added: "&a상자 스팟 위치를 저장했습니다: &f%id%"
+  chest-spot-removed: "&a상자 스팟 위치를 제거했습니다: &f%id%"
+  chest-spawned: "&a상자를 생성했습니다: &f%id%"
+  chest-not-found: "&c상자 위치를 찾을 수 없습니다: &f%id%"
+  chest-no-table: "&c보상 테이블이 비어 있습니다: &f%table%"
+  protected: "&c던전에서는 블록 설치/파괴가 불가능합니다."
+  inventory-saved: "&7던전 인벤토리를 저장했습니다."
+  inventory-loaded: "&7던전 인벤토리를 불러왔습니다."
+  return-teleported: "&a던전 입장 포탈 주변으로 돌아왔습니다."

@@ -1,0 +1,128 @@
+settings:
+  min-town-members: 2
+  party-max-members: 4
+  nation-required-members: 5
+  federation-required-towns: 4
+  federation-required-members: 20
+
+storage:
+  data-file: "/opt/minecraft/shared/town/data.yml"
+
+economy:
+  enabled: true
+  chunk-claim-cost: 10000
+  nation-tax-base: 10000
+
+war:
+  surrender-payment: 100000
+  protection-minutes: 10
+  debt-hours: 12
+
+prefix:
+  town: "&#8FD9A8%town% "
+  republic: "&#8EC5FF%nation% "
+  empire: "&#FF9AA2%nation% "
+  federation: "&#FFD166%nation% "
+
+chat:
+  global-format: "%rank%%affiliation%&f%player%&7: &f%message%"
+  town-format: "&a[파티] %rank%%affiliation%&f%player%&7: &f%message%"
+  nation-format: "&6[국가] %rank%%affiliation%&f%player%&7: &f%message%"
+
+messages:
+  nation-treasury-deposited: "&a%player%님이 국고에 &e%amount%&a 입금했습니다. 현재 국고: &e%treasury%"
+  nation-treasury-info: "&a%nation% 국고: &e%treasury% &7| 카르마: &f%karma% &7| 전쟁 체납: &c%debt%"
+  nation-suspended: "&c%nation% 국가는 전쟁 배상금 체납으로 기능이 정지되었습니다. 체납액: &e%amount%"
+  war-self: "&c자기 국가에는 전쟁을 선포할 수 없습니다."
+  war-already-exists: "&c이미 해당 국가와 진행 중인 전쟁 또는 선포가 있습니다."
+  war-not-found: "&c해당 국가와의 전쟁을 찾을 수 없습니다."
+  war-declared-attacker: "&c%defender% 국가에 전쟁을 선포했습니다."
+  war-declared-defender: "&c%attacker% 국가가 전쟁을 선포했습니다. &e/party war accept %attacker% &7또는 &e/party war surrender %attacker%"
+  war-accepted-attacker: "&c%defender% 국가가 전쟁을 수락했습니다. 10분 동안 해당 국가 영토 보호가 적용됩니다."
+  war-accepted-defender: "&a전쟁을 수락했습니다. %minutes%분 동안 적군은 영토에 진입할 수 없습니다."
+  war-surrendered: "&c%loser% 국가가 %winner% 국가에 항복했습니다. 카르마: &e%karma%"
+  war-surrender-received: "&a%loser% 국가의 항복을 받았습니다. 배상금: &e%amount% &7| 카르마: &e%karma%"
+  war-surrender-received-streak: "&e%loser% 국가의 항복을 받았습니다. 연속 항복 3회 수령으로 카르마 패널티가 적용되었습니다. 카르마: &e%karma%"
+  war-debt-created: "&c국고가 부족해 배상금 &e%amount%&c 체납이 등록되었습니다. &e%hours%시간&c 안에 국고를 채우고 /party war paydebt 를 사용하세요."
+  war-no-debt: "&a현재 전쟁 배상금 체납이 없습니다."
+  war-debt-not-enough: "&c국고가 부족합니다. 필요: &e%amount% &7현재: &e%treasury%"
+  war-debt-paid: "&a전쟁 배상금 &e%amount%&a 을 납부했습니다."
+  war-debt-paid-creditor: "&a%nation% 국가가 전쟁 배상금 &e%amount%&a 을 납부했습니다."
+  war-debt-expired: "&c전쟁 배상금 &e%amount%&c 체납 기한이 지나 국가 기능이 정지되고 영토 보호가 해제되었습니다."
+  war-debt-expired-creditor: "&e%nation% 국가가 배상금을 기한 내 납부하지 못해 국가 기능이 정지되었습니다."
+  war-protection-not-active: "&c해제할 전쟁 보호가 없습니다."
+  war-protection-released-self: "&e%nation% 국가가 전쟁 영토 보호를 해제했습니다."
+  war-protection-released-enemy: "&e%nation% 국가가 전쟁 영토 보호를 해제했습니다. 이제 진입이 가능합니다."
+  war-protection-expired: "&e전쟁 영토 보호 시간이 종료되었습니다."
+  war-protection-expired-enemy: "&e%nation% 국가의 전쟁 영토 보호 시간이 종료되었습니다."
+  war-entry-blocked: "&c전쟁 보호 중인 적국 영토에는 진입할 수 없습니다."
+  war-finished-winner: "&a전쟁 종료: %winner% 국가가 승리했습니다. 카르마: &e%karma%"
+  war-finished-loser: "&c전쟁 종료: %loser% 국가가 패배했습니다."
+  claim-nation-required: "&c파티 상태에서는 청크를 구매할 수 없습니다. 국가로 승급한 뒤 이용하세요."
+  claim-beacon-required: "&c국가 신호기를 먼저 설치해야 청크를 구매할 수 있습니다."
+  claim-adjacent-required: "&c새 청크는 기존 국가 땅에 상하좌우로 붙어 있어야 합니다."
+  claim-beacon-cannot-unclaim: "&c국가 신호기 청크는 해제할 수 없습니다. 국가 해산으로 처리하세요."
+  beacon-nation-leader-required: "&c국가장 또는 관리자만 국가 신호기를 설치할 수 있습니다."
+  beacon-placed: "&a국가 신호기가 설치되었습니다. &e%chunk%&a 청크가 &e%nation%&a 국가의 첫 땅이 되었습니다."
+  nation-beacon-given: "&a국가 신호기 1개를 지급했습니다. 설치한 청크가 국가의 첫 땅이 됩니다."
+  nation-pvp-on: "&c%nation% 국가 내부 PVP가 켜졌습니다."
+  nation-pvp-off: "&a%nation% 국가 내부 PVP가 꺼졌습니다."
+  nation-build-protection-on: "&a%nation% 국가 내부 건축 보호가 켜졌습니다."
+  nation-build-protection-off: "&e%nation% 국가 내부 건축 보호가 꺼졌습니다. 외부인도 설치/파괴할 수 있습니다."
+  nation-pvp-disabled: "&c이 국가 땅에서는 PVP가 꺼져 있습니다."
+  prefix: "&#8FD9A8[파티] &f"
+  no-permission: "&c권한이 없습니다."
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  player-not-found: "&c플레이어를 찾을 수 없습니다."
+  reloaded: "&aLeeSeolTown 설정을 다시 불러왔습니다."
+  town-created: "&a파티를 만들었습니다: &e%party% &7(최대 4명)"
+  town-exists: "&c이미 같은 이름의 파티가 있습니다."
+  already-in-town: "&c이미 하나의 파티에 소속되어 있어 새 파티 생성/참여가 불가능합니다."
+  not-in-town: "&c소속된 파티가 없습니다."
+  not-town-leader: "&c파티 대표만 사용할 수 있습니다."
+  not-nation-leader: "&c국가 수도 파티의 대표만 사용할 수 있습니다."
+  invite-sent: "&a%player%님을 파티에 초대했습니다."
+  invited: "&e%party%&f 파티에서 초대가 왔습니다."
+  invite-accept-button: "&#8FD9A8[수락]"
+  invite-accept-hover: "&f클릭해서 &e%party%&f 파티에 참가합니다."
+  invite-deny-button: "&#FF9AA2[거절]"
+  invite-deny-hover: "&f클릭해서 &e%party%&f 파티 초대를 거절합니다."
+  invite-denied: "&c%party% 파티 초대를 거절했습니다."
+  no-invite: "&c그 파티에서 받은 초대가 없습니다."
+  joined: "&a%party% 파티에 가입했습니다."
+  party-joined: "&a%player%님이 %party% 파티에 가입했습니다."
+  party-full: "&c파티는 최대 %count%명까지만 가입할 수 있습니다."
+  left: "&a파티에서 탈퇴했습니다."
+  party-left-broadcast: "&e%player%님이 %party% 파티에서 나갔습니다."
+  leader-cannot-leave: "&c파티 대표는 /party disband로 파티를 해산해야 합니다."
+  disbanded: "&c파티를 해산했습니다: &e%party%"
+  disband-town-warning: "&c정말 &e%name%&c 파티를 해산할까요? &7%seconds%초 안에 &e%command%&7 를 한 번 더 입력하면 해산됩니다."
+  party-member-not-found: "&c파티원을 찾을 수 없습니다: &e%player%"
+  party-transfer-self: "&c자기 자신에게 파티장 권한을 위임할 수 없습니다."
+  party-transfer-warning: "&c정말 &e%name%&c 님에게 파티장 권한을 위임할까요? &7%seconds%초 안에 &e%command%&7 를 한 번 더 입력하면 위임됩니다."
+  party-transfer-done: "&a%player%님이 %party% 파티장이 되었습니다."
+  party-kick-self: "&c자기 자신을 추방할 수 없습니다. 파티를 나가려면 /party leave 를 사용하세요."
+  party-kicked: "&c%player%님이 %party% 파티에서 추방되었습니다."
+  party-kick-target: "&c%party% 파티에서 추방되었습니다."
+  recognized-required: "&c정식 파티는 최소 %count%명 이상이어야 합니다."
+  claim-bought: "&a청크를 구매했습니다. 비용: &e%cost%"
+  claim-owned: "&c이미 다른 파티가 소유한 청크입니다."
+  claim-not-owned: "&c이 청크는 당신의 파티 소유가 아닙니다."
+  claim-removed: "&a청크 소유를 해제했습니다."
+  not-enough-money: "&c청크 구매 비용이 부족합니다. 필요 금액: &e%cost%"
+  economy-missing: "&c경제 플러그인과 연결되지 않아 구매할 수 없습니다."
+  protected: "&c이 땅은 &e%town%&c 파티 소유입니다."
+  nation-created: "&a국가를 세웠습니다: &e%nation% &7(%type%, 인원 %members%명, 예상 유지세 %tax%)"
+  nation-disbanded: "&c국가를 해산했습니다: &e%nation%"
+  disband-nation-warning: "&c정말 &e%name%&c 국가를 해산할까요? &7%seconds%초 안에 &e%command%&7 를 한 번 더 입력하면 해산됩니다."
+  federation-created: "&a연방을 세웠습니다: &e%nation%"
+  federation-requirements: "&c연방 조건: 파티 %towns%개 이상, 총 인원 %members%명 이상."
+  nation-member-required: "&c국가 인정은 총 인원 %count%명 이상부터 가능합니다."
+  nation-extra-party-admin-only: "&c다른 파티를 묶어 국가를 만드는 기능은 현재 관리자만 사용할 수 있습니다."
+  party-already-in-nation: "&c이미 국가에 소속된 파티입니다: &e%party%"
+  already-in-nation: "&c이미 국가에 소속되어 있습니다."
+  town-not-found: "&c파티를 찾을 수 없습니다: &e%town%"
+  nation-not-found: "&c국가를 찾을 수 없습니다."
+  chat-mode: "&a채팅 모드: &e%mode%"
+  chat-no-town: "&c파티 채팅을 사용하려면 파티에 소속되어 있어야 합니다."
+  chat-no-nation: "&c국가 채팅을 사용하려면 국가에 소속되어 있어야 합니다."

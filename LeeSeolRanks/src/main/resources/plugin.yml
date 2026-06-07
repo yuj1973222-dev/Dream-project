@@ -1,0 +1,62 @@
+name: LeeSeolRanks
+version: 0.1.0
+main: me.leeseol.ranks.LeeSeolRanksPlugin
+api-version: '26.1.2'
+description: Shared rank system for LeeSeol Network.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - PlaceholderAPI
+  - LuckPerms
+  - Vault
+commands:
+  rank:
+    description: Shows player rank information.
+    usage: /rank [player|up]
+    aliases:
+      - ranks
+  rankup:
+    description: Promotes yourself when the next rank condition is complete.
+    usage: /rankup
+  leeseolrank:
+    description: Admin rank management command.
+    usage: /leeseolrank <status|reload|set|dev>
+    aliases:
+      - lsrank
+permissions:
+  leeseolranks.use:
+    description: Allows using player rank commands.
+    default: true
+  leeseolranks.admin:
+    description: Allows managing LeeSeol ranks.
+    default: op
+  leeseolranks.bypass.requirements:
+    description: Bypasses rankup requirements.
+    default: op
+  leeseolranks.dev:
+    description: Dev permission for future BetterRanks/resource features.
+    default: false
+  leeseolranks.rank.player:
+    description: Current rank PLAYER.
+    default: false
+  leeseolranks.rank.s:
+    description: Current rank S.
+    default: false
+  leeseolranks.rank.a:
+    description: Current rank A.
+    default: false
+  leeseolranks.rank.b:
+    description: Current rank B.
+    default: false
+  leeseolranks.rank.c:
+    description: Current rank C.
+    default: false
+  leeseolranks.rank.d:
+    description: Current rank D.
+    default: false
+  leeseolranks.rank.admin:
+    description: Current rank ADMIN.
+    default: false
+  leeseolranks.rank.dev:
+    description: Current rank DEV.
+    default: false

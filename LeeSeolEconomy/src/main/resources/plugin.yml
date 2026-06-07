@@ -1,0 +1,44 @@
+name: LeeSeolEconomy
+version: 0.1.0
+main: me.leeseol.economy.LeeSeolEconomyPlugin
+api-version: '26.1.2'
+description: Shared won economy, shop NPCs, and server menu for LeeSeol Network.
+author: lee_seol
+depend:
+  - Vault
+softdepend:
+  - Essentials
+load: POSTWORLD
+commands:
+  won:
+    description: Shows and manages won balances.
+    usage: /won
+  shop:
+    description: Opens a LeeSeol shop GUI.
+    usage: /shop [shop]
+  wonnpc:
+    description: Manages economy shop NPCs.
+    usage: /wonnpc <create|remove|list>
+    permission: leeseoleconomy.admin
+  servermenu:
+    description: Opens the server movement menu.
+    usage: /servermenu
+  leeseolmenu:
+    description: Bridge commands for custom GUI menu actions.
+    usage: /leeseolmenu <open|move|shop|auction|dungeon>
+permissions:
+  leeseoleconomy.admin:
+    description: Allows economy administration.
+    default: op
+  leeseoleconomy.shop:
+    description: Allows opening shop GUIs.
+    default: true
+  leeseoleconomy.pay:
+    description: Allows sending money to another player.
+    default: true
+  leeseoleconomy.servermenu:
+    description: Allows opening the Shift+F server menu.
+    default: true
+  leeseoldungeon.menu-bypass:
+    description: Allows using the server menu inside restricted dungeon worlds.
+    default: false

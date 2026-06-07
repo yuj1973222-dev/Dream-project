@@ -1,0 +1,25 @@
+name: LeeSeolCombat
+version: 0.1.0
+main: me.leeseol.combat.LeeSeolCombatPlugin
+api-version: '26.1.2'
+description: PvP combat tag and Citizens-based logout clone system for LeeSeol Network.
+author: lee_seol
+depend:
+  - Citizens
+softdepend:
+  - PlaceholderAPI
+  - LeeSeolTown
+load: POSTWORLD
+commands:
+  leeseolcombat:
+    description: LeeSeol combat system command.
+    usage: /leeseolcombat <status|reload|force|spectatorclone|pvp|pvppoints>
+    aliases:
+      - combat
+permissions:
+  leeseolcombat.admin:
+    description: Allows reloading LeeSeolCombat.
+    default: op
+  leeseolcombat.bypass:
+    description: Bypasses combat tag and logout clone rules.
+    default: false

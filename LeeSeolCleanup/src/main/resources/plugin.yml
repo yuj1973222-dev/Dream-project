@@ -1,0 +1,20 @@
+name: LeeSeolCleanup
+version: 0.1.0
+main: me.leeseol.cleanup.LeeSeolCleanupPlugin
+api-version: '26.1.2'
+description: Periodic dropped item cleanup for LeeSeol survival and dungeon worlds.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - PlaceholderAPI
+commands:
+  leeseolcleanup:
+    description: LeeSeol item cleanup command.
+    usage: /leeseolcleanup <status|run|reload>
+    aliases:
+      - cleanup
+      - itemcleanup
+permissions:
+  leeseolcleanup.admin:
+    description: Allows managing the item cleanup system.
+    default: op

@@ -1,0 +1,35 @@
+name: LeeSeolQuest
+version: 0.1.0
+main: me.leeseol.quest.LeeSeolQuestPlugin
+api-version: '1.21'
+description: Tutorial and quest progression system for expedition.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - PlaceholderAPI
+  - Vault
+  - Citizens
+
+commands:
+  quest:
+    description: Open quest UI or manage your active quest.
+    usage: /quest [start|progress|abandon]
+    aliases:
+      - quests
+  tutorial:
+    description: Start or skip the tutorial quest.
+    usage: /tutorial [start|skip|reset]
+  lsquest:
+    description: Admin quest management command.
+    usage: /lsquest <reload|set|advance|objective|reset>
+
+permissions:
+  leeseolquest.use:
+    description: Allows using player quest commands.
+    default: true
+  leeseolquest.admin:
+    description: Allows managing LeeSeol quests.
+    default: op
+  leeseolquest.bypass:
+    description: Allows bypassing quest restrictions.
+    default: op

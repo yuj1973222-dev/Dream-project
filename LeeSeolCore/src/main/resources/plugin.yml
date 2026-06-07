@@ -1,0 +1,27 @@
+name: LeeSeolCore
+version: 0.1.0
+main: me.leeseol.core.LeeSeolCorePlugin
+api-version: '26.1.2'
+description: Core features for LeeSeol's Minecraft network.
+author: lee_seol
+softdepend:
+  - WorldEdit
+commands:
+  serverinfo:
+    description: Shows simple server information.
+    usage: /serverinfo
+  lscore:
+    description: Manages LeeSeolCore.
+    usage: /lscore reload
+    permission: leeseolcore.admin
+  leeseolcore:
+    description: Manages LeeSeolCore.
+    usage: /leeseolcore reload
+    permission: leeseolcore.admin
+permissions:
+  leeseolcore.admin:
+    description: Allows LeeSeolCore admin commands.
+    default: op
+  leeseolcore.dimension.bypass:
+    description: Allows bypassing dimension portal restrictions.
+    default: false

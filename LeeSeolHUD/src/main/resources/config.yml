@@ -1,0 +1,75 @@
+settings:
+  enabled: true
+  save-preferences: true
+
+storage:
+  # 비워두면 plugins/LeeSeolHUD/preferences.yml 파일을 사용합니다.
+  data-file: ""
+
+compass:
+  enabled: true
+  worlds:
+    - world
+    - world_nether
+    - dungeon
+  update-ticks: 1
+  default-enabled: true
+  bossbar:
+    color: WHITE
+    style: SOLID
+    progress: 0.0
+  image:
+    enabled: true
+    # 0도부터 355도까지 5도 단위 glyph를 사용합니다. 숫자/방위 표기는 이미지 안에서 15도 단위입니다.
+    base-codepoint: 58176
+    step-degrees: 5
+    glyph-segments: 16
+    show-fallback-text: false
+  format: "%glyph%"
+  fallback-format: "&b%compass% &7| &f%yaw%°"
+
+target-health:
+  # 기존 대상 체력 BossBar는 요청 방향과 달라 기본 정지합니다.
+  enabled: false
+  worlds:
+    - world
+    - world_nether
+    - dungeon
+  show-seconds: 5
+  default-enabled: true
+  bossbar:
+    color-high: GREEN
+    color-mid: YELLOW
+    color-low: RED
+    style: SEGMENTED_10
+  format: "&c%target% &f%health%/%max_health%"
+  ignore-citizens-npcs: true
+
+below-name-health:
+  enabled: true
+  bar-length: 10
+  full-char: "█"
+  empty-char: "█"
+  full-color: "&c"
+  empty-color: "&8"
+  heart-symbol: "❤"
+  text-color: "&f"
+  format: "&c%heart% &f%health%/%max_health%%heal%"
+  healing:
+    enabled: true
+    duration-ticks: 60
+    format: " %color%+%amount%"
+    color-high: "&a"
+    color-mid: "&2"
+    color-low: "&7"
+
+messages:
+  prefix: "&7[&bHUD&7] "
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  no-permission: "&c권한이 없습니다."
+  status: "&f나침반 &e%compass% &7/ &f대상 체력바 &e%target%"
+  compass-on: "&a나침반 HUD를 켰습니다."
+  compass-off: "&c나침반 HUD를 껐습니다."
+  target-on: "&a대상 체력바 HUD를 켰습니다."
+  target-off: "&c대상 체력바 HUD를 껐습니다."
+  reloaded: "&aLeeSeolHUD 설정을 다시 불러왔습니다."

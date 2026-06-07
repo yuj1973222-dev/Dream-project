@@ -1,0 +1,85 @@
+server-name: "LeeSeol Server"
+welcome-message-enabled: false
+welcome-message: "&aWelcome, {player}."
+
+enabled-worlds:
+  - lobby
+
+respawn-to-lobby:
+  enabled: true
+  target-server: "lobby"
+  delay-ticks: 20
+  message: "&b로비에서 다시 시작합니다."
+
+dimension-gate:
+  enabled: false
+  # disabled, lobby, survival
+  mode: "disabled"
+  bypass-permission: "leeseolcore.dimension.bypass"
+  survival:
+    main-worlds:
+      - "world"
+    nether-worlds:
+      - "world_nether"
+    dungeon-worlds:
+      - "dungeon"
+  messages:
+    lobby-blocked: "&c로비에서는 다른 차원으로 이동할 수 없습니다."
+    end-blocked: "&c서바이벌에서는 엔더 차원으로 이동할 수 없습니다."
+    dungeon-blocked: "&c던전 월드에서는 다른 차원으로 이동할 수 없습니다."
+    nether-blocked: "&c이 월드에서는 네더 차원으로 이동할 수 없습니다."
+
+portal-triggers:
+  enabled: true
+  portals:
+    lobby_to_survival:
+      world: lobby
+      min:
+        x: 10
+        y: 64
+        z: 10
+      max:
+        x: 14
+        y: 68
+        z: 14
+      cooldownSeconds: 3
+      actions:
+        - type: message
+          value: "&a야생 서버로 이동합니다."
+        - type: sound
+          value: "ENTITY_ENDERMAN_TELEPORT"
+        - type: velocity-server
+          target: survival
+
+    test_command_portal:
+      world: lobby
+      min:
+        x: 20
+        y: 64
+        z: 20
+      max:
+        x: 22
+        y: 66
+        z: 22
+      cooldownSeconds: 5
+      actions:
+        - type: console-command
+          command: "say %player% entered test_command_portal"
+        - type: player-command
+          command: "spawn"
+
+launch-pads:
+  enabled: true
+  pads:
+    lobby_spawn_jump:
+      world: lobby
+      x: 0
+      y: 65
+      z: 0
+      block: LIGHT_WEIGHTED_PRESSURE_PLATE
+      forward: 1.8
+      upward: 1.2
+      cooldownSeconds: 1
+      message: "&b점프!"
+      sound: "ENTITY_FIREWORK_ROCKET_LAUNCH"
+      particle: "CLOUD"

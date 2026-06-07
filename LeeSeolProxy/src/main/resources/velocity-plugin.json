@@ -1,0 +1,10 @@
+{
+  "id": "leeseolproxy",
+  "name": "LeeSeolProxy",
+  "version": "0.1.0",
+  "main": "me.leeseol.proxy.LeeSeolProxyPlugin",
+  "description": "Custom Velocity commands for LeeSeol's Minecraft network.",
+  "authors": [
+    "lee_seol"
+  ]
+}

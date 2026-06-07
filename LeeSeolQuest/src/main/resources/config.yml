@@ -1,0 +1,48 @@
+settings:
+  data-file: "/opt/minecraft/shared/quests/data.yml"
+  auto-start-tutorial: true
+  allow-tutorial-skip: true
+
+messages:
+  prefix: "&b[퀘스트] "
+  no-permission: "&c권한이 없습니다."
+  reloaded: "&aLeeSeolQuest 설정을 다시 불러왔습니다."
+  unknown-quest: "&c존재하지 않는 퀘스트입니다: &f%quest%"
+  already-active: "&c이미 진행 중인 퀘스트가 있습니다: &f%quest%"
+  already-completed: "&e이미 완료한 퀘스트입니다: &f%quest%"
+  started: "&a퀘스트를 시작했습니다: &f%quest%"
+  abandoned: "&e퀘스트를 포기했습니다: &f%quest%"
+  no-active: "&7진행 중인 퀘스트가 없습니다."
+  progress: "&f%quest% &7- &f%stage%단계 &7진행도: &b%progress%&7/&b%required%"
+  stage-complete: "&a퀘스트 단계 완료: &f%quest% &7%stage%단계"
+  completed: "&6퀘스트 완료: &f%quest%"
+  reward-money: "&a보상으로 &f%amount%원&a을 받았습니다."
+  admin-set: "&a%player%의 퀘스트 단계를 설정했습니다."
+  admin-reset: "&a%player%의 퀘스트 데이터를 초기화했습니다."
+  tutorial-skipped: "&e튜토리얼을 스킵했습니다."
+
+quests:
+  tutorial_start:
+    display-name: "첫 여정"
+    auto-start: true
+    stages:
+      1:
+        message: "&b/quest 명령어로 퀘스트 창을 열어보세요."
+        objective:
+          type: open-gui
+          target: quest
+          amount: 1
+      2:
+        message: "&b야생에서 석탄 원석을 3개 캐보세요."
+        objective:
+          type: mine-block
+          material: COAL_ORE
+          amount: 3
+      3:
+        message: "&b낚시에 한 번 성공해보세요."
+        objective:
+          type: fish
+          amount: 1
+    rewards:
+      money: 1000
+      commands: []

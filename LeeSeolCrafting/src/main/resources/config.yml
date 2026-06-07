@@ -1,0 +1,107 @@
+settings:
+  enabled: true
+  allowed-worlds:
+    - world
+  log-success: false
+
+gui:
+  crafting:
+    title: "&0제작대"
+    size: 54
+  processing:
+    title: "&0가공"
+    size: 54
+  disassemble:
+    title: "&0분해"
+    size: 54
+  confirm:
+    title: "&0제작 확인"
+    size: 27
+  repair:
+    title: "&0수리"
+    size: 27
+
+failure:
+  consume-money: true
+  consume-materials: true
+
+repair:
+  enabled: true
+  block-vanilla-anvil-repair: false
+  base-cost: 1000
+  cost-per-damage: 15
+  max-cost: 100000
+  allowed-types:
+    - SWORD
+    - AXE
+    - PICKAXE
+    - SHOVEL
+    - HOE
+    - HELMET
+    - CHESTPLATE
+    - LEGGINGS
+    - BOOTS
+
+recipes:
+  iron_pickaxe_basic:
+    type: crafting
+    display-name: "&f초급 철 곡괭이"
+    required-rank: PLAYER
+    cost: 5000
+    success-rate: 1.0
+    inputs:
+      - material: IRON_INGOT
+        amount: 3
+      - material: STICK
+        amount: 2
+    result:
+      material: IRON_PICKAXE
+      amount: 1
+      name: "&f초급 철 곡괭이"
+      lore:
+        - "&7기본 제작 장비"
+
+  raw_iron_processing:
+    type: processing
+    display-name: "&f원철 가공"
+    required-rank: PLAYER
+    cost: 100
+    success-rate: 1.0
+    inputs:
+      - material: RAW_IRON
+        amount: 1
+    result:
+      material: IRON_INGOT
+      amount: 1
+
+  iron_tool_disassemble:
+    type: disassemble
+    display-name: "&f철 도구 분해"
+    required-rank: PLAYER
+    cost: 0
+    success-rate: 1.0
+    inputs:
+      - material: IRON_PICKAXE
+        amount: 1
+    result:
+      material: IRON_NUGGET
+      amount: 9
+
+messages:
+  prefix: "&7[&b제작&7] "
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  no-permission: "&c권한이 없습니다."
+  disabled: "&c제작 시스템이 비활성화되어 있습니다."
+  world-blocked: "&c이 월드에서는 제작 시스템을 사용할 수 없습니다."
+  unknown-recipe: "&c존재하지 않는 레시피입니다."
+  not-enough-money: "&c돈이 부족합니다. 필요 금액: %amount%원"
+  missing-materials: "&c재료가 부족합니다."
+  inventory-full: "&c인벤토리 공간이 부족합니다."
+  rank-blocked: "&c이 레시피는 %rank% 랭크 이상만 사용할 수 있습니다."
+  craft-success: "&a%recipe% 제작에 성공했습니다."
+  craft-failed: "&c%recipe% 제작에 실패했습니다."
+  repair-disabled: "&c수리 시스템이 비활성화되어 있습니다."
+  repair-invalid: "&c손에 수리 가능한 손상 장비를 들어주세요."
+  repair-success: "&a수리 완료. 비용: %cost%원"
+  reloaded: "&aLeeSeolCrafting 설정을 다시 불러왔습니다."
+  status: "&f레시피: &b%recipes%개"

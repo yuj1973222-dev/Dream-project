@@ -1,0 +1,38 @@
+world: world
+
+spawn:
+  use-world-spawn: true
+  x: 0.5
+  y: 64.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+  teleport-delay-ticks: 5
+
+rules:
+  force-peaceful: true
+  force-adventure: true
+  prevent-block-break: true
+  prevent-block-place: true
+  prevent-damage: true
+  prevent-hunger: true
+  prevent-mob-spawning: true
+  disable-pvp: true
+
+tab-header:
+  enabled: true
+  interval-ticks: 40
+  # Uses assets/minecraft/font/default.json from the shared network resource pack.
+  logo-font: "minecraft:default"
+  logo-glyph: "\\uE301"
+  logo-leading-lines: 4
+  logo-trailing-spaces: 0
+  logo-ping-gap-lines: 2
+  ping-label: "PING : "
+  ping-color: "#87DFFF"
+  footer: "\uC628\uB77C\uC778 \uC811\uC18D\uC790 : "
+  footer-color: "#D8C6A3"
+  max-display-players: 500
+messages:
+  build-denied: "&c로비에서는 블록을 변경할 수 없습니다."
+  spawn-set: "&a로비 스폰 위치를 현재 위치로 저장했습니다."

@@ -1,0 +1,40 @@
+name: LeeSeolTown
+version: 0.1.0
+main: me.leeseol.town.LeeSeolTownPlugin
+api-version: '26.1.2'
+description: Party, nation, claim, and chat system for LeeSeol Network.
+author: lee_seol
+softdepend:
+  - Vault
+  - LeeSeolEconomy
+  - PlaceholderAPI
+load: POSTWORLD
+commands:
+  town:
+    description: Manages parties, nations, claims, and chat.
+    usage: /party
+    aliases:
+      - party
+      - village
+      - towny
+  tc:
+    description: Sends or toggles party chat.
+    usage: /tc [message]
+    aliases:
+      - pc
+  nc:
+    description: Sends or toggles nation chat.
+    usage: /nc [message]
+permissions:
+  leeseoltown.use:
+    description: Allows using basic town commands.
+    default: true
+  leeseoltown.claim:
+    description: Allows claiming chunks for a recognized party.
+    default: true
+  leeseoltown.chat:
+    description: Allows using party and nation chat.
+    default: true
+  leeseoltown.admin:
+    description: Allows administrating LeeSeolTown.
+    default: op

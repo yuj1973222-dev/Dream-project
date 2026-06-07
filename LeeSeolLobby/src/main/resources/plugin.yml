@@ -1,0 +1,20 @@
+name: LeeSeolLobby
+version: 0.1.0
+main: me.leeseol.lobby.LeeSeolLobbyPlugin
+api-version: '1.21'
+author: LeeSeol
+description: Lobby protection and spawn control for the LeeSeol network.
+
+commands:
+  lobbysetspawn:
+    description: Set the fixed lobby spawn to your current position.
+    usage: /lobbysetspawn
+    permission: leeseollobby.admin
+
+permissions:
+  leeseollobby.admin:
+    description: Allows managing lobby settings.
+    default: op
+  leeseollobby.bypass:
+    description: Allows bypassing lobby build and gamemode protection.
+    default: op
