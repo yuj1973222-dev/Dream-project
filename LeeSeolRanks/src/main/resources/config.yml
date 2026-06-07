@@ -15,6 +15,9 @@ staff:
 rank-up:
   # PLAYER -> D -> C -> B -> A -> S 순서로 승급합니다.
   # 조건을 채운 뒤 /rankup 또는 /rank up 명령어를 직접 입력해야 승급합니다.
+  # false면 money는 보유 조건이며 승급 시 차감하지 않습니다.
+  # true면 승급 성공 시 해당 랭크의 money 금액을 차감합니다.
+  consume-money: false
   thresholds:
     D: 10
     C: 20
@@ -55,6 +58,8 @@ messages:
   rank-up-ready: "&a승급 조건을 채웠습니다. &e/rankup&a 으로 &e%rank%&a 랭크에 승급할 수 있습니다."
   rank-up-not-ready: "&c아직 승급할 수 없습니다. &7%rank% 승급 조건: &e%kills%/%required%"
   rank-up: "&a랭크가 &e%rank%&a로 승급되었습니다. 킬 카운트가 초기화되었습니다."
+  rank-up-money-consumed: "&7승급 비용으로 &e%amount%원&7을 사용했습니다."
+  rank-up-money-withdraw-failed: "&c승급 비용 &e%amount%원&c을 차감하지 못했습니다. 잔액을 다시 확인해주세요."
   set-rank: "&f%player%의 랭크를 &e%rank%&f로 설정했습니다."
   dev-on: "&f%player%에게 &bDEV 랭크&f를 부여했습니다."
   dev-off: "&f%player%의 랭크를 &ePLAYER&f로 변경했습니다."

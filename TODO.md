@@ -2,6 +2,56 @@
 
 Deferred work. Keep this list short and move completed items out.
 
+## Current Operating Direction
+
+This main operations chat should keep the server direction aligned in this order:
+
+1. Balance: economy, progression, PvP risk, rank requirements, item value, and reward
+   loops.
+2. Server features / plugins: only implement or verify features that support the
+   current balance direction.
+3. Additional items / content: add new item sources after the value loop is clear.
+4. Design / GUI / resource pack: polish after the gameplay direction is stable, unless
+   a visual issue blocks testing.
+
+## Balance First
+
+Current priority: establish a stable survival balance baseline before adding more
+content or doing broad design polish.
+
+- Baseline reference: `BALANCE_BASELINE.md`.
+- Economy loop:
+  - Measure `LeeSeolJobs` mining, farming, and fishing income with a real player.
+  - Review daily limits, cooldowns, and shop/NPC shop prices against expected play
+    time.
+  - Confirm auction flow does not create money or bypass item-value assumptions.
+- Progression loop:
+  - Review `LeeSeolRanks` rank-up requirements against Jobs income, combat rewards,
+    and expected playtime.
+  - Review `LeeSeolCrafting` costs, processing value, disassembly value, and repair
+    costs against vanilla anvil repair.
+  - Decide which Quest rewards should be progression helpers instead of major money
+    sources.
+- PvP / combat loop:
+  - Decide the first AdvancedEnchantments safety patch before opening serious PvP.
+  - Verify `LeeSeolCombat` PVP points and trophy drops with two players.
+  - Keep same-affiliation reward suppression enabled unless nation-war rules require
+    a different design.
+- Item and loot value:
+  - Do not add major new custom items until the base economy and rank progression are
+    measured.
+  - Dungeon loot tables should be configured after item value tiers are decided.
+  - AdvancedEnchantments EXP-book access should be treated as part of item/value
+    inflation, not only as a combat feature.
+
+Next balance decisions:
+
+1. Define target income ranges for early, mid, and late survival play.
+2. Define rank-up cost/time targets for the current rank ladder.
+3. Decide the minimum safe AdvancedEnchantments restrictions for PvP.
+4. Decide whether Jobs/Crafting/Ranks should be tuned first or whether PvP-risk
+   enchants should be restricted first.
+
 ## Infrastructure
 
 - Back up VM server files to the PC D drive while preserving server folder structure.

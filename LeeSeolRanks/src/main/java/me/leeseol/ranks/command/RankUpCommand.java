@@ -45,6 +45,19 @@ public final class RankUpCommand implements CommandExecutor {
             return true;
         }
 
+        long moneyRequired = plugin.rankRequirementService().moneyRequired(next);
+        if (!player.hasPermission("leeseolranks.bypass.requirements")
+                && plugin.rankRequirementService().consumeMoneyOnRankUp()
+                && moneyRequired > 0L) {
+            if (!plugin.rankRequirementService().withdrawRankUpMoney(player, next)) {
+                plugin.message(player, "rank-up-money-withdraw-failed",
+                        "%amount%", plugin.rankRequirementService().moneyText(moneyRequired));
+                return true;
+            }
+            plugin.message(player, "rank-up-money-consumed",
+                    "%amount%", plugin.rankRequirementService().moneyText(moneyRequired));
+        }
+
         data.setRank(next);
         data.setKills(0);
         plugin.rankStore().save();

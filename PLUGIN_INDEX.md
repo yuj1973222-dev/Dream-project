@@ -68,17 +68,18 @@ context for normal work.
 
 ## Current Plugin-Part Priority
 
-1. Verify `LeeSeolQuest` with an online player: GUI, survival PlaceholderAPI, shared
-   progress, `server-menu` open objective progress, and restart persistence. Lobby
-   PlaceholderAPI for `lee_seol` passed on 2026-06-08.
-2. Verify cross-plugin Quest hooks with an online player:
-   `craft-item` from `LeeSeolCrafting`, `earn-money` from `LeeSeolJobs`, and
-   `rank-up` from `LeeSeolRanks`.
-3. Verify `LeeSeolJobs` with an online player: mine, harvest, fish, daily limit,
-   stats, and Quest `earn-money` progress.
-4. Verify `LeeSeolCrafting` with an online player: GUI open, craft/process/disassemble,
-   repair, money/material consumption, and Quest `craft-item` progress.
-5. Verify `LeeSeolHUD` with an online player: join compass BossBar, `/hud` toggles,
-   target health BossBar, and world-change cleanup.
-6. Verify `LeeSeolCombat` PVP rewards with two online players: point award, trophy
-   drop, repeat cooldown, same-affiliation suppression, and admin point adjustment.
+1. Balance pass first: use `LeeSeolEconomy`, `LeeSeolJobs`, `LeeSeolCrafting`,
+   `LeeSeolRanks`, `LeeSeolCombat`, and AdvancedEnchantments data to establish a
+   survival economy/progression/PvP baseline before broad feature or design work.
+2. Measure live player loops needed for balance: Jobs mining/farming/fishing income,
+   Crafting material and money consumption, Rank progress requirements, Quest reward
+   impact, and Combat PVP rewards.
+3. Decide the first AdvancedEnchantments safety patch from
+   `ADVANCED_ENCHANTMENTS_BALANCE_REVIEW.md` before opening serious PvP or adding new
+   high-value loot sources.
+4. Tune economy/progression in this order unless the user changes direction:
+   Jobs income and limits, Crafting costs and repair, Rank requirements, Quest
+   rewards, then auction/shop value assumptions.
+5. Keep player-online verification active, but treat it as balance measurement rather
+   than the main goal: Quest GUI/hooks, Jobs payouts, Crafting flows, Ranks rank-up,
+   HUD display, and Combat rewards still need real-player checks.

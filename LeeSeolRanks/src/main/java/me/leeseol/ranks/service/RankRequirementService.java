@@ -8,6 +8,7 @@ import me.leeseol.ranks.LeeSeolRanksPlugin;
 import me.leeseol.ranks.model.Rank;
 import me.leeseol.ranks.model.RankData;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -62,6 +63,35 @@ public final class RankRequirementService {
             return Math.max(0, plugin.getConfig().getInt(path, 0));
         }
         return Math.max(1, plugin.getConfig().getInt("rank-up.thresholds." + rank.name(), defaultThreshold(rank)));
+    }
+
+    public boolean consumeMoneyOnRankUp() {
+        return plugin.getConfig().getBoolean("rank-up.consume-money", false);
+    }
+
+    public long moneyRequired(Rank rank) {
+        return requirementLong(rank, "money", 0L);
+    }
+
+    public boolean withdrawRankUpMoney(Player player, Rank targetRank) {
+        long moneyRequired = moneyRequired(targetRank);
+        if (!consumeMoneyOnRankUp() || moneyRequired <= 0L) {
+            return true;
+        }
+        if (economy == null) {
+            return false;
+        }
+        EconomyResponse response = economy.withdrawPlayer(player, moneyRequired);
+        if (!response.transactionSuccess()) {
+            plugin.getLogger().warning("Failed to withdraw rank-up money from "
+                    + player.getName() + ": " + response.errorMessage);
+            return false;
+        }
+        return true;
+    }
+
+    public String moneyText(double amount) {
+        return money(amount);
     }
 
     private long requirementLong(Rank rank, String key, long fallback) {
