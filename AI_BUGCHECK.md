@@ -28,9 +28,12 @@ or Velocity forwarding secrets.
 ## Useful Commands
 
 ```powershell
-& 'C:\Program Files\Git\cmd\git.exe' log --oneline -10
-& 'C:\Program Files\Git\cmd\git.exe' diff -- LeeSeolQuest
-& 'C:\Program Files\Git\cmd\git.exe' diff -- LeeSeolEconomy/src/main/java
+git log --oneline -10
+git diff -- LeeSeolQuest
+git diff -- LeeSeolEconomy/src/main/java
+.\tools\local-env-check.ps1
+.\tools\build-plugin.ps1 LeeSeolQuest -SkipTests
+.\tools\build-plugin.ps1 LeeSeolEconomy -SkipTests
 rg -n "ERROR|Exception|Could not load|LeeSeolQuest|LeeSeolEconomy" SERVER_STATE.md PLUGIN_INDEX.md TODO.md
 ```
 
