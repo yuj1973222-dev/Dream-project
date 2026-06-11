@@ -69,6 +69,14 @@ architecture changes.
 ## World Model
 
 - Lobby is a separate Paper backend.
+  - Current lobby map: `TheTitansAttack - By Elysiumfire`, installed on
+    2026-06-11 from the user's ZIP as `/opt/minecraft/lobby/world`.
+  - First boot performed Paper world storage migration successfully and kept
+    `level-name=world`.
+  - Previous lobby world backup:
+    `/opt/minecraft/backups/lobby-map-replace-2026-06-11_21-43-37/world-before.tar.gz`
+  - `LeeSeolLobby` currently uses `spawn.use-world-spawn: true`, so player joins use
+    the imported map's world spawn unless `/lobbysetspawn` is run later.
 - Survival is a separate Paper backend.
 - Dungeon gameplay is not a Velocity backend.
 - Dungeon gameplay world is the internal Paper world `dungeon` inside the survival
