@@ -225,9 +225,13 @@ sudo ss -ltnp | grep -E '25565|25566|25567|25568|8163'
 - `LeeSeolJobs`
   - Deployed to survival only.
   - Shared jobs data file: `/opt/minecraft/shared/jobs/data.yml`
-  - Provides `/jobs` and `/lsjobs`.
-  - Current support: mining, farming, fishing rewards, Vault payout through
-    LeeSeolEconomy, daily limits, cooldowns, and placed-ore abuse guard.
+  - Provides `/jobs`, `/activity`, `/activities`, `/expedition`, `/explore`, and
+    admin `/lsjobs`.
+  - Current support: mining, farming, fishing, and exploration rewards, Vault payout
+    through LeeSeolEconomy, daily limits, cooldowns, and placed-ore abuse guard.
+  - Exploration currently rewards the first time a player enters each biome per day
+    in allowed survival worlds, using the same daily limit/rank multiplier/Quest
+    `earn-money` path as the other activity rewards.
   - Soft-integrates with `LeeSeolQuestApi#progress(...)` for `earn-money` objective
     progress when LeeSeolQuest is present.
 - `LeeSeolCrafting`

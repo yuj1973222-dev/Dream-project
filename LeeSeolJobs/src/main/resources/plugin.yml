@@ -2,7 +2,7 @@ name: LeeSeolJobs
 version: 0.1.0
 main: me.leeseol.jobs.LeeSeolJobsPlugin
 api-version: '26.1.2'
-description: Mining, farming, and fishing income loop for expedition survival.
+description: Activity and exploration income loop for expedition survival.
 author: lee_seol
 load: POSTWORLD
 softdepend:
@@ -12,8 +12,13 @@ softdepend:
   - LeeSeolRanks
 commands:
   jobs:
-    description: Show LeeSeolJobs player stats.
-    usage: /jobs [stats|top]
+    description: Show expedition activity stats.
+    usage: /activity [stats|top]
+    aliases:
+      - activity
+      - activities
+      - expedition
+      - explore
   lsjobs:
     description: Admin command for LeeSeolJobs.
     usage: /lsjobs <reload|stats|reset>

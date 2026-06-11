@@ -34,7 +34,7 @@ context for normal work.
 | `LeeSeolCleanup` | survival only | Dropped item cleanup timer | `LeeSeolCleanupPlugin.java`, `listener/`, `service/`, `config.yml`, `plugin.yml` | TAB footer timer expectations | `deploy-leeseolcleanup.sh`; restart `minecraft` only |
 | `LeeSeolRanks` | survival, lobby | Shared rank data, one-rank permissions, rankup requirements, PlaceholderAPI rank display, ADMIN/DEV staff permission sync | `LeeSeolRanksPlugin.java`, `model/Rank.java`, `service/RankRequirementService.java`, `storage/`, `command/`, `hook/`, `config.yml`, `plugin.yml` | LuckPerms, Vault/LeeSeolEconomy balance checks, LeeSeolQuest `rank-up` hook, TAB, BetterRanks font images, LeeSeolTown chat | restart `minecraft` and `lobby`; verify `LeeSeolRanks enabled`, `rank requirements`, `leeseolrank status` |
 | `LeeSeolQuest` | survival, lobby | Tutorial, daily/weekly operating pass, quest progression, quest GUI, shared quest data, PlaceholderAPI quest tracker placeholders, Bukkit quest events, lightweight external progress API | `LeeSeolQuestPlugin.java`, `service/QuestService.java`, `model/QuestResetPeriod.java`, `api/LeeSeolQuestApi.java`, `event/`, `storage/QuestStore.java`, `command/`, `listener/`, `gui/`, `config.yml`, `plugin.yml` | PlaceholderAPI, Vault command rewards through `won give`, Citizens NPC click metadata, Crafting/Jobs/Ranks hooks | `deploy-leeseolquest.sh`; restart `minecraft` and `lobby`; verify `LeeSeolQuest enabled`, `Loaded 6 quests`, `Done`, and `lsquest reload` |
-| `LeeSeolJobs` | survival only | Mining, farming, and fishing income loop with Vault payouts, daily limits, cooldowns, and placed-ore abuse guard | `LeeSeolJobsPlugin.java`, `service/`, `storage/JobsStore.java`, `listener/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | restart `minecraft`; verify `LeeSeolJobs enabled`, `Done`, `version LeeSeolJobs`, `lsjobs reload` |
+| `LeeSeolJobs` | survival only | Activity income loop for mining, farming, fishing, and daily biome exploration with Vault payouts, daily limits, cooldowns, and placed-ore abuse guard | `LeeSeolJobsPlugin.java`, `listener/ExplorationListener.java`, `service/`, `storage/JobsStore.java`, `listener/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | `deploy-leeseoljobs.sh`; restart `minecraft`; verify `LeeSeolJobs enabled`, `Done`, `version LeeSeolJobs`, `/activity` or `lsjobs reload` |
 | `LeeSeolCrafting` | survival only | Config-driven crafting, processing, disassembly, money-based repair GUI, and Quest `craft-item` hook | `LeeSeolCraftingPlugin.java`, `service/`, `gui/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | restart `minecraft`; verify `LeeSeolCrafting enabled`, `Done`, and `/lscrafting reload` when RCON/in-game access is available |
 | `LeeSeolHUD` | survival only | Image-based BossBar compass, HUD toggles, direct `/compasshud <on\|off>` command, and TAB below-name heart health display with fading heal suffixes | `LeeSeolHudPlugin.java`, `service/`, `listener/`, `hook/HudPlaceholderExpansion.java`, `command/`, `config.yml`, `plugin.yml` | PlaceholderAPI, TAB below-name objective, one-time ItemsAdder/resource-pack compass glyphs `U+E340`-`U+E7BF` and transparent WHITE BossBar sprites | restart `minecraft`; verify `LeeSeolHUD enabled`, `TAB enabled`, `Done`, `version LeeSeolHUD`, `lshud status`, resource-pack SHA, and in-game compass/health/heal display |
 
@@ -50,7 +50,7 @@ context for normal work.
 | DeluxeMenus survival/lobby | `/opt/minecraft/*/plugins/DeluxeMenus/` | Current Shift+F visual menu is PixieStudios `gui_menus/pixiestudios_gamemenu1.yml` plus the related 9 Pixie menus; patched clicks call `/leeseolmenu` for auction, shop, dungeon, and server movement. Survival menu titles intentionally use direct glyphs `U+F806 + U+E02F..U+E037` instead of `:pixiestudios_*:` tags because survival-side tag conversion failed to render the GUI image. |
 | Shared ranks | `/opt/minecraft/shared/ranks/ranks.yml` | Current expected records: `lee_seol=ADMIN`, `YamiyongO_o=DEV`. |
 | Shared quests | `/opt/minecraft/shared/quests/data.yml` | Shared lobby/survival quest progress for `LeeSeolQuest`. |
-| Shared jobs | `/opt/minecraft/shared/jobs/data.yml` | Survival-only Jobs statistics and daily reward totals. |
+| Shared jobs | `/opt/minecraft/shared/jobs/data.yml` | Survival-only activity statistics, daily reward totals, and daily rewarded exploration biomes. |
 | LuckPerms | MariaDB-backed | Avoid direct DB edits; prefer console commands or plugin sync. |
 
 ## Minimal Verification By Task
@@ -76,13 +76,13 @@ context for normal work.
 3. Balance pass third: use `LeeSeolEconomy`, `LeeSeolJobs`, `LeeSeolCrafting`,
    `LeeSeolRanks`, `LeeSeolCombat`, and AdvancedEnchantments data to tune the
    survival economy/progression/PvP baseline.
-4. Measure live player loops needed for balance: Jobs mining/farming/fishing income,
-   Crafting material and money consumption, Rank progress requirements, Quest reward
-   impact, and Combat PVP rewards.
+4. Measure live player loops needed for balance: activity mining/farming/fishing and
+   exploration income, Crafting material and money consumption, Rank progress
+   requirements, Quest reward impact, and Combat PVP rewards.
 5. Validate the first AdvancedEnchantments PvP safety patch from 2026-06-11 before
    opening serious PvP or adding new high-value loot sources.
 6. Tune economy/progression in this order unless the user changes direction:
-   Jobs income and limits, Crafting costs and repair, Rank requirements, Quest
+   activity income and limits, Crafting costs and repair, Rank requirements, Quest
    rewards, then auction/shop value assumptions.
 7. Keep player-online verification active, but treat it as balance measurement rather
    than the main goal: Quest GUI/hooks, Jobs payouts, Crafting flows, Ranks rank-up,

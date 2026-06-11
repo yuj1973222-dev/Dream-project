@@ -44,7 +44,8 @@ public final class JobsCommand implements CommandExecutor, TabCompleter {
             "stats",
             "%mining%", String.valueOf(stats.daily(JobType.MINING)),
             "%farming%", String.valueOf(stats.daily(JobType.FARMING)),
-            "%fishing%", String.valueOf(stats.daily(JobType.FISHING))
+            "%fishing%", String.valueOf(stats.daily(JobType.FISHING)),
+            "%exploration%", String.valueOf(stats.daily(JobType.EXPLORATION))
         );
     }
 }

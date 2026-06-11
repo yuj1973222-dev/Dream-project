@@ -17,6 +17,7 @@ daily-limits:
   mining: 50000
   farming: 30000
   fishing: 30000
+  exploration: 15000
 
 rank-multipliers:
   PLAYER: 1.0
@@ -68,14 +69,21 @@ fishing:
     default: 30
     treasure: 150
 
+exploration:
+  enabled: true
+  # Rewards the first time a player enters each biome per day.
+  cooldown-millis: 5000
+  rewards:
+    new-biome-daily: 600
+
 messages:
-  prefix: "&7[&a직업&7] "
+  prefix: "&7[&a활동&7] "
   player-only: "&c게임 안에서만 사용할 수 있습니다."
   no-permission: "&c권한이 없습니다."
-  reloaded: "&aLeeSeolJobs 설정을 다시 불러왔습니다."
+  reloaded: "&a활동 보상 설정을 다시 불러왔습니다."
   reward: "&f%type% 보상으로 &a%amount%원&f을 획득했습니다."
   daily-limit: "&c오늘 %type% 보상 한도에 도달했습니다."
-  stats: "&f오늘 보상 - 광질: &a%mining%원 &7/ 농사: &a%farming%원 &7/ 낚시: &a%fishing%원"
-  reset: "&a%player%의 Jobs 데이터를 초기화했습니다."
+  stats: "&f오늘 활동 보상 - 광질: &a%mining%원 &7/ 농사: &a%farming%원 &7/ 낚시: &a%fishing%원 &7/ 탐험: &a%exploration%원"
+  reset: "&a%player%의 활동 데이터를 초기화했습니다."
   player-not-found: "&c대상 유저를 찾을 수 없습니다."
   status: "&f등록 유저: &a%players%명"

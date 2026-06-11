@@ -6,6 +6,14 @@
 
 초반 플레이어가 광질, 농사, 낚시로 돈을 벌 수 있는 기본 경제 루프를 만든다.
 
+2026-06-11 방향 변경:
+
+- 플레이어가 고정 직업을 고르는 시스템으로 확장하지 않는다.
+- `LeeSeolJobs`는 이름은 유지하되 플레이어 경험은 `활동/탐험 보상`으로
+  재해석한다.
+- 목표는 마인크래프트 자유도를 낮추는 전직 시스템이 아니라, 오픈월드에서
+  실제로 한 행동을 자연스럽게 기록하고 보상하는 레이어다.
+
 목표 흐름:
 
 ```text
@@ -79,8 +87,9 @@ LeeSeolJobs/
 | 광질 보상 | 지정 광물 채굴 시 돈 지급 |
 | 농사 보상 | 완전히 자란 작물 수확 시 돈 지급 |
 | 낚시 보상 | 낚시 성공 시 돈 지급 |
+| 탐험 보상 | 허용 월드에서 오늘 처음 들어간 바이옴마다 돈 지급 |
 | 월드 제한 | `world`, `world_nether` 등 config 지정 |
-| 일일 보상 제한 | 직업별/플레이어별 하루 최대 지급액 |
+| 일일 보상 제한 | 활동별/플레이어별 하루 최대 지급액 |
 | 쿨다운 | 반복 이벤트 악용 방지 |
 | 랭크 배율 | D/C/B/A/S 랭크에 따른 보상 배율 |
 | 던전 제한 | `dungeon` 월드는 별도 설정 또는 보상 제외 |
@@ -91,7 +100,9 @@ LeeSeolJobs/
 
 | 명령어 | 권한 | 역할 |
 |---|---|---|
-| `/jobs` | `leeseoljobs.use` | 내 직업 통계 GUI 또는 요약 |
+| `/jobs` | `leeseoljobs.use` | 내 활동 통계 GUI 또는 요약 |
+| `/activity` | `leeseoljobs.use` | `/jobs`의 플레이어용 활동 별칭 |
+| `/expedition` | `leeseoljobs.use` | `/jobs`의 탐험/활동 별칭 |
 | `/jobs stats` | `leeseoljobs.use` | 내 보상/일일 제한 확인 |
 | `/jobs top` | `leeseoljobs.use` | 누적 보상 순위 |
 | `/lsjobs reload` | `leeseoljobs.admin` | 설정 리로드 |
@@ -128,6 +139,7 @@ daily-limits:
   mining: 50000
   farming: 30000
   fishing: 30000
+  exploration: 15000
 
 rank-multipliers:
   PLAYER: 1.0
@@ -167,6 +179,12 @@ fishing:
   rewards:
     default: 30
     treasure: 150
+
+exploration:
+  enabled: true
+  cooldown-millis: 5000
+  rewards:
+    new-biome-daily: 600
 ```
 
 ## 데이터 저장
@@ -192,6 +210,9 @@ players:
       mining: 3000
       farming: 500
       fishing: 0
+      exploration: 600
+      exploration-biomes:
+        - plains
 ```
 
 1차는 YAML로 충분하다. 데이터가 커지면 MariaDB 전환을 검토한다.
@@ -283,13 +304,14 @@ leeseolranks.rank.s
 
 추후 `LeeSeolRanks` API가 생기면 직접 조회로 바꿀 수 있다.
 
-## PlaceholderAPI
+## PlaceholderAPI 후보
 
 | Placeholder | 의미 |
 |---|---|
 | `%leeseoljobs_daily_mining%` | 오늘 광질 보상 |
 | `%leeseoljobs_daily_farming%` | 오늘 농사 보상 |
 | `%leeseoljobs_daily_fishing%` | 오늘 낚시 보상 |
+| `%leeseoljobs_daily_exploration%` | 오늘 탐험 보상 |
 | `%leeseoljobs_total_money%` | 누적 Jobs 보상 |
 
 ## 구현 순서
@@ -316,5 +338,6 @@ leeseolranks.rank.s
 | 낚시 성공 | 돈 지급 |
 | 일일 제한 초과 | 돈 미지급 |
 | dungeon 월드 | 기본 보상 미지급 |
-| Vault 없음 | 서버 크래시 없이 기능 비활성 |
+| 오늘 처음 들어간 바이옴 | 탐험 보상 지급, 중복 바이옴 보상 미지급 |
+| Vault 정상 로드 | 보상 지급 가능 |
 | reload | 보상표 반영 |

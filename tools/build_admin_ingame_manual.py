@@ -236,15 +236,16 @@ CUSTOM_SECTIONS: list[tuple[str, list[str]]] = [
         ],
     ),
     (
-        "초반 직업 보상: LeeSeolJobs",
+        "초반 활동 보상: LeeSeolJobs",
         [
-            command("/jobs", "광질/농사/낚시 일일 보상 통계를 표시한다."),
-            command("/jobs stats", "`/jobs`와 동일하게 자신의 통계를 표시한다."),
+            command("/activity", "광질/농사/낚시/탐험 일일 활동 보상 통계를 표시한다."),
+            command("/jobs", "`/activity`와 같은 기존 호환 명령어다."),
+            command("/jobs stats", "`/activity`와 동일하게 자신의 통계를 표시한다."),
             command("/jobs top", "현재 코드에서는 탭완성만 존재하며 별도 랭킹 출력은 미구현 상태다.", TEST),
             command("/lsjobs status", "Jobs 데이터에 저장된 플레이어 수를 표시한다."),
-            command("/lsjobs reload", "Jobs 보상/제한 설정을 다시 읽는다.", TEST),
-            command("/lsjobs stats <player>", "대상의 일일/누적 직업 통계를 표시한다."),
-            command("/lsjobs reset <player>", "대상의 직업 통계를 초기화한다.", WARN),
+            command("/lsjobs reload", "활동 보상/제한 설정을 다시 읽는다.", TEST),
+            command("/lsjobs stats <player>", "대상의 일일/누적 활동 통계를 표시한다."),
+            command("/lsjobs reset <player>", "대상의 활동 통계를 초기화한다.", WARN),
         ],
     ),
     (
@@ -431,7 +432,7 @@ def build_markdown() -> str:
     lines.append(command("/auction submit, /auction open, /auction end", "등록-관리자 선정-입찰-낙찰-돈 차감/지급 흐름 확인.", TEST))
     lines.append(command("/dungeon enter/exit, /dungeon chest roll", "내부 dungeon 월드 이동, 보호, 랜덤 상자 생성, survival 복귀 랜덤 범위 확인.", TEST))
     lines.append(command("/combat force, 로그아웃/관전 clone", "전투 태그, 전투 중 종료 즉사, 일반 로그아웃 시체 NPC, 타격/드랍 처리 확인.", TEST))
-    lines.append(command("/quest, /jobs, /craftmenu, /rankup", "초반 플레이 루프의 퀘스트 진행, 돈 지급, 제작, 랭크업 연동 확인.", TEST))
+    lines.append(command("/quest, /activity, /craftmenu, /rankup", "초반 플레이 루프의 퀘스트 진행, 활동 돈 지급, 제작, 랭크업 연동 확인.", TEST))
     lines.append("")
     return "\n".join(lines)
 

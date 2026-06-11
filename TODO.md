@@ -13,6 +13,14 @@ This main operations chat should keep the server direction aligned in this order
 4. Design / GUI / resource pack: polish after the gameplay direction is stable, unless
    a visual issue blocks testing.
 
+Current activity-system decision:
+
+- Do not turn `LeeSeolJobs` into a fixed class/job-selection system.
+- Treat it as an open-world activity reward layer: mining, farming, fishing, and
+  exploration should reward what players naturally do in the world.
+- Future progression should prefer collections, discoveries, region goals, and
+  optional mastery over permanent job identity.
+
 ## Plugin Pass First
 
 Current priority: make `LeeSeolQuest` the operating pass that ties server systems
@@ -38,7 +46,8 @@ Keep the balance baseline as a guardrail while the plugin and item passes are bu
 
 - Baseline reference: `BALANCE_BASELINE.md`.
 - Economy loop:
-  - Measure `LeeSeolJobs` mining, farming, and fishing income with a real player.
+  - Measure `LeeSeolJobs` mining, farming, fishing, and exploration income with a
+    real player.
   - Review daily limits, cooldowns, and shop/NPC shop prices against expected play
     time.
   - Confirm auction flow does not create money or bypass item-value assumptions.
@@ -177,9 +186,12 @@ Next balance decisions:
 
 - `LeeSeolJobs` is implemented and deployed to survival.
 - `LEESEOLJOBS_VERIFICATION.md` exists. Console/RCON verification passed.
+- 2026-06-11: Jobs was reworked into the first activity-system pass. `/activity`,
+  `/activities`, `/expedition`, and `/explore` now alias `/jobs`; exploration rewards
+  the first entry into each biome per day.
 - Still needs player-online verification: mining reward, placed-ore abuse guard,
-  farming reward, fishing reward, daily limit, `/jobs stats`, and Quest `earn-money`
-  progress.
+  farming reward, fishing reward, exploration biome reward, daily limit,
+  `/activity` stats, and Quest `earn-money` progress.
 
 ## Crafting
 

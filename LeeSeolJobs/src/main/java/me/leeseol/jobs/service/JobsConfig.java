@@ -22,6 +22,8 @@ public final class JobsConfig {
     private final Map<String, Double> rankMultipliers = new HashMap<>();
     private long miningCooldownMillis;
     private long fishingCooldownMillis;
+    private long explorationCooldownMillis;
+    private long explorationNewBiomeReward;
     private boolean antiPlaceAbuse;
     private long placedBlockRememberMillis;
     private boolean farmingRequireFullyGrown;
@@ -45,6 +47,8 @@ public final class JobsConfig {
 
         miningCooldownMillis = Math.max(0L, config.getLong("mining.cooldown-millis", 250L));
         fishingCooldownMillis = Math.max(0L, config.getLong("fishing.cooldown-millis", 1000L));
+        explorationCooldownMillis = Math.max(0L, config.getLong("exploration.cooldown-millis", 5000L));
+        explorationNewBiomeReward = Math.max(0L, config.getLong("exploration.rewards.new-biome-daily", 600L));
         antiPlaceAbuse = config.getBoolean("mining.anti-place-abuse.enabled", true);
         long rememberMinutes = Math.max(0L, config.getLong("mining.anti-place-abuse.remember-minutes", 30L));
         placedBlockRememberMillis = rememberMinutes * 60_000L;
@@ -99,6 +103,14 @@ public final class JobsConfig {
 
     public long fishingCooldownMillis() {
         return fishingCooldownMillis;
+    }
+
+    public long explorationCooldownMillis() {
+        return explorationCooldownMillis;
+    }
+
+    public long explorationNewBiomeReward() {
+        return explorationNewBiomeReward;
     }
 
     public boolean antiPlaceAbuse() {

@@ -203,15 +203,16 @@
 - `/lsquest objective <player> <type> [target]` - 온라인 대상에게 퀘스트 목표 진행도를 1 추가한다. 상태: <font color="#d97706"><b>테스트 필요</b></font>
 - `/lsquest reset <player>` - 대상의 퀘스트 데이터를 초기화한다. 상태: <font color="#dc2626"><b>주의</b></font>
 
-### 초반 직업 보상: LeeSeolJobs
+### 초반 활동 보상: LeeSeolJobs
 
-- `/jobs` - 광질/농사/낚시 일일 보상 통계를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
-- `/jobs stats` - `/jobs`와 동일하게 자신의 통계를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
+- `/activity` - 광질/농사/낚시/탐험 일일 활동 보상 통계를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
+- `/jobs` - `/activity`와 같은 기존 호환 명령어다. 상태: <font color="#16a34a"><b>확인됨</b></font>
+- `/jobs stats` - `/activity`와 동일하게 자신의 통계를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
 - `/jobs top` - 현재 코드에서는 탭완성만 존재하며 별도 랭킹 출력은 미구현 상태다. 상태: <font color="#d97706"><b>테스트 필요</b></font>
 - `/lsjobs status` - Jobs 데이터에 저장된 플레이어 수를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
-- `/lsjobs reload` - Jobs 보상/제한 설정을 다시 읽는다. 상태: <font color="#d97706"><b>테스트 필요</b></font>
-- `/lsjobs stats <player>` - 대상의 일일/누적 직업 통계를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
-- `/lsjobs reset <player>` - 대상의 직업 통계를 초기화한다. 상태: <font color="#dc2626"><b>주의</b></font>
+- `/lsjobs reload` - 활동 보상/제한 설정을 다시 읽는다. 상태: <font color="#d97706"><b>테스트 필요</b></font>
+- `/lsjobs stats <player>` - 대상의 일일/누적 활동 통계를 표시한다. 상태: <font color="#16a34a"><b>확인됨</b></font>
+- `/lsjobs reset <player>` - 대상의 활동 통계를 초기화한다. 상태: <font color="#dc2626"><b>주의</b></font>
 
 ### 제작 / 가공 / 수리: LeeSeolCrafting
 

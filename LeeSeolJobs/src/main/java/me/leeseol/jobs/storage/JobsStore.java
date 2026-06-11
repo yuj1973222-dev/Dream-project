@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,7 @@ public final class JobsStore {
                     stats.total(type, yaml.getLong(path + "totals." + type.configKey(), 0L));
                     stats.daily(type, yaml.getLong(path + "daily." + type.configKey(), 0L));
                 }
+                stats.dailyExplorationBiomes(yaml.getStringList(path + "daily.exploration-biomes"));
                 if (!today().equals(stats.dailyDate())) {
                     stats.resetDaily(today());
                 }
@@ -70,6 +72,7 @@ public final class JobsStore {
                 yaml.set(path + "totals." + type.configKey(), stats.total(type));
                 yaml.set(path + "daily." + type.configKey(), stats.daily(type));
             }
+            yaml.set(path + "daily.exploration-biomes", new ArrayList<>(stats.dailyExplorationBiomes()));
             yaml.set(path + "daily.date", stats.dailyDate());
         }
         try {

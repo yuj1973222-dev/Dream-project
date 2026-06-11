@@ -3,7 +3,8 @@ package me.leeseol.jobs.model;
 public enum JobType {
     MINING("mining", "광질"),
     FARMING("farming", "농사"),
-    FISHING("fishing", "낚시");
+    FISHING("fishing", "낚시"),
+    EXPLORATION("exploration", "탐험");
 
     private final String configKey;
     private final String displayName;

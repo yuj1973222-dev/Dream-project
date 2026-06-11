@@ -2,6 +2,7 @@ package me.leeseol.jobs;
 
 import me.leeseol.jobs.command.JobsAdminCommand;
 import me.leeseol.jobs.command.JobsCommand;
+import me.leeseol.jobs.listener.ExplorationListener;
 import me.leeseol.jobs.listener.FarmingListener;
 import me.leeseol.jobs.listener.FishingListener;
 import me.leeseol.jobs.listener.MiningListener;
@@ -39,6 +40,7 @@ public final class LeeSeolJobsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MiningListener(this), this);
         getServer().getPluginManager().registerEvents(new FarmingListener(this), this);
         getServer().getPluginManager().registerEvents(new FishingListener(this), this);
+        getServer().getPluginManager().registerEvents(new ExplorationListener(this), this);
         getLogger().info("LeeSeolJobs enabled. players=" + jobsStore.all().size());
     }
 

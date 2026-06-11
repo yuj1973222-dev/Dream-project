@@ -64,11 +64,11 @@ quests:
       commands: []
 
   daily_jobs_income:
-    display-name: "일일 직업: 5,000원 벌기"
+    display-name: "일일 활동: 5,000원 벌기"
     reset: daily
     stages:
       1:
-        message: "&b광질, 농사, 낚시 보상으로 오늘 5,000원을 벌어보세요."
+        message: "&b광질, 농사, 낚시, 탐험 활동 보상으로 오늘 5,000원을 벌어보세요."
         objective:
           type: earn-money
           target: jobs
@@ -109,7 +109,7 @@ quests:
     reset: weekly
     stages:
       1:
-        message: "&b이번 주 직업 보상으로 30,000원을 벌어보세요."
+        message: "&b이번 주 활동 보상으로 30,000원을 벌어보세요."
         objective:
           type: earn-money
           target: jobs

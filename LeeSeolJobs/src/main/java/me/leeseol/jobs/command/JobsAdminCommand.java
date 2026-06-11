@@ -58,13 +58,15 @@ public final class JobsAdminCommand implements CommandExecutor, TabCompleter {
             plugin.message(sender, "player-not-found");
             return true;
         }
-        sender.sendMessage(plugin.color("&a" + stats.name() + " Jobs"));
+        sender.sendMessage(plugin.color("&a" + stats.name() + " 활동"));
         sender.sendMessage(plugin.color("&7오늘: 광질 " + stats.daily(JobType.MINING)
             + " / 농사 " + stats.daily(JobType.FARMING)
-            + " / 낚시 " + stats.daily(JobType.FISHING)));
+            + " / 낚시 " + stats.daily(JobType.FISHING)
+            + " / 탐험 " + stats.daily(JobType.EXPLORATION)));
         sender.sendMessage(plugin.color("&7누적: 광질 " + stats.total(JobType.MINING)
             + " / 농사 " + stats.total(JobType.FARMING)
-            + " / 낚시 " + stats.total(JobType.FISHING)));
+            + " / 낚시 " + stats.total(JobType.FISHING)
+            + " / 탐험 " + stats.total(JobType.EXPLORATION)));
         return true;
     }
 

@@ -1,7 +1,11 @@
 package me.leeseol.jobs.model;
 
+import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class PlayerJobStats {
@@ -10,6 +14,7 @@ public final class PlayerJobStats {
     private String dailyDate;
     private final Map<JobType, Long> totals = new EnumMap<>(JobType.class);
     private final Map<JobType, Long> daily = new EnumMap<>(JobType.class);
+    private final Set<String> dailyExplorationBiomes = new HashSet<>();
 
     public PlayerJobStats(UUID uuid, String name, String dailyDate) {
         this.uuid = uuid;
@@ -42,6 +47,7 @@ public final class PlayerJobStats {
         for (JobType type : JobType.values()) {
             daily.put(type, 0L);
         }
+        dailyExplorationBiomes.clear();
     }
 
     public long total(JobType type) {
@@ -63,5 +69,30 @@ public final class PlayerJobStats {
     public void add(JobType type, long amount) {
         totals.put(type, total(type) + amount);
         daily.put(type, daily(type) + amount);
+    }
+
+    public boolean markDailyExplorationBiome(String biomeKey) {
+        if (biomeKey == null || biomeKey.isBlank()) {
+            return false;
+        }
+        return dailyExplorationBiomes.add(biomeKey.toLowerCase(Locale.ROOT));
+    }
+
+    public boolean hasDailyExplorationBiome(String biomeKey) {
+        return biomeKey != null && dailyExplorationBiomes.contains(biomeKey.toLowerCase(Locale.ROOT));
+    }
+
+    public void dailyExplorationBiomes(Collection<String> biomeKeys) {
+        dailyExplorationBiomes.clear();
+        if (biomeKeys == null) {
+            return;
+        }
+        for (String biomeKey : biomeKeys) {
+            markDailyExplorationBiome(biomeKey);
+        }
+    }
+
+    public Set<String> dailyExplorationBiomes() {
+        return Set.copyOf(dailyExplorationBiomes);
     }
 }
