@@ -21,6 +21,14 @@ Current activity-system decision:
 - Future progression should prefer collections, discoveries, region goals, and
   optional mastery over permanent job identity.
 
+Highest future gameplay priority:
+
+- When this chat returns to gameplay planning after the current visual/ItemsAdder
+  issue, continue the activity/open-world direction first.
+- Next step should be player-online verification and tuning of `/activity`, biome
+  exploration rewards, Quest `earn-money` progress, and the operating pass flow before
+  adding unrelated large systems.
+
 ## Plugin Pass First
 
 Current priority: make `LeeSeolQuest` the operating pass that ties server systems
