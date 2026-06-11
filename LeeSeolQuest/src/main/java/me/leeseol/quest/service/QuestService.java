@@ -1,10 +1,15 @@
 package me.leeseol.quest.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import java.util.UUID;
 import me.leeseol.quest.LeeSeolQuestPlugin;
 import me.leeseol.quest.event.QuestCompletedEvent;
@@ -15,6 +20,7 @@ import me.leeseol.quest.model.ObjectiveType;
 import me.leeseol.quest.model.PlayerQuestData;
 import me.leeseol.quest.model.Quest;
 import me.leeseol.quest.model.QuestObjective;
+import me.leeseol.quest.model.QuestResetPeriod;
 import me.leeseol.quest.model.QuestStage;
 import me.leeseol.quest.storage.QuestStore;
 import org.bukkit.Bukkit;
@@ -24,6 +30,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 public final class QuestService {
+    private static final DateTimeFormatter DATE_KEY = DateTimeFormatter.ISO_LOCAL_DATE;
+
     private final LeeSeolQuestPlugin plugin;
     private final QuestStore store;
     private final Map<String, Quest> quests = new LinkedHashMap<>();
@@ -81,7 +89,7 @@ public final class QuestService {
         }
 
         PlayerQuestData data = store.data(player.getUniqueId());
-        if (!force && data.completedQuests().contains(quest.id())) {
+        if (!force && isCompleted(data, quest)) {
             plugin.message(player, "already-completed", "%quest%", quest.displayName());
             return false;
         }
@@ -121,7 +129,7 @@ public final class QuestService {
         }
 
         for (Quest quest : quests.values()) {
-            if (quest.autoStart() && !data.completedQuests().contains(quest.id())) {
+            if (quest.autoStart() && !isCompleted(data, quest)) {
                 startQuest(player, quest.id(), false);
                 return;
             }
@@ -228,7 +236,7 @@ public final class QuestService {
         PlayerQuestData data = store.data(player.getUniqueId());
         for (Quest quest : quests.values()) {
             if (quest.autoStart()) {
-                data.completedQuests().add(quest.id());
+                data.completedQuests().add(completionKey(quest));
             }
         }
         data.clearActiveQuest();
@@ -261,7 +269,25 @@ public final class QuestService {
     }
 
     public int completedCount(Player player) {
-        return store.data(player.getUniqueId()).completedQuests().size();
+        PlayerQuestData data = store.data(player.getUniqueId());
+        int count = 0;
+        for (Quest quest : quests.values()) {
+            if (isCompleted(data, quest)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean isCompleted(PlayerQuestData data, Quest quest) {
+        if (quest == null) {
+            return false;
+        }
+        return data.completedQuests().contains(completionKey(quest));
+    }
+
+    public String resetPeriodText(Quest quest) {
+        return quest.resetPeriod().displayName();
     }
 
     private void completeStage(Player player, Quest quest, QuestStage stage, PlayerQuestData data) {
@@ -274,7 +300,7 @@ public final class QuestService {
 
         QuestStage nextStage = quest.nextStage(stage.number());
         if (nextStage == null) {
-            data.completedQuests().add(quest.id());
+            data.completedQuests().add(completionKey(quest));
             data.clearActiveQuest();
             store.save();
             plugin.message(player, "completed", "%quest%", quest.displayName());
@@ -341,6 +367,7 @@ public final class QuestService {
             id,
             section.getString("display-name", id),
             section.getBoolean("auto-start", false),
+            QuestResetPeriod.fromConfig(section.getString("reset", "once")),
             List.copyOf(stages),
             rewardMoney,
             List.copyOf(rewardCommands)
@@ -402,5 +429,29 @@ public final class QuestService {
             rewards.add("명령 보상 " + quest.rewardCommands().size() + "개");
         }
         return rewards.isEmpty() ? "없음" : String.join(", ", rewards);
+    }
+
+    private String completionKey(Quest quest) {
+        if (quest.resetPeriod() == QuestResetPeriod.DAILY) {
+            return quest.id() + "@daily:" + today().format(DATE_KEY);
+        }
+        if (quest.resetPeriod() == QuestResetPeriod.WEEKLY) {
+            LocalDate today = today();
+            WeekFields weekFields = WeekFields.ISO;
+            int year = today.get(weekFields.weekBasedYear());
+            int week = today.get(weekFields.weekOfWeekBasedYear());
+            return quest.id() + "@weekly:" + year + "-W" + String.format(Locale.ROOT, "%02d", week);
+        }
+        return quest.id();
+    }
+
+    private LocalDate today() {
+        String configuredZone = plugin.getConfig().getString("settings.reset-time-zone", "Asia/Seoul");
+        try {
+            return LocalDate.now(ZoneId.of(configuredZone));
+        } catch (Exception exception) {
+            plugin.getLogger().warning("Invalid quest reset-time-zone '" + configuredZone + "', using system default.");
+            return LocalDate.now();
+        }
     }
 }

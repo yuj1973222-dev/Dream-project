@@ -60,7 +60,8 @@ public final class QuestGui {
     }
 
     private ItemStack questItem(Quest quest, PlayerQuestData data) {
-        Material material = data.completedQuests().contains(quest.id()) ? Material.EMERALD : Material.BOOK;
+        boolean completed = questService.isCompleted(data, quest);
+        Material material = completed ? Material.EMERALD : Material.BOOK;
         if (quest.id().equalsIgnoreCase(data.activeQuestId())) {
             material = Material.WRITABLE_BOOK;
         }
@@ -72,11 +73,12 @@ public final class QuestGui {
         List<String> lore = new ArrayList<>();
         if (quest.id().equalsIgnoreCase(data.activeQuestId())) {
             lore.add(Text.color("&a진행 중"));
-        } else if (data.completedQuests().contains(quest.id())) {
+        } else if (completed) {
             lore.add(Text.color("&6완료됨"));
         } else {
             lore.add(Text.color("&7클릭해서 시작"));
         }
+        lore.add(Text.color("&7주기: &f" + questService.resetPeriodText(quest)));
         lore.add(Text.color("&8ID: " + quest.id()));
         meta.setLore(lore);
         meta.getPersistentDataContainer().set(Holder.QUEST_ID_KEY, org.bukkit.persistence.PersistentDataType.STRING, quest.id());

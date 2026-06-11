@@ -33,7 +33,7 @@ context for normal work.
 | `LeeSeolCombat` | survival only | Combat tags, combat-logout death punishment, normal logout Citizens corpse clone, corpse drops, PVP points, player-head trophy rewards | `LeeSeolCombatPlugin.java`, `listener/SessionListener.java`, `listener/PvpRewardListener.java`, `manager/CombatCloneManager.java`, `service/PvpRewardService.java`, `storage/PvpPointStore.java`, `config.yml`, `plugin.yml` | Citizens, ProtocolLib, PlaceholderAPI/LeeSeolTown optional same-affiliation checks, survival inventory | `deploy-leeseolcombat.sh`; restart `minecraft` only; verify `version LeeSeolCombat`, `version Citizens`, `combat status` |
 | `LeeSeolCleanup` | survival only | Dropped item cleanup timer | `LeeSeolCleanupPlugin.java`, `listener/`, `service/`, `config.yml`, `plugin.yml` | TAB footer timer expectations | `deploy-leeseolcleanup.sh`; restart `minecraft` only |
 | `LeeSeolRanks` | survival, lobby | Shared rank data, one-rank permissions, rankup requirements, PlaceholderAPI rank display, ADMIN/DEV staff permission sync | `LeeSeolRanksPlugin.java`, `model/Rank.java`, `service/RankRequirementService.java`, `storage/`, `command/`, `hook/`, `config.yml`, `plugin.yml` | LuckPerms, Vault/LeeSeolEconomy balance checks, LeeSeolQuest `rank-up` hook, TAB, BetterRanks font images, LeeSeolTown chat | restart `minecraft` and `lobby`; verify `LeeSeolRanks enabled`, `rank requirements`, `leeseolrank status` |
-| `LeeSeolQuest` | survival, lobby | Tutorial and quest progression, quest GUI, shared quest data, PlaceholderAPI quest tracker placeholders, Bukkit quest events, lightweight external progress API | `LeeSeolQuestPlugin.java`, `service/QuestService.java`, `api/LeeSeolQuestApi.java`, `event/`, `storage/QuestStore.java`, `command/`, `listener/`, `gui/`, `config.yml`, `plugin.yml` | PlaceholderAPI, Vault command rewards through `won give`, Citizens NPC click metadata, future Crafting/Jobs/Ranks hooks | restart `minecraft` and `lobby`; verify `LeeSeolQuest enabled`, `Done`, and `lsquest reload` |
+| `LeeSeolQuest` | survival, lobby | Tutorial, daily/weekly operating pass, quest progression, quest GUI, shared quest data, PlaceholderAPI quest tracker placeholders, Bukkit quest events, lightweight external progress API | `LeeSeolQuestPlugin.java`, `service/QuestService.java`, `model/QuestResetPeriod.java`, `api/LeeSeolQuestApi.java`, `event/`, `storage/QuestStore.java`, `command/`, `listener/`, `gui/`, `config.yml`, `plugin.yml` | PlaceholderAPI, Vault command rewards through `won give`, Citizens NPC click metadata, Crafting/Jobs/Ranks hooks | `deploy-leeseolquest.sh`; restart `minecraft` and `lobby`; verify `LeeSeolQuest enabled`, `Loaded 6 quests`, `Done`, and `lsquest reload` |
 | `LeeSeolJobs` | survival only | Mining, farming, and fishing income loop with Vault payouts, daily limits, cooldowns, and placed-ore abuse guard | `LeeSeolJobsPlugin.java`, `service/`, `storage/JobsStore.java`, `listener/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | restart `minecraft`; verify `LeeSeolJobs enabled`, `Done`, `version LeeSeolJobs`, `lsjobs reload` |
 | `LeeSeolCrafting` | survival only | Config-driven crafting, processing, disassembly, money-based repair GUI, and Quest `craft-item` hook | `LeeSeolCraftingPlugin.java`, `service/`, `gui/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | restart `minecraft`; verify `LeeSeolCrafting enabled`, `Done`, and `/lscrafting reload` when RCON/in-game access is available |
 | `LeeSeolHUD` | survival only | Image-based BossBar compass, HUD toggles, direct `/compasshud <on\|off>` command, and TAB below-name heart health display with fading heal suffixes | `LeeSeolHudPlugin.java`, `service/`, `listener/`, `hook/HudPlaceholderExpansion.java`, `command/`, `config.yml`, `plugin.yml` | PlaceholderAPI, TAB below-name objective, one-time ItemsAdder/resource-pack compass glyphs `U+E340`-`U+E7BF` and transparent WHITE BossBar sprites | restart `minecraft`; verify `LeeSeolHUD enabled`, `TAB enabled`, `Done`, `version LeeSeolHUD`, `lshud status`, resource-pack SHA, and in-game compass/health/heal display |
@@ -68,18 +68,22 @@ context for normal work.
 
 ## Current Plugin-Part Priority
 
-1. Balance pass first: use `LeeSeolEconomy`, `LeeSeolJobs`, `LeeSeolCrafting`,
-   `LeeSeolRanks`, `LeeSeolCombat`, and AdvancedEnchantments data to establish a
-   survival economy/progression/PvP baseline before broad feature or design work.
-2. Measure live player loops needed for balance: Jobs mining/farming/fishing income,
+1. Plugin pass first: use `LeeSeolQuest` operating pass as the top-level player guide,
+   then connect Jobs, Crafting, Ranks, Dungeon, Combat, Economy, and Auction into that
+   loop.
+2. Item/content pass second: define item value tiers, sources, sinks, and dungeon or
+   crafting uses before adding many new custom items.
+3. Balance pass third: use `LeeSeolEconomy`, `LeeSeolJobs`, `LeeSeolCrafting`,
+   `LeeSeolRanks`, `LeeSeolCombat`, and AdvancedEnchantments data to tune the
+   survival economy/progression/PvP baseline.
+4. Measure live player loops needed for balance: Jobs mining/farming/fishing income,
    Crafting material and money consumption, Rank progress requirements, Quest reward
    impact, and Combat PVP rewards.
-3. Decide the first AdvancedEnchantments safety patch from
-   `ADVANCED_ENCHANTMENTS_BALANCE_REVIEW.md` before opening serious PvP or adding new
-   high-value loot sources.
-4. Tune economy/progression in this order unless the user changes direction:
+5. Validate the first AdvancedEnchantments PvP safety patch from 2026-06-11 before
+   opening serious PvP or adding new high-value loot sources.
+6. Tune economy/progression in this order unless the user changes direction:
    Jobs income and limits, Crafting costs and repair, Rank requirements, Quest
    rewards, then auction/shop value assumptions.
-5. Keep player-online verification active, but treat it as balance measurement rather
+7. Keep player-online verification active, but treat it as balance measurement rather
    than the main goal: Quest GUI/hooks, Jobs payouts, Crafting flows, Ranks rank-up,
    HUD display, and Combat rewards still need real-player checks.

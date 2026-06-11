@@ -77,7 +77,7 @@ These are candidates, not applied changes.
 | Jobs | Measure real hourly income first; lower daily caps only if players cap too quickly. | Current caps may be fine if active play takes long enough. |
 | Crafting | Keep raw iron processing at `100` unless ingot sale/buy values change. | It is not a money exploit at current shop values. |
 | Repair | Decide whether to block vanilla anvil repair before relying on repair as a money sink. | Otherwise the custom repair economy can be optional. |
-| AdvancedEnchantments | Restrict `explosive`, `reflect`, `greatsword`; move or nerf `forcefield`. | These are high-risk before PvP rules and protection behavior are proven. |
+| AdvancedEnchantments | First PvP safety patch applied on 2026-06-11: `explosive`, `reflect`, and `greatsword` chances are `0`; `forcefield` moved to `ELITE` with chances `6/8/10/12/14` and `20s` cooldowns. | Next review should focus on `blind`, `paralyze`, `shockwave`, and economy automation enchants after player tests. |
 | Automation enchants | Limit `veinminer`, `harvest`, `smelting`, and `experience` after Jobs/Crafting tests. | They can multiply income or bypass processing value. |
 
 ## Measurement Checklist
@@ -92,4 +92,3 @@ Use online player tests to collect balance data, not just plugin verification.
 - Check `/rank progress` after 1 hour of ordinary play.
 - Test whether AdvancedEnchantments automation effects trigger Jobs rewards more than
   expected.
-

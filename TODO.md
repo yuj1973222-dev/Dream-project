@@ -6,18 +6,35 @@ Deferred work. Keep this list short and move completed items out.
 
 This main operations chat should keep the server direction aligned in this order:
 
-1. Balance: economy, progression, PvP risk, rank requirements, item value, and reward
-   loops.
-2. Server features / plugins: only implement or verify features that support the
-   current balance direction.
-3. Additional items / content: add new item sources after the value loop is clear.
+1. Server features / plugins: make the operating pass guide the player's next action.
+2. Additional items / content: define item sources, uses, sinks, and tiers.
+3. Balance: tune economy, progression, PvP risk, rank requirements, item value, and
+   reward loops after the core pass exists.
 4. Design / GUI / resource pack: polish after the gameplay direction is stable, unless
    a visual issue blocks testing.
 
-## Balance First
+## Plugin Pass First
 
-Current priority: establish a stable survival balance baseline before adding more
-content or doing broad design polish.
+Current priority: make `LeeSeolQuest` the operating pass that ties server systems
+together.
+
+- `LEESEOLQUEST_OPERATION_PASS_VERIFICATION.md` exists.
+- Operating pass 0.1 was implemented and deployed on 2026-06-11.
+- Current deployed pass quests:
+  - `daily_check_in`
+  - `daily_jobs_income`
+  - `daily_crafting_processing`
+  - `daily_fishing`
+  - `weekly_survival_routine`
+- Next plugin-pass work:
+  - Verify the pass with an online player.
+  - Add Dungeon and Combat pass quests after those systems are player-tested.
+  - Add pass categories or a richer GUI if the current 6-entry quest GUI becomes too
+    small.
+
+## Balance Baseline
+
+Keep the balance baseline as a guardrail while the plugin and item passes are built.
 
 - Baseline reference: `BALANCE_BASELINE.md`.
 - Economy loop:
@@ -33,7 +50,8 @@ content or doing broad design polish.
   - Decide which Quest rewards should be progression helpers instead of major money
     sources.
 - PvP / combat loop:
-  - Decide the first AdvancedEnchantments safety patch before opening serious PvP.
+  - First AdvancedEnchantments PvP safety patch was applied on 2026-06-11 before
+    opening serious PvP.
   - Verify `LeeSeolCombat` PVP points and trophy drops with two players.
   - Keep same-affiliation reward suppression enabled unless nation-war rules require
     a different design.
@@ -48,7 +66,8 @@ Next balance decisions:
 
 1. Define target income ranges for early, mid, and late survival play.
 2. Define rank-up cost/time targets for the current rank ladder.
-3. Decide the minimum safe AdvancedEnchantments restrictions for PvP.
+3. Review whether the first AdvancedEnchantments PvP safety patch is enough after
+   player testing.
 4. Decide whether Jobs/Crafting/Ranks should be tuned first or whether PvP-risk
    enchants should be restricted first.
 
@@ -143,9 +162,11 @@ Next balance decisions:
   vanilla anvil repair in LeeSeolCrafting 1.0.
 - `ADVANCED_ENCHANTMENTS_BALANCE_REVIEW.md` exists. 2026-06-08 follow-up reviewed
   live `enchantments.yml`, group prices, enchantment-table access, and Jobs/Crafting
-  overlap. No live config was changed. Next decision: apply the PVP safety patch
-  first, or wait for player-online Jobs/Crafting verification before changing
-  AdvancedEnchantments values.
+  overlap. On 2026-06-11, the first PvP safety patch was applied live:
+  `explosive`, `reflect`, and `greatsword` chances are `0`; `forcefield` moved to
+  `ELITE` with lower chances and `20s` cooldowns. Next decision: verify with players,
+  then decide whether `blind`, `paralyze`, `shockwave`, or automation enchants need a
+  second pass.
 - `LEESEOLJOBS_DESIGN.md` exists and 0.1.0 has been implemented/deployed.
 - `LEESEOLRANKS_RANKUP_EXPANSION_DESIGN.md` exists and 0.1.0 requirements expansion
   has been implemented/deployed.

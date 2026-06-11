@@ -212,7 +212,11 @@ sudo ss -ltnp | grep -E '25565|25566|25567|25568|8163'
   - Shared quest data file: `/opt/minecraft/shared/quests/data.yml`
   - Provides `/quest`, `/tutorial`, `/lsquest` and PlaceholderAPI placeholders under
     `%leeseolquest_*%`.
-  - Current baseline quest config contains one tutorial quest, `tutorial_start`.
+  - Current quest config contains tutorial quest `tutorial_start` plus operating pass
+    quests: `daily_check_in`, `daily_jobs_income`, `daily_crafting_processing`,
+    `daily_fishing`, and `weekly_survival_routine`.
+  - Since 2026-06-11, quest configs support reset periods `once`, `daily`, and
+    `weekly` using `settings.reset-time-zone: "Asia/Seoul"`.
   - Current objective support includes `open-gui`, `mine-block`, `fish`,
     `kill-player`, `harvest-crop`, `dungeon-enter`, and Citizens NPC click based
     `npc-dialogue`.

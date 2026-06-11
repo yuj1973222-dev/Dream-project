@@ -6,6 +6,7 @@ public record Quest(
     String id,
     String displayName,
     boolean autoStart,
+    QuestResetPeriod resetPeriod,
     List<QuestStage> stages,
     long rewardMoney,
     List<String> rewardCommands
