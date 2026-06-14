@@ -114,6 +114,82 @@ Future release structures such as war flags, defense towers, trade posts, gates,
 logistics bases are out of beta implementation scope, but the data model must allow
 new structure types without replacing the war core.
 
+## Nation Tier And Benefits
+
+Nation tiers are a progression system for national scale, not direct player power.
+Tier rewards must not grant personal combat stats such as damage, defense, or health.
+Higher tiers should make a nation larger, more complex, and more capable of operating
+war logistics.
+
+Tier benefits focus on:
+
+- claim capacity;
+- capital zone size;
+- border outpost count;
+- supply depot count;
+- official war roster size;
+- nation administration features;
+- logistics capacity;
+- recovery and restoration options;
+- prestige and map visibility.
+
+Recommended beta tier table:
+
+```text
+Tier 1 Settlement
+- capital zone: 3x3 chunks
+- max claims: 16 chunks
+- border outposts: 0
+- supply depots: 1
+- official war roster: defense only
+
+Tier 2 Small Nation
+- capital zone: 3x3 chunks
+- max claims: 32 chunks
+- border outposts: 1
+- supply depots: 2
+- official war roster: 8 players
+- unlocks war declaration
+- unlocks basic nation notice and tax controls
+
+Tier 3 Kingdom
+- capital zone: 5x5 chunks
+- max claims: 64 chunks
+- border outposts: 2
+- supply depots: 3
+- official war roster: 12 players
+- increases war supply capacity
+- improves structure restoration options
+
+Tier 4 Great Power
+- capital zone: 5x5 chunks
+- max claims: 96 chunks
+- border outposts: 3
+- supply depots: 4
+- official war roster: 16 players
+- unlocks limited formal ally or support mechanics
+- increases logistics route capacity
+
+Tier 5 Empire
+- capital zone: 7x7 chunks
+- max claims: 128 chunks
+- border outposts: 4
+- supply depots: 5
+- official war roster: 20 players
+- unlocks maximum logistics capacity
+- unlocks top prestige and map visibility features
+```
+
+Tier-up requirements should consume existing resources instead of creating money.
+Requirements can include treasury cost, required member count, owned claim count,
+capital core existence, required depots or outposts, upkeep-paid state, and minimum
+karma threshold.
+
+Higher tiers must also increase maintenance pressure. A larger nation should be
+stronger through territory, logistics, and organization, but it should also have more
+exposed structures, higher upkeep, and more repair responsibility. This keeps small
+nations viable while giving rich nations meaningful upgrades to pursue.
+
 ## Structure Detection
 
 The plugin must not detect entire buildings. It detects registered anchors.
