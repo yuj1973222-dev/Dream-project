@@ -41,6 +41,52 @@
 탭완성을 건드리기 쉽다. 실제 서버 운영에서는 이런 변경 범위 확대가
 플러그인 간 충돌처럼 보이는 간헐적 문제로 이어질 수 있다.
 
+## Command Audit Findings
+
+감사 기준은 세 가지다.
+
+- 공개 등록 명령: `plugin.yml`에 등록된 root command와 alias.
+- 실제 코드 분기: `TownCommand`가 처리하는 하위 명령과 숨은 alias.
+- 현재 방향: `PLUGIN_INDEX.md`, `TODO.md`, survival 운영 방향에 남아 있는
+  명령.
+
+현재 `plugin.yml`의 공개 root command는 `town`이고 alias로 `party`,
+`village`, `towny`가 붙어 있다. 하지만 실제 사용 방향은 `/party`다.
+따라서 `/party`를 canonical command로 두고 `/town`, `/village`, `/towny`는
+호환 alias 또는 제거 후보로 분리해야 한다.
+
+현재 코드상 확실한 정리 대상은 다음과 같다.
+
+- `/party claim`, `/party claimprice`, `/party unclaim`: 현재 서비스 로직은
+  국가 소속, 국가장 권한, 국가 코어 조건을 요구한다. 파티 명령처럼 보이지만
+  실제로는 국가 영토 명령이므로 canonical 위치는 `/party nation claim`,
+  `/party nation claimprice`, `/party nation unclaim`이다.
+- `/party federation ...`: `Federation`은 `NationType` 중 하나이고
+  `disband`도 일반 국가 해산 로직을 사용한다. root의 `federation`은
+  오래된 관리자 명령 형태로 보고, canonical 위치를 `/party nation
+  federation ...`으로 옮긴다.
+- `/party safezone ...`: 현재 명칭은 neutral zone이다. `safezone`은 오래된
+  호환 alias로 보고 help와 tab completion에서는 제거한다.
+- `/party diagnose`: `/party diag`의 긴 alias다. 관리자 숨김 alias로 유지할 수
+  있지만 help/tab에는 `diag`만 표시한다.
+- `/party nation buy`, `purchase`, `price`, `cost`, `claimcost`: 국가 영토
+  명령의 편의 alias다. `claim`, `claimprice`, `unclaim`만 canonical로
+  표시하고 나머지는 숨김 호환 alias로 둘지 제거할지 작업 전에 한 번 더
+  확인한다.
+
+현재 코드상 유지할 수 있는 alias는 다음과 같다.
+
+- `/party deny`와 `/party reject`: 같은 초대 거절 의미이므로 유지 가능하다.
+- `/party me`, `/party status`, `/party 소속`: 개인 소속 정보 조회이므로
+  유지 가능하다. tab completion에는 `me`만 보여도 된다.
+- `/party chat party`와 `/party chat town`: 내부 모델 이름은 `TOWN`이지만
+  플레이어 표현은 party가 더 맞다. canonical 표시를 `party`로 두고 `town`은
+  호환 alias로 유지한다.
+
+`/party war ...`는 국가 간 전쟁 기능이지만, 전쟁은 국가 설정이 아니라 별도
+행동 도메인이다. 1차 정리에서는 `/party war`를 유지한다. 사용자가 모든 국가
+관련 행동을 `/party nation ...` 아래로 묶길 원하면 별도 설계안으로 분리한다.
+
 ## Command Design
 
 `TownCommand`는 `/party`의 중앙 진입점으로만 남긴다.
@@ -58,8 +104,7 @@
   transfer, kick, info, me.
 - `ClaimCommandGroup`: claim, claimprice, unclaim.
 - `NationCommandGroup`: nation create, disband, pvp, build, treasury, upkeep,
-  deposit, claim, claimprice, unclaim.
-- `FederationCommandGroup`: federation create, disband.
+  deposit, claim, claimprice, unclaim, federation.
 - `WarCommandGroup`: war declare, accept, surrender, release, paydebt, finish.
 - `StructureCommandGroup`: structure undo.
 - `NeutralCommandGroup`: neutral pos1, pos2, create, delete, list, info.
@@ -75,10 +120,13 @@
 
 기존 플레이어 명령어는 바꾸지 않는다.
 
-- 명령어 이름과 alias를 유지한다.
+- canonical 명령어는 유지하거나 더 명확한 위치로 옮긴다.
+- 오래된 alias는 즉시 삭제하지 않고 help/tab에서 먼저 숨긴다.
+- 삭제 후보 alias는 별도 목록으로 남기고 사용 여부를 확인한 뒤 제거한다.
 - 메시지 key를 바꾸지 않는다.
 - 권한 이름을 바꾸지 않는다.
-- `plugin.yml`의 공개 명령어 구조를 바꾸지 않는다.
+- `plugin.yml`의 공개 명령어 구조는 `/party` canonical 방향으로 정리하되,
+  기존 접속자가 쓰던 명령은 호환 alias로 남긴다.
 - `/tc`, `/pc`, `/nc`는 이미 작은 `ChannelChatCommand`에 있으므로 유지한다.
 
 명령어 도움말의 출력 순서는 현재 플레이어가 익숙한 흐름을 최대한 유지한다.
