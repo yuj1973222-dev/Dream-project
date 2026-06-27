@@ -12,6 +12,8 @@ import me.leeseol.core.launchpad.LaunchPadManager;
 import me.leeseol.core.listener.DimensionGateListener;
 import me.leeseol.core.listener.JoinListener;
 import me.leeseol.core.menu.CoreServerMenuManager;
+import me.leeseol.core.networkmove.BungeeCordNetworkMovePort;
+import me.leeseol.core.networkmove.NetworkMovePort;
 import me.leeseol.core.portal.PortalListener;
 import me.leeseol.core.portal.PortalManager;
 import me.leeseol.core.servernpc.ServerNpcManager;
@@ -20,10 +22,6 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public final class LeeSeolCorePlugin extends JavaPlugin {
     private long enabledAtMillis;
@@ -35,6 +33,7 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
     private SurvivalSpawnManager survivalSpawnManager;
     private ContentService contentService;
     private BlueMapContentMarkers blueMapContentMarkers;
+    private NetworkMovePort networkMovePort;
 
     @Override
     public void onEnable() {
@@ -46,12 +45,13 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
         serverMenuManager = new CoreServerMenuManager(this);
         serverNpcManager = new ServerNpcManager(this);
         survivalSpawnManager = new SurvivalSpawnManager(this);
+        networkMovePort = new BungeeCordNetworkMovePort(this);
         contentService = new ContentService(this, new WorldGuardContentRegionService(this));
         blueMapContentMarkers = new BlueMapContentMarkers(this, contentService);
         contentService.setAfterChange(blueMapContentMarkers::refreshLater);
 
         reloadCoreConfig();
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeCordNetworkMovePort.CHANNEL);
 
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new DimensionGateListener(this), this);
@@ -77,7 +77,7 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
         if (blueMapContentMarkers != null) {
             blueMapContentMarkers.clear();
         }
-        getServer().getMessenger().unregisterOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().unregisterOutgoingPluginChannel(this, BungeeCordNetworkMovePort.CHANNEL);
         getLogger().info("LeeSeolCore disabled.");
     }
 
@@ -114,20 +114,11 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
     }
 
     public void sendPlayerToServer(Player player, String targetServer) {
-        if (targetServer == null || targetServer.isBlank()) {
-            return;
-        }
+        networkMovePort.requestMove(player, targetServer);
+    }
 
-        // Velocity behavior needs live-server verification; use the BungeeCord-compatible Connect subchannel.
-        try {
-            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-            DataOutputStream output = new DataOutputStream(byteStream);
-            output.writeUTF("Connect");
-            output.writeUTF(targetServer);
-            player.sendPluginMessage(this, "BungeeCord", byteStream.toByteArray());
-        } catch (IOException exception) {
-            getLogger().warning("Failed to send player to server " + targetServer + ": " + exception.getMessage());
-        }
+    public NetworkMovePort networkMovePort() {
+        return networkMovePort;
     }
 
     private void registerCommand(String name, org.bukkit.command.CommandExecutor executor) {

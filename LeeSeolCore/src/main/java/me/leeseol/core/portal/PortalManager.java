@@ -1,8 +1,5 @@
 package me.leeseol.core.portal;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -179,19 +176,9 @@ public final class PortalManager {
     }
 
     private void connectToVelocityServer(Player player, String targetServer) {
-        if (targetServer == null || targetServer.isBlank()) {
-            return;
-        }
+        plugin.sendPlayerToServer(player, targetServer);
 
         // Velocity 환경에서 동작 확인 필요: BungeeCord 호환 Connect subchannel을 사용한다.
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             DataOutputStream output = new DataOutputStream(byteStream)) {
-            output.writeUTF("Connect");
-            output.writeUTF(targetServer);
-            player.sendPluginMessage(plugin, "BungeeCord", byteStream.toByteArray());
-        } catch (IOException exception) {
-            plugin.getLogger().warning("Failed to send Velocity connect message: " + exception.getMessage());
-        }
     }
 
     private void playSound(Player player, String rawSound) {

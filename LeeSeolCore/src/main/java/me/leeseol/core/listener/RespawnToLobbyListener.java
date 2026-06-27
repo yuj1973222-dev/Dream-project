@@ -7,10 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public final class RespawnToLobbyListener implements Listener {
     private final LeeSeolCorePlugin plugin;
 
@@ -45,13 +41,6 @@ public final class RespawnToLobbyListener implements Listener {
         }
 
         // Velocity 환경에서 동작 확인 필요: BungeeCord 호환 Connect subchannel을 사용한다.
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             DataOutputStream output = new DataOutputStream(byteStream)) {
-            output.writeUTF("Connect");
-            output.writeUTF(targetServer);
-            player.sendPluginMessage(plugin, "BungeeCord", byteStream.toByteArray());
-        } catch (IOException exception) {
-            plugin.getLogger().warning("Failed to send respawn lobby connect message: " + exception.getMessage());
-        }
+        plugin.sendPlayerToServer(player, targetServer);
     }
 }
