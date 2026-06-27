@@ -1,89 +1,120 @@
 # PLUGIN_INDEX.md
 
-Read this before opening broad code. It maps each custom plugin to the smallest useful
-context for normal work.
+Use this file as the current plugin structure map. It exists to prevent broad
+code reads and cross-domain edits. Keep history, failed attempts, and date-based
+notes out of this file.
 
-## How To Use
+## Work Scope Template
 
-- For a plugin task, read only this file, `SERVER_STATE.md`, and the target plugin.
-- Do not inspect unrelated plugins unless the dependency column says to.
-- Do not read old logs first. Verify with recent logs after the change.
-- Update this file only when plugin ownership, deployment target, or shared state
-  changes.
-- This plugin-development chat must not edit ItemsAdder, `generated.zip`, TAB logo
-  glyphs, BetterRanks images, or Velocity resource-pack SHA values. Those belong to
-  the separate GUI/resource-pack part. The 2026-06-04 LeeSeolHUD compass task was a
-  user-approved one-time exception and should not be treated as a general rule.
-- `LeeSeolStations` and custom furniture click integrations are currently assigned to
-  the GUI/resource-pack part. Plugin work may expose command/API endpoints for that
-  part to call, but should not directly implement ItemsAdder furniture handling here.
+State scope before feature work:
+
+```text
+Work:
+Primary:
+Allowed consumers:
+Bridge/config:
+Affected contracts:
+Not included:
+Verify:
+```
+
+- Primary owns the data or behavior.
+- Allowed consumers may only display or integrate that same domain.
+- Bridge/config covers external settings such as TAB, PlaceholderAPI, LuckPerms,
+  Vault, BetterHUD, BetterRanks, ItemsAdder, WorldGuard, WorldEdit, Citizens, or
+  BlueMap.
+- If a contract changes, verify the affected consumers/bridges too.
+
+## Integration Map
+
+| Domain | Primary | Allowed consumers | Bridge/config |
+| --- | --- | --- | --- |
+| Rank | `LeeSeolRanks` | `LeeSeolTown` scoreboard/chat, `LeeSeolQuest` rank-up progress, TAB/BetterRanks displays | PlaceholderAPI `%leeseolranks_*%`, LuckPerms command sync, Vault, BetterRanks `%img_*%` |
+| Economy | `LeeSeolEconomy` | `LeeSeolTown` claims/upkeep/treasury, `LeeSeolAuction`, `LeeSeolQuest` money rewards via `/won give`, `LeeSeolJobs`/`LeeSeolCrafting` via Vault, survival menus | Vault provider, BungeeCord channel, shared balances/market/ledger files |
+| Content locations / neutral zones | `LeeSeolCore` | `LeeSeolTown` neutral-zone source, WorldGuard/BlueMap content displays | `/content`, `contents.yml`, WorldEdit, WorldGuard, BlueMap |
+| Party / nation / claim / war | `LeeSeolTown` | scoreboard/chat prefixes, territory actionbars, BlueMap claim markers, `LeeSeolCombat` same-affiliation PVP filter, TAB/PAPI displays | Vault, PlaceholderAPI `%leeseoltown_*%`, WorldGuard, BlueMap, ItemsAdder, WorldEdit, shared Town data |
+| Quest progress | `LeeSeolQuest` | `LeeSeolRanks`, `LeeSeolJobs`, `LeeSeolCrafting`, `LeeSeolEconomy` server menu | `LeeSeolQuestApi`, quest Bukkit events, PlaceholderAPI `%leeseolquest_*%`, `/won give` reward path |
+| Lobby / queue movement | `LeeSeolProxy` | `LeeSeolLobby` limbo handling, Paper menu move commands | Velocity `network.properties`/`queue.properties`, `leeseol:queue`, BungeeCord `Connect` |
+| Resource pack | `LeeSeolProxy` | ItemsAdder output and visual placeholder assets | Velocity pack offer, `resourcepack.properties`, `resourcepack` service |
+| Dungeon | `LeeSeolDungeon` | `LeeSeolQuest` `dungeon-enter`, `LeeSeolEconomy` menu bridge | survival-internal `dungeon` world, shared dungeon inventory/return files |
+| Combat / PVP | `LeeSeolCombat` | `LeeSeolQuest` `kill-player`, `LeeSeolTown` placeholders for same-affiliation reward checks | Citizens, PlaceholderAPI, `/opt/minecraft/shared/combat/pvp.yml` |
+| Cleanup alerts | `LeeSeolCleanup` | TAB/actionbar/external displays when they consume placeholders | PlaceholderAPI `%leeseolcleanup_*%`, direct actionbar countdown |
+| Jobs / activity | `LeeSeolJobs` | `LeeSeolQuest` `earn-money`, economy payout, rank multipliers | Vault, `LeeSeolQuestApi`, shared jobs data |
+| Crafting / repair | `LeeSeolCrafting` | `LeeSeolQuest` `craft-item`, economy fees, rank requirements | Vault, `LeeSeolQuestApi`, recipe PDC `recipe_id` |
+| Custom enchanting | `LeeSeolEnchanting` | item lore/display consumers only when explicitly scoped | AdvancedEnchantments |
+| Hologram | `LeeSeolHologram` | display-only consumers only when explicitly scoped | display entities, local hologram data |
+
+## Contract Smoke Tests
+
+Run only the rows touched by the change.
+
+| Contract | Shared surface | Smoke test |
+| --- | --- | --- |
+| Rank | `%leeseolranks_rank%`, `%leeseolranks_rank_lower%`, `%leeseolranks_image%`, `%leeseolranks_prefix%`, `%leeseolranks_kills%`, `%leeseolranks_next%`; `leeseolranks.rank.*`; BetterRanks image placeholders | `/leeseolrank status`, `/rank requirements`, `/rankup`, PAPI parse, LuckPerms permission check, TAB/BetterRanks/Town display |
+| Economy | Vault provider, `/won give`, shared balances/market/ledger files, survival menu moves | `/won`, `/pay`, `/won report`, `/market status`, `/servermenu`, dependent fee/reward path |
+| Content locations / neutral zones | `/content` registry, `contents.yml`, WorldGuard content regions, BlueMap markers, Town neutral-zone consumer | `/content list`, `/content tp`, `/party diag`, neutral-zone protection/claim behavior |
+| Party / nation / claim / war | Town data, nation colors, `%leeseoltown_affiliation%`, `%leeseoltown_rank%`, `%leeseoltown_has_party%`, `%leeseoltown_has_town%`, `%leeseoltown_town%`, `%leeseoltown_party%`, `%leeseoltown_nation%`, `%leeseoltown_nation_color%`, `%leeseoltown_nation_color_hex%`, `%leeseoltown_nation_type%`, `beacon-claim`, treasury/upkeep/debt/function-suspension fields, invasion/total `WarMode`, territory actionbar, scoreboard/chat | `/party me`, `/party claimprice`, `/party nation claimprice`, `/party nation deposit`, `/party nation upkeep`, `/party war declare <nation> invasion`, `/party diag`, PAPI parse, scoreboard/chat/territory display |
+| Town structures | ItemsAdder block ids, PDC `structure_core`/`structure_id`, `structures/*.schem`, nation core first-claim flow, WorldEdit paste/undo | structure core select/place, `nation_core`/`outpost`/`supply_depot`, `/party structure undo`, claim protection around core chunk |
+| Quest progress | `LeeSeolQuestApi`, objective strings, daily/weekly reset keys, quest events, `%leeseolquest_*%`, `/won give` rewards | `/quest progress`, `/lsquest objective`, PAPI parse, rank/jobs/crafting/server-menu progress hooks |
+| Dungeon | portal triggers, return locations, inventory sync, loot spots, dungeon protection | `/dungeon enter`, `/dungeon exit`, `/dungeon portal list`, `/dungeon chest list`, portal return, loot roll, protection |
+| Queue / lobby movement | backend names, `leeseol:queue` actions, `queue.properties`, `network.properties` | `/survival`, queue/limbo enter, `/lobby`, queue leave, kicked fallback |
+| Resource pack | Velocity offer URL/hash, hosted pack file | Velocity plugin load, pack offer on join, resourcepack service response |
+| Combat / PVP | combat tag, Citizens logout clone, PVP points, Town same-affiliation placeholders | `/combat status`, `/combat diag`, logout clone death, same town/nation reward block |
+| Cleanup alerts | cleanup timer, `%leeseolcleanup_next%`, `%leeseolcleanup_seconds%`, actionbar warning | `/cleanup status`, `/cleanup run`, PAPI parse, countdown/actionbar warning |
+| Jobs / crafting / enchanting | Vault payout/fee, quest progress hooks, rank requirements, AdvancedEnchantments bridge | `/activity`, `/lsjobs status`, `/craftmenu`, `/lscrafting status`, `/lsenchanting status` |
 
 ## Custom Plugins
 
-| Plugin | Target | Role | Minimal Files To Read | Depends On / Touches | Deploy / Verify |
-| --- | --- | --- | --- | --- | --- |
-| `LeeSeolCore` | survival, lobby | Core commands, launch pads, portal triggers, dimension gates, Velocity movement | `src/main/java/.../LeeSeolCorePlugin.java`, relevant `command/`, `listener/`, `manager/`, `src/main/resources/config.yml`, `plugin.yml` | Velocity channel, Paper worlds | `deploy-leeseolcore.sh`; restart affected Paper server |
-| `LeeSeolProxy` | Velocity | `/lobby`, `/survival`, `/servers` proxy movement, one-time network resource-pack offer | `src/main/java/.../LeeSeolProxyPlugin.java`, `command/`, `velocity-plugin.json` | `velocity.toml` backend names, `resourcepack` service URL/SHA1 | `deploy-leeseolproxy.sh`; restart `velocity` |
-| `LeeSeolEconomy` | survival, lobby | Won economy, Vault, shop UI, NPC helpers, Shift+F menu, DeluxeMenus bridge `/leeseolmenu`, Quest `open-gui` soft hook for `server-menu` opens | `LeeSeolEconomyPlugin.java`, `command/`, `listener/`, `gui/`, `servermenu/`, `config.yml`, `plugin.yml` | Vault, LeeSeolAuction, LeeSeolDungeon world blocks, optional DeluxeMenus command calls, soft LeeSeolQuest API reflection | `deploy-leeseoleconomy.sh`; restart affected Paper server |
-| `LeeSeolAuction` | survival, lobby | Admin-opened auction, user submissions, bidding GUI | `LeeSeolAuctionPlugin.java`, `command/`, `listener/`, `gui/`, `service/`, `config.yml`, `plugin.yml` | Vault, LeeSeolEconomy, dungeon-world restrictions | `deploy-leeseolauction.sh`; restart affected Paper server |
-| `LeeSeolDungeon` | survival only | Internal `dungeon` world, dungeon portals, block protection, loot chests | `LeeSeolDungeonPlugin.java`, `command/`, `listener/`, `service/`, `config.yml`, `plugin.yml` | LeeSeolEconomy server menu, LeeSeolAuction world block | `deploy-leeseoldungeon.sh`; restart `minecraft` only |
-| `LeeSeolLobby` | lobby only | Lobby spawn/protection rules | `LeeSeolLobbyPlugin.java`, listeners, `config.yml`, `plugin.yml` | Lobby world config | `deploy-leeseollobby.sh`; restart `lobby` |
-| `LeeSeolTown` | survival, lobby | Villages, nations, claims, affiliation prefixes, chat formatting, `%leeseoltown_has_party%` TAB routing placeholder | `LeeSeolTownPlugin.java`, `service/TownService.java`, `command/`, `listener/`, `hook/`, `config.yml`, `plugin.yml` | TAB, PlaceholderAPI, LeeSeolRanks rank prefix | Prefer jar-only deploy for chat/TAB fixes; restart affected Paper server |
-| `LeeSeolHologram` | survival, lobby | In-game RGB hologram displays | `LeeSeolHologramPlugin.java`, `command/`, `listener/`, `service/`, `config.yml`, `plugin.yml` | Display entities | `deploy-leeseolhologram.sh`; restart affected Paper server |
-| `LeeSeolCombat` | survival only | Combat tags, combat-logout death punishment, normal logout Citizens corpse clone, corpse drops, PVP points, player-head trophy rewards | `LeeSeolCombatPlugin.java`, `listener/SessionListener.java`, `listener/PvpRewardListener.java`, `manager/CombatCloneManager.java`, `service/PvpRewardService.java`, `storage/PvpPointStore.java`, `config.yml`, `plugin.yml` | Citizens, ProtocolLib, PlaceholderAPI/LeeSeolTown optional same-affiliation checks, survival inventory | `deploy-leeseolcombat.sh`; restart `minecraft` only; verify `version LeeSeolCombat`, `version Citizens`, `combat status` |
-| `LeeSeolCleanup` | survival only | Dropped item cleanup timer | `LeeSeolCleanupPlugin.java`, `listener/`, `service/`, `config.yml`, `plugin.yml` | TAB footer timer expectations | `deploy-leeseolcleanup.sh`; restart `minecraft` only |
-| `LeeSeolRanks` | survival, lobby | Shared rank data, one-rank permissions, rankup requirements, PlaceholderAPI rank display, ADMIN/DEV staff permission sync | `LeeSeolRanksPlugin.java`, `model/Rank.java`, `service/RankRequirementService.java`, `storage/`, `command/`, `hook/`, `config.yml`, `plugin.yml` | LuckPerms, Vault/LeeSeolEconomy balance checks, LeeSeolQuest `rank-up` hook, TAB, BetterRanks font images, LeeSeolTown chat | restart `minecraft` and `lobby`; verify `LeeSeolRanks enabled`, `rank requirements`, `leeseolrank status` |
-| `LeeSeolQuest` | survival, lobby | Tutorial, daily/weekly operating pass, quest progression, quest GUI, shared quest data, PlaceholderAPI quest tracker placeholders, Bukkit quest events, lightweight external progress API | `LeeSeolQuestPlugin.java`, `service/QuestService.java`, `model/QuestResetPeriod.java`, `api/LeeSeolQuestApi.java`, `event/`, `storage/QuestStore.java`, `command/`, `listener/`, `gui/`, `config.yml`, `plugin.yml` | PlaceholderAPI, Vault command rewards through `won give`, Citizens NPC click metadata, Crafting/Jobs/Ranks hooks | `deploy-leeseolquest.sh`; restart `minecraft` and `lobby`; verify `LeeSeolQuest enabled`, `Loaded 6 quests`, `Done`, and `lsquest reload` |
-| `LeeSeolJobs` | survival only | Activity income loop for mining, farming, fishing, and daily biome exploration with Vault payouts, daily limits, cooldowns, and placed-ore abuse guard | `LeeSeolJobsPlugin.java`, `listener/ExplorationListener.java`, `service/`, `storage/JobsStore.java`, `listener/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | `deploy-leeseoljobs.sh`; restart `minecraft`; verify `LeeSeolJobs enabled`, `Done`, `version LeeSeolJobs`, `/activity` or `lsjobs reload` |
-| `LeeSeolCrafting` | survival only | Config-driven crafting, processing, disassembly, money-based repair GUI, and Quest `craft-item` hook | `LeeSeolCraftingPlugin.java`, `service/`, `gui/`, `command/`, `config.yml`, `plugin.yml` | Vault/LeeSeolEconomy, soft LeeSeolQuest API reflection, LeeSeolRanks rank permissions | restart `minecraft`; verify `LeeSeolCrafting enabled`, `Done`, and `/lscrafting reload` when RCON/in-game access is available |
-| `LeeSeolHUD` | survival only | Image-based BossBar compass, HUD toggles, direct `/compasshud <on\|off>` command, and TAB below-name heart health display with fading heal suffixes | `LeeSeolHudPlugin.java`, `service/`, `listener/`, `hook/HudPlaceholderExpansion.java`, `command/`, `config.yml`, `plugin.yml` | PlaceholderAPI, TAB below-name objective, one-time ItemsAdder/resource-pack compass glyphs `U+E340`-`U+E7BF` and transparent WHITE BossBar sprites | restart `minecraft`; verify `LeeSeolHUD enabled`, `TAB enabled`, `Done`, `version LeeSeolHUD`, `lshud status`, resource-pack SHA, and in-game compass/health/heal display |
+| Plugin | Target | Current responsibility / commands | Key files and contracts | Minimal verify |
+| --- | --- | --- | --- | --- |
+| `LeeSeolCore` | survival + lobby | Common Paper core: server info, survival spawn/return, portal triggers, launch pads, Shift+F server menu, Citizens server NPCs, `/content`; commands `/serverinfo`, `/survivalspawn`, `/lscore`, `/leeseolcore`, `/content` | `LeeSeolCorePlugin.java`, `command/`, `content/`, `portal/`, `launchpad/`, `menu/`, `servernpc/`, `spawn/`, `listener/`, `config.yml`, `plugin.yml`; contracts: `contents.yml`, BungeeCord channel, WorldGuard/BlueMap content regions | `version LeeSeolCore`, `/content list`, `/survivalspawn`, `/leeseolcore servernpc list`; verify portal/launchpad/menu only if touched |
+| `LeeSeolTown` | survival | Party/town membership, nation colors, nation core-gated claims, treasury/upkeep/debt suspension, invasion/total war, chat channels, territory actionbar/scoreboard, neutral zones, structure core placement/undo; commands `/town`, `/party`, `/village`, `/towny`, `/tc`, `/pc`, `/nc` | `LeeSeolTownPlugin.java`, `command/`, `command/NationClaimCommand.java`, `service/TownService.java`, `service/TerritoryTransition.java`, `storage/TownStore.java`, `listener/`, `hook/`, `diagnostic/`, `scoreboard/`, `structure/`, `config.yml`, `plugin.yml`; contracts: `%leeseoltown_*%`, shared town data keys `towns`/`nations`/`wars`, `beacon-claim`, `upkeep.*`, `debt.*`, `functions-suspended`, Core `contents.yml`, ItemsAdder structure ids, WorldGuard/BlueMap, Vault | `version LeeSeolTown`, `/party me`, `/party claimprice`, `/party nation claimprice`, `/party nation claim`, `/party nation deposit`, `/party nation upkeep`, `/party war declare <nation> invasion`, `/party diag`, PAPI parse, scoreboard/chat/territory/claim smoke |
+| `LeeSeolQuest` | survival | Quests/tutorial, daily/weekly reset progress, GUI objectives, money reward dispatch; commands `/quest`, `/quests`, `/tutorial`, `/lsquest` | `LeeSeolQuestPlugin.java`, `api/`, `command/`, `listener/`, `gui/`, `service/`, `storage/`, `hook/`, `config.yml`, `plugin.yml`; contracts: `LeeSeolQuestApi`, quest events, `%leeseolquest_*%`, `/won give` | `version LeeSeolQuest`, `/quest`, `/quest progress`, `/lsquest reload`, PAPI parse, API consumer smoke |
+| `LeeSeolDungeon` | survival | Internal survival dungeon world, inventory sync, return locations, portal triggers, loot chests, dungeon protection; command `/dungeon` | `LeeSeolDungeonPlugin.java`, `command/`, `portal/`, `world/`, `loot/`, `protection/`, `inventory/`, `returnloc/`, `config.yml`, `plugin.yml`; contracts: shared dungeon inventory/return files, `dungeon` world | `version LeeSeolDungeon`, `/dungeon enter`, `/dungeon exit`, `/dungeon portal list`, `/dungeon chest list`, portal/loot/protection smoke |
+| `LeeSeolCombat` | survival | Combat tag, combat logout death/clone, pending deaths, Citizens clone hitbox, PVP reward points/trophies; command `/leeseolcombat` alias `/combat` | `LeeSeolCombatPlugin.java`, `command/`, `listener/`, `tag/`, `clone/`, `reward/`, `storage/`, `config.yml`, `plugin.yml`; contracts: Citizens, `%leeseoltown_town%`, `%leeseoltown_nation%`, shared `pvp.yml` | `version LeeSeolCombat`, `/combat status`, `/combat diag`, tag/logout clone, PVP reward filter |
+| `LeeSeolProxy` | velocity | Velocity server list, lobby/survival movement, maintenance/fallback, queue/limbo, resource-pack offer; commands `/servers`, `/lobby`, `/survival` | `LeeSeolProxyPlugin.java`, `command/`, `queue/`, `resourcepack/`, `velocity-plugin.json`; contracts: `leeseol:queue`, `network.properties`, `queue.properties`, `resourcepack.properties` | Velocity plugin load, `/servers`, `/survival`, `/lobby`, resource-pack offer, queue/limbo roundtrip |
+| `LeeSeolEconomy` | survival | Won economy, Vault provider, shops, market, NPC shops, server menu, ledger; commands `/won`, `/pay`, `/shop`, `/wonnpc`, `/market`, `/servermenu`, `/leeseolmenu` | `LeeSeolEconomyPlugin.java`, `command/`, `storage/`, `shop/`, `market/`, `npc/`, `servermenu/`, `vault/`, `ledger/`, `config.yml`, `plugin.yml`; contracts: Vault, shared balances/market/ledger, `/won give`, BungeeCord channel | `version LeeSeolEconomy`, `/won`, `/pay`, `/won report`, `/market status`, `/shop`, `/servermenu`, Vault provider check |
+| `LeeSeolAuction` | survival | Player auction GUI, bid/increment/end flow, blocked worlds; command `/auction` aliases `/ah`, `/auc` | `LeeSeolAuctionPlugin.java`, `command/`, `gui/`, `service/`, `storage/`, `vault/`, `config.yml`, `plugin.yml`; contracts: Vault economy, auction storage | `version LeeSeolAuction`, `/auction`, `/auction submit`, admin open/end flow, bid economy smoke |
+| `LeeSeolCleanup` | survival | Dropped-item cleanup timer, broadcasts, actionbar countdown, cleanup placeholders; command `/leeseolcleanup` aliases `/cleanup`, `/itemcleanup` | `LeeSeolCleanupPlugin.java`, `command/`, `service/`, `hook/`, `config.yml`, `plugin.yml`; contracts: `%leeseolcleanup_next%`, `%leeseolcleanup_seconds%` | `version LeeSeolCleanup`, `/cleanup status`, `/cleanup run`, PAPI parse, warning/actionbar smoke |
+| `LeeSeolRanks` | survival | Rank model, rank-up requirements, kill/playtime tracking, Vault money requirement, LuckPerms sync, PAPI/BetterRanks visual placeholders; commands `/rank`, `/ranks`, `/rankup`, `/leeseolrank`, `/lsrank` | `LeeSeolRanksPlugin.java`, `command/`, `hook/`, `listener/`, `model/`, `permission/`, `requirement/`, `storage/`, `config.yml`, `plugin.yml`; contracts: `%leeseolranks_*%`, `leeseolranks.rank.*`, LuckPerms, Vault, Quest rank-up hook | `version LeeSeolRanks`, `/rank`, `/rank requirements`, `/rankup`, `/leeseolrank status`, PAPI parse, LuckPerms/TAB display |
+| `LeeSeolJobs` | survival | Mining/farming/fishing/exploration activity rewards, cooldowns, block history, daily limits; commands `/jobs`, `/activity`, `/activities`, `/expedition`, `/explore`, `/lsjobs` | `LeeSeolJobsPlugin.java`, `command/`, `listener/`, `service/`, `storage/`, `config.yml`, `plugin.yml`; contracts: Vault payout, `LeeSeolQuestApi` `earn-money`, shared jobs data | `version LeeSeolJobs`, `/activity`, `/lsjobs status`, one reward source, Vault payout, quest progress hook |
+| `LeeSeolCrafting` | survival | Custom recipe menus, forge/process/disassemble, repair, failure/cost/rank checks; commands `/craftmenu`, `/forge`, `/process`, `/disassemble`, `/repair`, `/lscrafting` | `LeeSeolCraftingPlugin.java`, `command/`, `gui/`, `service/`, `model/`, `config.yml`, `plugin.yml`; contracts: Vault fee, `LeeSeolQuestApi` `craft-item`, recipe PDC `recipe_id` | `version LeeSeolCrafting`, `/craftmenu`, `/forge`, `/process`, `/disassemble`, `/repair`, `/lscrafting status` |
+| `LeeSeolEnchanting` | survival | Custom enchanting-table rolls, bookshelf scaling, AdvancedEnchantments bridge, lore descriptions; command `/lsenchanting` aliases `/leeseolenchanting`, `/customenchanting` | `LeeSeolEnchantingPlugin.java`, `command/`, `config/`, `listener/`, `service/`, `config.yml`, `plugin.yml`; contracts: AdvancedEnchantments reflective API, item lore | `version LeeSeolEnchanting`, `/lsenchanting status`, `/lsenchanting bookshelves`, table roll, lore rewrite |
+| `LeeSeolLobby` | lobby | Movement-only lobby rules, spawn/void return, tab header, limbo world and queue plugin messages; command `/lobbysetspawn` | `LeeSeolLobbyPlugin.java`, `config.yml`, `plugin.yml`; contracts: `leeseol:queue`, lobby spawn/rules/limbo config | `version LeeSeolLobby`, `/lobbysetspawn`, spawn/void/rules, tab header, queue limbo roundtrip |
+| `LeeSeolHologram` | survival + lobby | Display-entity holograms with editable lines and spacing; command `/holo` aliases `/hologram`, `/lholo` | `LeeSeolHologramPlugin.java`, `command/`, `model/`, `service/`, `storage/`, `config.yml`, `plugin.yml`; contracts: local hologram data file only | `version LeeSeolHologram`, `/holo list`, create/addline/move/delete display smoke |
+| `LeeSeolHUD` | disabled | Legacy HUD remains inactive. Descriptor still declares `/hud`, `/compasshud`, `/lshud`, but it is not an active deploy target | `LeeSeolHUD/`, `plugin.yml`, `config.yml`; old BossBar/PAPI HUD code only | Verify inactive/absent only; do not deploy unless explicitly reactivated |
 
-## External Config Hotspots
+## Deploy Targets
 
-| Area | Server Path | Notes |
-| --- | --- | --- |
-| TAB survival | `/opt/minecraft/server/plugins/TAB/` | Uses `%leeseolranks_prefix%`, `%leeseoltown_affiliation%`, and `%leeseoltown_has_party%`; party players route to column 4 slots `62-80`. |
-| TAB lobby | `/opt/minecraft/lobby/plugins/TAB/` | Mirrors survival party routing where requested. |
-| ItemsAdder lobby | `/opt/minecraft/lobby/plugins/ItemsAdder/` | Generates pack content only; auto-apply/self-host should stay disabled. |
-| ItemsAdder survival | `/opt/minecraft/server/plugins/ItemsAdder/` | Uses the already-offered shared pack; auto-apply/self-host should stay disabled. |
-| Resource pack host | `/opt/minecraft/lobby/plugins/ItemsAdder/output/` | Served by `resourcepack.service` on port `8163`; Velocity offers this URL once. |
-| DeluxeMenus survival/lobby | `/opt/minecraft/*/plugins/DeluxeMenus/` | Current Shift+F visual menu is PixieStudios `gui_menus/pixiestudios_gamemenu1.yml` plus the related 9 Pixie menus; patched clicks call `/leeseolmenu` for auction, shop, dungeon, and server movement. Survival menu titles intentionally use direct glyphs `U+F806 + U+E02F..U+E037` instead of `:pixiestudios_*:` tags because survival-side tag conversion failed to render the GUI image. |
-| Shared ranks | `/opt/minecraft/shared/ranks/ranks.yml` | Current expected records: `lee_seol=ADMIN`, `YamiyongO_o=DEV`. |
-| Shared quests | `/opt/minecraft/shared/quests/data.yml` | Shared lobby/survival quest progress for `LeeSeolQuest`. |
-| Shared jobs | `/opt/minecraft/shared/jobs/data.yml` | Survival-only activity statistics, daily reward totals, and daily rewarded exploration biomes. |
-| LuckPerms | MariaDB-backed | Avoid direct DB edits; prefer console commands or plugin sync. |
+- Survival Paper `/opt/minecraft/server/plugins`: `LeeSeolCore`,
+  `LeeSeolHologram`, `LeeSeolEconomy`, `LeeSeolAuction`, `LeeSeolDungeon`,
+  `LeeSeolCombat`, `LeeSeolCleanup`, `LeeSeolRanks`, `LeeSeolQuest`,
+  `LeeSeolJobs`, `LeeSeolCrafting`, `LeeSeolEnchanting`, `LeeSeolTown`.
+- Lobby Paper `/opt/minecraft/lobby/plugins`: `LeeSeolCore`, `LeeSeolLobby`,
+  `LeeSeolHologram`.
+- Velocity `/opt/minecraft/velocity/plugins`: `LeeSeolProxy`.
+- Disabled legacy: `LeeSeolHUD`.
+- Do not deploy survival/lobby plugin sets into `newworld`.
 
-## Minimal Verification By Task
+## External Hotspots
 
-- Jar change: build, descriptor check, deploy target jar, restart affected service,
-  check recent errors.
-- Config change: backup, edit exact config, restart or plugin reload, check recent
-  errors and the exact changed value.
-- Resource pack change: regenerate/copy `generated.zip`, update
-  `/opt/minecraft/velocity/plugins/leeseolproxy/resourcepack.properties` SHA1,
-  restart `resourcepack` and `velocity`, GET-download it, verify required assets
-  exist in zip, then join server.
-- Rank/TAB change: verify shared rank file, LuckPerms sync log, TAB placeholder output
-  in-game.
+- MariaDB-backed LuckPerms: rank sync and permissions display.
+- PlaceholderAPI: ranks, town, quest, cleanup, HUD legacy.
+- TAB/BetterRanks/BetterHUD configs: consume visual placeholders and resource-pack
+  glyphs; edit only when the display contract changes.
+- ItemsAdder: generated resource pack and Town structure block ids.
+- WorldGuard/WorldEdit: Core content regions and Town structures/neutral zones.
+- BlueMap: Core content markers, Town neutral/nation claim markers.
+- Citizens: Core server NPCs, Town integrations, Combat logout clones.
+- AdvancedEnchantments: `LeeSeolEnchanting` custom enchant bridge.
+- Shared files under `/opt/minecraft/shared`: economy, ranks, quests, jobs,
+  dungeon inventory/returns, town data/neutral zones, combat PVP data.
+- Resource pack host: service `resourcepack`, port `8163`; network pack offer is
+  owned by Velocity/`LeeSeolProxy`.
 
-## Current Plugin-Part Priority
+## Notes
 
-1. Plugin pass first: use `LeeSeolQuest` operating pass as the top-level player guide,
-   then connect Jobs, Crafting, Ranks, Dungeon, Combat, Economy, and Auction into that
-   loop.
-2. Item/content pass second: define item value tiers, sources, sinks, and dungeon or
-   crafting uses before adding many new custom items.
-3. Balance pass third: use `LeeSeolEconomy`, `LeeSeolJobs`, `LeeSeolCrafting`,
-   `LeeSeolRanks`, `LeeSeolCombat`, and AdvancedEnchantments data to tune the
-   survival economy/progression/PvP baseline.
-4. Measure live player loops needed for balance: activity mining/farming/fishing and
-   exploration income, Crafting material and money consumption, Rank progress
-   requirements, Quest reward impact, and Combat PVP rewards.
-5. Validate the first AdvancedEnchantments PvP safety patch from 2026-06-11 before
-   opening serious PvP or adding new high-value loot sources.
-6. Tune economy/progression in this order unless the user changes direction:
-   activity income and limits, Crafting costs and repair, Rank requirements, Quest
-   rewards, then auction/shop value assumptions.
-7. Keep player-online verification active, but treat it as balance measurement rather
-   than the main goal: Quest GUI/hooks, Jobs payouts, Crafting flows, Ranks rank-up,
-   HUD display, and Combat rewards still need real-player checks.
+- `TODO.md` is for agreed current-goal deferrals only. It is not a source of truth
+  for this structure map.
+- Do not add development logs, old reports, or planned features here unless code or
+  active config already implements them.

@@ -1,74 +1,30 @@
 # TOKEN_WORKFLOW.md
 
-This workflow reduces token use during plugin development and server maintenance.
+`AGENTS.md` is the canonical low-token workflow. Keep this file as a tiny reminder,
+not a second rulebook.
 
-## Default Context Budget
+## Default Read Set
 
-Before starting a normal plugin task, read only:
+- Always read `AGENTS.md`.
+- Read `SERVER_STATE.md` only for architecture, deploy, or live service state.
+- For plugin work, search `PLUGIN_INDEX.md` for the target plugin and open only the
+  listed files.
+- Read `TODO.md` only for planning or deferred work.
+- Read handoff files only when the user provides or explicitly names one.
 
-1. `AGENTS.md`
-2. `SERVER_STATE.md`
-3. `PLUGIN_INDEX.md`
-4. `TODO.md` only if the request mentions deferred work
-5. The target plugin's minimal files from `PLUGIN_INDEX.md`
+## Work Shape
 
-Do not read every plugin, every deploy script, or broad server logs unless the task
-requires cross-plugin debugging.
+- One request should target one feature and one primary plugin.
+- If multiple plugins are necessary, state the order before editing.
+- Use recent logs only for live verification.
+- Do not check Chunky, BlueMap, old GUI/resource-pack experiments, or deleted reports
+  unless explicitly requested.
 
-## One Plugin Rule
+## After Work
 
-- Treat one request as one feature in one primary plugin.
-- If a request touches multiple plugins, name the order before editing.
-- Deploy through one main chat/session only. Other chats may draft or analyze, but
-  should not deploy to the live VM.
+Update only the shortest relevant active file:
 
-## Search Rules
-
-- Use `rg --files` to locate files.
-- Use targeted `rg "symbol"` inside the target plugin.
-- Avoid broad text searches across the whole workspace unless the dependency is
-  unknown.
-- Prefer reading one class at a time over loading entire modules.
-
-## Remote Log Rules
-
-- Do not paste or read long historical logs.
-- Prefer:
-
-```bash
-sudo journalctl -u minecraft -u lobby -u velocity --since "5 minutes ago" -p err --no-pager
-```
-
-- If old logs are needed, grep only the exact plugin name or error phrase.
-
-## Deploy Rules
-
-- Build/deploy only the target plugin.
-- Restart only affected services.
-- If a config is owned by a running plugin and the plugin saves on disable, stop the
-  service before editing that config.
-- Always clean temporary scripts created for the current task.
-
-## Summary Cache Rule
-
-After a meaningful change, update only the shortest relevant state file:
-
-- Architecture or service changes: `SERVER_STATE.md`
-- Plugin responsibility or deploy target changes: `PLUGIN_INDEX.md`
-- Deferred work: `TODO.md`
-- New repeated mistake: `AGENTS.md`
-
-Avoid writing long narrative summaries into the chat when a state file can hold the
-stable fact.
-
-## User Request Shortcut
-
-For lowest token use, send requests in this shape:
-
-```text
-Target: LeeSeolRanks
-Goal: Change only the default PLAYER rank behavior.
-Scope: Touch LeeSeolRanks only. Do not edit TAB or ItemsAdder.
-Verify: Build succeeds and recent server logs have no errors.
-Deploy: Apply live. Restart minecraft/lobby is allowed.
-```
+- `SERVER_STATE.md`: deployed architecture or service state
+- `PLUGIN_INDEX.md`: plugin ownership, read set, deploy target, verification
+- `TODO.md`: backlog or current development order
+- `AGENTS.md`: durable operating rule or repeated mistake

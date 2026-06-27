@@ -21,6 +21,10 @@
 *.swp
 *~
 
+# Local git worktree sandboxes
+.worktrees/
+worktrees/
+
 # Server/config backups created during deployment
 *.before-*
 *.before_*
@@ -34,6 +38,13 @@ assets/backup/
 previews/
 resourcepacks/
 diagnostics/
+outputs/
+
+# Generated translation/reference exports
+ADVANCED_ENCHANTMENTS_*.tsv
+ADVANCED_ENCHANTMENTS_*LIST.md
+AdvancedEnchantments_*.xlsx
+tools/retranslate_advanced_enchantments.py
 
 # IDE/editor noise
 .idea/
