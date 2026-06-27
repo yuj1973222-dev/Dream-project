@@ -33,6 +33,8 @@ import me.leeseol.proxy.command.SurvivalQueueCommand;
 import me.leeseol.proxy.network.NetworkSettings;
 import me.leeseol.proxy.queue.QueueSettings;
 import me.leeseol.proxy.queue.SurvivalQueueController;
+import me.leeseol.proxy.resourcepack.ResourcePackOfferService;
+import me.leeseol.proxy.resourcepack.ResourcePackSettings;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
@@ -44,13 +46,11 @@ import org.slf4j.Logger;
         authors = {"lee_seol"}
 )
 public final class LeeSeolProxyPlugin {
-    private static final String DEFAULT_RESOURCE_PACK_URL = "http://34.64.126.179:8163/generated.zip";
-    private static final String DEFAULT_RESOURCE_PACK_SHA1 = "6484feef71105bfd2a2d6acdcc2af6a1bde2f598";
-
     private final ProxyServer proxy;
     private final Logger logger;
     private final Path dataDirectory;
     private ResourcePackInfo resourcePackInfo;
+    private ResourcePackOfferService resourcePackOfferService;
     private NetworkSettings networkSettings = NetworkSettings.defaults();
     private SurvivalQueueController queueController;
     private ChannelIdentifier queueChannel;
@@ -72,6 +72,7 @@ public final class LeeSeolProxyPlugin {
                 .build();
         commandManager.register(serversMeta, new ServerListCommand(proxy));
 
+        resourcePackOfferService = new ResourcePackOfferService(proxy, logger);
         loadResourcePackInfo();
         networkSettings = loadNetworkSettings();
         QueueSettings queueSettings = loadQueueSettings();
@@ -197,11 +198,7 @@ public final class LeeSeolProxyPlugin {
     private void loadResourcePackInfo() {
         Path configPath = dataDirectory.resolve("resourcepack.properties");
         Properties properties = new Properties();
-        properties.setProperty("enabled", "true");
-        properties.setProperty("url", DEFAULT_RESOURCE_PACK_URL);
-        properties.setProperty("sha1", DEFAULT_RESOURCE_PACK_SHA1);
-        properties.setProperty("force", "false");
-        properties.setProperty("prompt", "익스페디션 서버 리소스팩을 적용합니다.");
+        ResourcePackSettings.defaults().writeDefaultsTo(properties);
 
         try {
             Files.createDirectories(dataDirectory);
@@ -220,37 +217,7 @@ public final class LeeSeolProxyPlugin {
             return;
         }
 
-        boolean enabled = Boolean.parseBoolean(properties.getProperty("enabled", "true"));
-        if (!enabled) {
-            resourcePackInfo = null;
-            logger.info("Velocity resource pack offer disabled.");
-            return;
-        }
-
-        String url = properties.getProperty("url", "").trim();
-        String sha1 = properties.getProperty("sha1", "").trim();
-        String prompt = properties.getProperty("prompt", "").trim();
-        boolean force = Boolean.parseBoolean(properties.getProperty("force", "false"));
-
-        if (url.isEmpty() || sha1.isEmpty()) {
-            resourcePackInfo = null;
-            logger.warn("Resource pack url or sha1 is empty. Resource pack offer is disabled.");
-            return;
-        }
-
-        try {
-            ResourcePackInfo.Builder builder = proxy.createResourcePackBuilder(url)
-                    .setHash(hexToBytes(sha1))
-                    .setShouldForce(force);
-            if (!prompt.isEmpty()) {
-                builder.setPrompt(Component.text(prompt));
-            }
-            resourcePackInfo = builder.build();
-            logger.info("Velocity resource pack offer enabled: {}", url);
-        } catch (IllegalArgumentException exception) {
-            resourcePackInfo = null;
-            logger.warn("Invalid resource pack settings. Resource pack offer is disabled.", exception);
-        }
+        resourcePackInfo = resourcePackOfferService.reload(ResourcePackSettings.from(properties));
     }
 
     private NetworkSettings loadNetworkSettings() {
@@ -297,24 +264,6 @@ public final class LeeSeolProxyPlugin {
         }
 
         return QueueSettings.from(properties);
-    }
-
-    private static byte[] hexToBytes(String hex) {
-        String normalized = hex.trim();
-        if (normalized.length() != 40) {
-            throw new IllegalArgumentException("SHA1 must be 40 hex characters.");
-        }
-
-        byte[] bytes = new byte[20];
-        for (int index = 0; index < bytes.length; index++) {
-            int high = Character.digit(normalized.charAt(index * 2), 16);
-            int low = Character.digit(normalized.charAt(index * 2 + 1), 16);
-            if (high < 0 || low < 0) {
-                throw new IllegalArgumentException("SHA1 contains non-hex characters.");
-            }
-            bytes[index] = (byte) ((high << 4) + low);
-        }
-        return bytes;
     }
 
 }
