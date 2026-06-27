@@ -51,7 +51,7 @@ public final class CombatCloneManager {
         registry = CitizensAPI.createInMemoryNPCRegistry("leeseolcombat");
     }
 
-    public void cleanupStaleHitboxes() {
+    public int cleanupStaleHitboxes() {
         int removed = 0;
         for (World world : plugin.getServer().getWorlds()) {
             removed += cleanupStaleHitboxes(world);
@@ -59,6 +59,7 @@ public final class CombatCloneManager {
         if (removed > 0) {
             plugin.getLogger().info("Removed stale combat hitboxes: " + removed);
         }
+        return removed;
     }
 
     public int cleanupStaleHitboxes(Chunk chunk) {
@@ -234,6 +235,10 @@ public final class CombatCloneManager {
 
     public int activeHitboxCount() {
         return clonesByHitbox.size();
+    }
+
+    public boolean registryInitialized() {
+        return registry != null;
     }
 
     private void killClone(CombatClone clone, Player attacker) {

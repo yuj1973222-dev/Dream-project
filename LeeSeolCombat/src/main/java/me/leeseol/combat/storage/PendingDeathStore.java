@@ -45,6 +45,14 @@ public final class PendingDeathStore {
         return pendingDeaths.contains(uuid);
     }
 
+    public int count() {
+        return pendingDeaths.size();
+    }
+
+    public File file() {
+        return file;
+    }
+
     private void save() {
         YamlConfiguration yaml = new YamlConfiguration();
         yaml.set("players", pendingDeaths.stream().map(UUID::toString).sorted().toList());

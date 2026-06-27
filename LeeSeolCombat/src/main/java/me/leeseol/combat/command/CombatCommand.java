@@ -1,6 +1,9 @@
 package me.leeseol.combat.command;
 
 import me.leeseol.combat.LeeSeolCombatPlugin;
+import me.leeseol.combat.diagnostic.CombatDiagnosticService;
+import me.leeseol.combat.diagnostic.DiagnosticReport;
+import me.leeseol.combat.diagnostic.FeatureDiagnostic;
 import me.leeseol.combat.model.PvpRecord;
 import me.leeseol.combat.util.Text;
 import org.bukkit.Bukkit;
@@ -33,6 +36,12 @@ public final class CombatCommand implements CommandExecutor {
             plugin.reloadPluginConfig();
             plugin.message(sender, "reload");
             return true;
+        }
+        if (args[0].equalsIgnoreCase("diag") || args[0].equalsIgnoreCase("diagnose")) {
+            if (!hasAdmin(sender)) {
+                return true;
+            }
+            return diag(sender, args);
         }
         if (args[0].equalsIgnoreCase("force")) {
             if (!hasAdmin(sender)) {
@@ -76,6 +85,17 @@ public final class CombatCommand implements CommandExecutor {
         }
         plugin.combatTagManager().forceTag(first, second);
         plugin.message(sender, "force-combat-admin", "%player1%", first.getName(), "%player2%", second.getName());
+        return true;
+    }
+
+    private boolean diag(CommandSender sender, String[] args) {
+        boolean fix = args.length >= 2 && args[1].equalsIgnoreCase("fix");
+        DiagnosticReport report = new CombatDiagnosticService(plugin).run(fix);
+        sender.sendMessage("LeeSeolCombat feature diagnostics" + (fix ? " (fix)" : ""));
+        for (FeatureDiagnostic result : report.results()) {
+            sender.sendMessage(result.line());
+        }
+        sender.sendMessage(report.summaryLine());
         return true;
     }
 
@@ -155,6 +175,7 @@ public final class CombatCommand implements CommandExecutor {
     private static void sendUsage(CommandSender sender, String label) {
         Text.send(sender, "&c사용법: /" + label + " status");
         Text.send(sender, "&c사용법: /" + label + " reload");
+        Text.send(sender, "&c사용법: /" + label + " diag [fix]");
         Text.send(sender, "&c사용법: /" + label + " force <유저1> <유저2>");
         Text.send(sender, "&c사용법: /" + label + " spectatorclone <on|off>");
         Text.send(sender, "&c사용법: /" + label + " pvp [player]");

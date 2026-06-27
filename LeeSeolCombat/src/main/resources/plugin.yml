@@ -13,7 +13,7 @@ load: POSTWORLD
 commands:
   leeseolcombat:
     description: LeeSeol combat system command.
-    usage: /leeseolcombat <status|reload|force|spectatorclone|pvp|pvppoints>
+    usage: /leeseolcombat <status|reload|diag|force|spectatorclone|pvp|pvppoints>
     aliases:
       - combat
 permissions:
