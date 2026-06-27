@@ -8,7 +8,6 @@ JAR="$PROJECT_DIR/target/LeeSeolQuest-0.1.0.jar"
 CONFIG="$PROJECT_DIR/src/main/resources/config.yml"
 STAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 SURVIVAL="/opt/minecraft/server"
-LOBBY="/opt/minecraft/lobby"
 BACKUP_DIR="/opt/minecraft/backups"
 SHARED_DIR="/opt/minecraft/shared/quests"
 
@@ -55,25 +54,19 @@ deploy_one() {
 }
 
 deploy_one survival "$SURVIVAL"
-deploy_one lobby "$LOBBY"
 sudo chown -R yuj1973222:yuj1973222 "$SHARED_DIR"
 
-sudo systemctl restart minecraft lobby
+sudo systemctl restart minecraft
 sleep 12
 
 echo "== services =="
-systemctl is-active minecraft lobby
+systemctl is-active minecraft
 echo "== survival logs =="
 sudo journalctl -u minecraft --since "3 minutes ago" --no-pager \
   | grep -Ei "LeeSeolQuest|Done|ERROR|Exception|Could not load" || true
-echo "== lobby logs =="
-sudo journalctl -u lobby --since "3 minutes ago" --no-pager \
-  | grep -Ei "LeeSeolQuest|Done|ERROR|Exception|Could not load" || true
 echo "== deployed =="
 ls -lh "$SURVIVAL/plugins/LeeSeolQuest-0.1.0.jar" \
-  "$LOBBY/plugins/LeeSeolQuest-0.1.0.jar" \
-  "$SURVIVAL/plugins/LeeSeolQuest/config.yml" \
-  "$LOBBY/plugins/LeeSeolQuest/config.yml"
+  "$SURVIVAL/plugins/LeeSeolQuest/config.yml"
 
 sudo rm -rf "$BUILD_DIR"
 rm -f "$ARCHIVE"

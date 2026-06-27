@@ -27,7 +27,7 @@ fi
 sudo mkdir -p /opt/minecraft/shared/auction /opt/minecraft/backups
 sudo chown -R yuj1973222:yuj1973222 /opt/minecraft/shared/auction
 
-for dir in /opt/minecraft/server /opt/minecraft/lobby /opt/minecraft/dungeon; do
+for dir in /opt/minecraft/server; do
   if [ ! -d "$dir" ]; then
     continue
   fi
@@ -50,7 +50,7 @@ for dir in /opt/minecraft/server /opt/minecraft/lobby /opt/minecraft/dungeon; do
     "$dir/plugins/LeeSeolAuction/config.yml"
 done
 
-echo "LeeSeolAuction jar and config deployed. Restart Paper servers to apply."
+echo "LeeSeolAuction jar and config deployed to survival only. Restart minecraft to apply."
 
 sudo rm -rf "$BUILD_DIR"
 rm -f "$ARCHIVE"

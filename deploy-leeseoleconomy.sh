@@ -26,7 +26,7 @@ fi
 
 sudo mkdir -p /opt/minecraft/backups
 
-for dir in /opt/minecraft/server /opt/minecraft/lobby /opt/minecraft/dungeon; do
+for dir in /opt/minecraft/server; do
   if [ ! -d "$dir" ]; then
     continue
   fi
@@ -48,12 +48,6 @@ for dir in /opt/minecraft/server /opt/minecraft/lobby /opt/minecraft/dungeon; do
   sudo chown yuj1973222:yuj1973222 "$dir/plugins/LeeSeolEconomy-0.1.0.jar"
 
   local_server="survival"
-  if [ "$name" = "lobby" ]; then
-    local_server="lobby"
-  elif [ "$name" = "dungeon" ]; then
-    local_server="newworld"
-  fi
-
   sudo python3 - "$dir/plugins/LeeSeolEconomy/config.yml" "$local_server" <<'PY'
 from pathlib import Path
 import re
@@ -72,7 +66,7 @@ PY
   sudo chown yuj1973222:yuj1973222 "$dir/plugins/LeeSeolEconomy/config.yml"
 done
 
-echo "LeeSeolEconomy jar deployed. Restart Paper servers after related config patches."
+echo "LeeSeolEconomy jar deployed to survival only. Restart minecraft after related config patches."
 
 sudo rm -rf "$BUILD_DIR"
 rm -f "$ARCHIVE"

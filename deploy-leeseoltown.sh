@@ -28,9 +28,9 @@ fi
 
 sudo mkdir -p /opt/minecraft/shared/town /opt/minecraft/backups
 
-sudo systemctl stop lobby minecraft
+sudo systemctl stop minecraft
 
-for dir in /opt/minecraft/server /opt/minecraft/lobby; do
+for dir in /opt/minecraft/server; do
   name="$(basename "$dir")"
   sudo mkdir -p "$dir/plugins"
 
@@ -53,26 +53,20 @@ for dir in /opt/minecraft/server /opt/minecraft/lobby; do
   fi
 done
 
-sudo systemctl start minecraft lobby
+sudo systemctl start minecraft
 
 sleep 90
 
 echo "== services =="
-systemctl is-active velocity minecraft lobby
+systemctl is-active velocity minecraft
 
 echo "== survival LeeSeolTown logs =="
 sudo journalctl -u minecraft -n 220 --no-pager \
   | grep -Ei 'LeeSeolTown|Done|error|exception|Could not load' \
   | tail -100
 
-echo "== lobby LeeSeolTown logs =="
-sudo journalctl -u lobby -n 220 --no-pager \
-  | grep -Ei 'LeeSeolTown|Done|error|exception|Could not load' \
-  | tail -100
-
 echo "== deployed jars =="
-ls -lh /opt/minecraft/server/plugins/LeeSeolTown-0.1.0.jar \
-  /opt/minecraft/lobby/plugins/LeeSeolTown-0.1.0.jar
+ls -lh /opt/minecraft/server/plugins/LeeSeolTown-0.1.0.jar
 
 echo "== cleanup =="
 sudo rm -rf "$BUILD_DIR"

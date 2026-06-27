@@ -26,9 +26,6 @@ if [ ! -f "$JAR" ]; then
 fi
 
 TARGETS=(/opt/minecraft/server /opt/minecraft/lobby)
-if [ -d /opt/minecraft/dungeon ]; then
-  TARGETS+=(/opt/minecraft/dungeon)
-fi
 
 for dir in "${TARGETS[@]}"; do
   name="$(basename "$dir")"
@@ -97,11 +94,6 @@ PY
 done
 
 SERVICES=(minecraft lobby)
-if systemctl list-unit-files newworld.service --no-pager --no-legend | grep -q newworld.service; then
-  if systemctl is-active --quiet newworld; then
-    SERVICES+=(newworld)
-  fi
-fi
 
 sudo systemctl restart "${SERVICES[@]}"
 
@@ -119,13 +111,6 @@ echo "== lobby LeeSeolCore logs =="
 sudo journalctl -u lobby -n 240 --no-pager \
   | grep -Ei 'LeeSeolCore|PortalTrigger|LaunchPad|Done|error|exception' \
   | tail -100
-
-if systemctl list-unit-files newworld.service --no-pager --no-legend | grep -q newworld.service; then
-  echo "== newworld LeeSeolCore logs =="
-  sudo journalctl -u newworld -n 240 --no-pager \
-    | grep -Ei 'LeeSeolCore|PortalTrigger|LaunchPad|Done|error|exception' \
-    | tail -100
-fi
 
 echo "== deployed jars =="
 for dir in "${TARGETS[@]}"; do

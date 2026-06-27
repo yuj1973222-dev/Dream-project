@@ -8,7 +8,6 @@ JAR="$PROJECT_DIR/target/LeeSeolRanks-0.1.0.jar"
 CONFIG="$PROJECT_DIR/src/main/resources/config.yml"
 STAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 SURVIVAL="/opt/minecraft/server"
-LOBBY="/opt/minecraft/lobby"
 BACKUP_DIR="/opt/minecraft/backups"
 SHARED_DIR="/opt/minecraft/shared/ranks"
 SHARED_DATA="$SHARED_DIR/ranks.yml"
@@ -35,8 +34,6 @@ sudo mkdir -p "$BACKUP_DIR" "$SHARED_DIR"
 if [ ! -f "$SHARED_DATA" ]; then
   if [ -f "$SURVIVAL/plugins/LeeSeolRanks/ranks.yml" ]; then
     sudo cp -f "$SURVIVAL/plugins/LeeSeolRanks/ranks.yml" "$SHARED_DATA"
-  elif [ -f "$LOBBY/plugins/LeeSeolRanks/ranks.yml" ]; then
-    sudo cp -f "$LOBBY/plugins/LeeSeolRanks/ranks.yml" "$SHARED_DATA"
   fi
 fi
 
@@ -74,24 +71,18 @@ deploy_one() {
 }
 
 deploy_one survival "$SURVIVAL"
-deploy_one lobby "$LOBBY"
 sudo chown -R yuj1973222:yuj1973222 "$SHARED_DIR"
 
-sudo systemctl restart minecraft lobby
+sudo systemctl restart minecraft
 sleep 12
 
 echo "== services =="
-systemctl is-active minecraft lobby
+systemctl is-active minecraft
 echo "== survival logs =="
 sudo journalctl -u minecraft --since "3 minutes ago" --no-pager \
   | grep -Ei "LeeSeolRanks|PlaceholderAPI|Done|ERROR|Exception|Could not load" || true
-echo "== lobby logs =="
-sudo journalctl -u lobby --since "3 minutes ago" --no-pager \
-  | grep -Ei "LeeSeolRanks|PlaceholderAPI|Done|ERROR|Exception|Could not load" || true
 echo "== deployed =="
-ls -lh "$SURVIVAL/plugins/LeeSeolRanks-0.1.0.jar" \
-  "$LOBBY/plugins/LeeSeolRanks-0.1.0.jar" \
-  "$SHARED_DATA"
+ls -lh "$SURVIVAL/plugins/LeeSeolRanks-0.1.0.jar" "$SHARED_DATA"
 
 sudo rm -rf "$BUILD_DIR"
 rm -f "$ARCHIVE"
