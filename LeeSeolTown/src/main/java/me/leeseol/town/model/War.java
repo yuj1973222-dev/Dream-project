@@ -4,15 +4,21 @@ public final class War {
     private final String id;
     private final String attackerNationId;
     private final String defenderNationId;
+    private final WarMode mode;
     private WarStatus status;
     private final long declaredAt;
     private long protectionUntil;
     private boolean defenderProtectionActive;
 
     public War(String id, String attackerNationId, String defenderNationId, WarStatus status, long declaredAt) {
+        this(id, attackerNationId, defenderNationId, WarMode.INVASION, status, declaredAt);
+    }
+
+    public War(String id, String attackerNationId, String defenderNationId, WarMode mode, WarStatus status, long declaredAt) {
         this.id = id;
         this.attackerNationId = attackerNationId;
         this.defenderNationId = defenderNationId;
+        this.mode = mode == null ? WarMode.INVASION : mode;
         this.status = status;
         this.declaredAt = declaredAt;
     }
@@ -27,6 +33,10 @@ public final class War {
 
     public String defenderNationId() {
         return defenderNationId;
+    }
+
+    public WarMode mode() {
+        return mode;
     }
 
     public WarStatus status() {

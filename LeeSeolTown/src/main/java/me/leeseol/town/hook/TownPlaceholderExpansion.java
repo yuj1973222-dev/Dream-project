@@ -62,8 +62,14 @@ public final class TownPlaceholderExpansion extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("nation")) {
             return nation == null ? "" : nation.name();
         }
+        if (params.equalsIgnoreCase("nation_color")) {
+            return nation == null ? "" : nation.color().displayName();
+        }
+        if (params.equalsIgnoreCase("nation_color_hex")) {
+            return nation == null ? "" : nation.color().hex();
+        }
         if (params.equalsIgnoreCase("nation_type")) {
-            return nation == null ? "" : nation.type().displayName();
+            return nation == null ? "" : nation.color().displayName();
         }
         return null;
     }

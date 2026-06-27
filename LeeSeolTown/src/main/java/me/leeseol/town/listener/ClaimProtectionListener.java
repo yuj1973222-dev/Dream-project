@@ -2,6 +2,7 @@ package me.leeseol.town.listener;
 
 import me.leeseol.town.LeeSeolTownPlugin;
 import me.leeseol.town.model.ClaimKey;
+import me.leeseol.town.model.Nation;
 import me.leeseol.town.model.Town;
 import me.leeseol.town.service.TownService;
 import org.bukkit.Material;
@@ -34,6 +35,14 @@ public final class ClaimProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
         ClaimKey claim = ClaimKey.from(event.getBlockPlaced().getLocation());
+        if (event.getBlockPlaced().getType() == Material.BEACON && plugin.structureRegistry().enabled()) {
+            Nation nation = townService.playerNation(event.getPlayer());
+            if (nation != null && nation.beaconClaim() == null) {
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(plugin.msg("nation-core-custom-required"));
+                return;
+            }
+        }
         if (event.getBlockPlaced().getType() == Material.BEACON
                 && townService.shouldCancelNationBeaconPlace(event.getPlayer(), claim)) {
             event.setCancelled(true);

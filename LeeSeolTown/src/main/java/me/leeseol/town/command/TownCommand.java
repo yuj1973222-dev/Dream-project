@@ -1,10 +1,14 @@
 package me.leeseol.town.command;
 
 import me.leeseol.town.LeeSeolTownPlugin;
+import me.leeseol.town.diagnostic.DiagnosticReport;
+import me.leeseol.town.diagnostic.FeatureDiagnostic;
+import me.leeseol.town.diagnostic.TownDiagnosticService;
 import me.leeseol.town.model.ChatMode;
-import me.leeseol.town.model.NationType;
 import me.leeseol.town.model.Town;
+import me.leeseol.town.model.WarMode;
 import me.leeseol.town.service.TownService;
+import me.leeseol.town.structure.StructureUndoRecord;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public final class TownCommand implements CommandExecutor, TabCompleter {
     private final LeeSeolTownPlugin plugin;
@@ -50,6 +56,7 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             case "transfer" -> transfer(sender, args);
             case "kick" -> kick(sender, args);
             case "claim" -> playerOnly(sender, player -> townService.claimChunk(player));
+            case "claimprice", "claimcost" -> playerOnly(sender, player -> townService.sendClaimPrice(player));
             case "unclaim" -> playerOnly(sender, player -> townService.unclaimChunk(player));
             case "info" -> info(sender, args);
             case "me", "status", "소속" -> playerOnly(sender, player -> {
@@ -58,8 +65,9 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             });
             case "chat" -> chat(sender, args);
             case "nation" -> nation(sender, args);
-            case "federation" -> federation(sender, args);
             case "war" -> war(sender, args);
+            case "structure" -> structure(sender, args);
+            case "diag", "diagnose" -> diag(sender, args);
             case "reload" -> reload(sender);
             default -> sendHelp(sender);
         }
@@ -159,6 +167,15 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             playerOnly(sender, player -> townService.disbandNation(player));
             return;
         }
+        NationClaimCommand claimCommand = args.length >= 2 ? NationClaimCommand.parse(args[1]) : null;
+        if (claimCommand != null) {
+            playerOnly(sender, player -> switch (claimCommand) {
+                case CLAIM -> townService.claimChunk(player);
+                case PRICE -> townService.sendClaimPrice(player);
+                case UNCLAIM -> townService.unclaimChunk(player);
+            });
+            return;
+        }
         if (args.length >= 3 && args[1].equalsIgnoreCase("pvp")) {
             Boolean enabled = parseToggle(args[2]);
             if (enabled == null) {
@@ -181,6 +198,14 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             playerOnly(sender, player -> townService.sendNationTreasury(player));
             return;
         }
+        if (args.length >= 2 && args[1].equalsIgnoreCase("upkeep")) {
+            if (args.length >= 3 && args[2].equalsIgnoreCase("pay")) {
+                playerOnly(sender, player -> townService.payNationUpkeep(player));
+            } else {
+                playerOnly(sender, player -> townService.sendNationUpkeep(player));
+            }
+            return;
+        }
         if (args.length >= 3 && args[1].equalsIgnoreCase("deposit")) {
             Double amount = parseAmount(args[2]);
             if (amount == null) {
@@ -191,35 +216,30 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (args.length < 4 || !args[1].equalsIgnoreCase("create")) {
-            sender.sendMessage("/party nation create <name> <republic|empire> [party...]");
+            sender.sendMessage("/party nation create <name> <color> [party...]");
             sender.sendMessage("/party nation disband");
             sender.sendMessage("/party nation pvp <on|off>");
             sender.sendMessage("/party nation build <on|off>");
             sender.sendMessage("/party nation treasury");
+            sender.sendMessage("/party nation upkeep [pay]");
             sender.sendMessage("/party nation deposit <amount>");
+            sender.sendMessage("/party nation claim");
+            sender.sendMessage("/party nation claimprice");
+            sender.sendMessage("/party nation unclaim");
             return;
         }
-        NationType type = NationType.parse(args[3]);
         List<String> extraParties = args.length <= 4 ? List.of() : Arrays.asList(args).subList(4, args.length);
-        playerOnly(sender, player -> townService.createNation(player, args[2], type, extraParties));
-    }
-
-    private void federation(CommandSender sender, String[] args) {
-        if (args.length >= 2 && args[1].equalsIgnoreCase("disband")) {
-            playerOnly(sender, player -> townService.disbandNation(player));
-            return;
-        }
-        if (args.length < 4 || !args[1].equalsIgnoreCase("create")) {
-            sender.sendMessage("/party federation create <name> <party1> [party2] [party3] [...]");
-            sender.sendMessage("/party federation disband");
-            return;
-        }
-        playerOnly(sender, player -> townService.createFederation(player, args[2], Arrays.asList(args).subList(3, args.length)));
+        playerOnly(sender, player -> townService.createNation(player, args[2], args[3], extraParties));
     }
 
     private void war(CommandSender sender, String[] args) {
         if (args.length >= 3 && args[1].equalsIgnoreCase("declare")) {
-            playerOnly(sender, player -> townService.declareWar(player, args[2]));
+            WarMode mode = args.length >= 4 ? WarMode.parse(args[3]) : WarMode.INVASION;
+            if (mode == null) {
+                sender.sendMessage("/party war declare <nation> [invasion|total]");
+                return;
+            }
+            playerOnly(sender, player -> townService.declareWar(player, args[2], mode));
             return;
         }
         if (args.length >= 3 && args[1].equalsIgnoreCase("accept")) {
@@ -242,7 +262,7 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             playerOnly(sender, player -> townService.finishWar(player, args[2], args[3]));
             return;
         }
-        sender.sendMessage("/party war declare <nation>");
+        sender.sendMessage("/party war declare <nation> [invasion|total]");
         sender.sendMessage("/party war accept <attackerNation>");
         sender.sendMessage("/party war surrender <enemyNation>");
         sender.sendMessage("/party war release <enemyNation>");
@@ -259,6 +279,72 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
         }
         plugin.reloadAll();
         sender.sendMessage(plugin.msg("reloaded"));
+    }
+
+    private void diag(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("leeseoltown.admin")) {
+            sender.sendMessage(plugin.msg("no-permission"));
+            return;
+        }
+        boolean fix = args.length >= 2 && args[1].equalsIgnoreCase("fix");
+        DiagnosticReport report = new TownDiagnosticService(plugin).run(fix);
+        sender.sendMessage("LeeSeolTown feature diagnostics" + (fix ? " (fix)" : ""));
+        for (FeatureDiagnostic result : report.results()) {
+            sender.sendMessage(result.line());
+        }
+        sender.sendMessage(report.summaryLine());
+    }
+
+    private void structure(CommandSender sender, String[] args) {
+        if (args.length < 2 || !args[1].equalsIgnoreCase("undo")) {
+            sender.sendMessage(plugin.msg("structure-undo-usage"));
+            return;
+        }
+        if (args.length >= 3) {
+            if (!sender.hasPermission("leeseoltown.structure.admin")) {
+                sender.sendMessage(plugin.msg("no-permission"));
+                return;
+            }
+            plugin.structureUndoService().playerIdByName(args[2]).ifPresentOrElse(
+                    playerId -> undoStructure(sender, playerId, true),
+                    () -> sender.sendMessage(plugin.msg("structure-undo-target-not-found").replace("%player%", args[2]))
+            );
+            return;
+        }
+        if (!canUseStructureUndo(sender)) {
+            sender.sendMessage(plugin.msg("no-permission"));
+            return;
+        }
+        playerOnly(sender, player -> {
+            undoStructure(sender, player.getUniqueId(), false);
+            return true;
+        });
+    }
+
+    private void undoStructure(CommandSender sender, UUID playerId, boolean admin) {
+        try {
+            StructureUndoRecord record = plugin.structureUndoService().undo(playerId);
+            if (record == null) {
+                sender.sendMessage(plugin.msg("structure-undo-empty"));
+                return;
+            }
+            String key = admin ? "structure-undo-admin-success" : "structure-undo-success";
+            sender.sendMessage(plugin.msg(key)
+                    .replace("%player%", record.playerName())
+                    .replace("%structure%", record.structureName()));
+        } catch (RuntimeException exception) {
+            sender.sendMessage(plugin.msg("structure-undo-failed").replace("%reason%", undoFailureReason(exception)));
+            plugin.getLogger().warning("Failed to undo structure placement: " + exception.getMessage());
+        }
+    }
+
+    private boolean canUseStructureUndo(CommandSender sender) {
+        return sender.hasPermission("leeseoltown.structure.undo") || sender.hasPermission("leeseoltown.structure.admin");
+    }
+
+    private String undoFailureReason(RuntimeException exception) {
+        String message = exception.getMessage();
+        return message == null || message.isBlank() ? exception.getClass().getSimpleName() : message;
     }
 
     private void playerOnly(CommandSender sender, PlayerAction action) {
@@ -279,24 +365,32 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage("/party transfer <player>");
         sender.sendMessage("/party kick <player>");
         sender.sendMessage("/party claim");
+        sender.sendMessage("/party claimprice");
         sender.sendMessage("/party unclaim");
         sender.sendMessage("/party me");
         sender.sendMessage("/party chat <global|party|nation>");
-        sender.sendMessage("/party nation create <name> <republic|empire> [party...]");
+        sender.sendMessage("/party nation create <name> <color> [party...]");
         sender.sendMessage("/party nation disband");
         sender.sendMessage("/party nation pvp <on|off>");
         sender.sendMessage("/party nation build <on|off>");
         sender.sendMessage("/party nation treasury");
+        sender.sendMessage("/party nation upkeep [pay]");
         sender.sendMessage("/party nation deposit <amount>");
-        sender.sendMessage("/party war declare <nation>");
+        sender.sendMessage("/party nation claim");
+        sender.sendMessage("/party nation claimprice");
+        sender.sendMessage("/party nation unclaim");
+        sender.sendMessage("/party war declare <nation> [invasion|total]");
         sender.sendMessage("/party war accept <attackerNation>");
         sender.sendMessage("/party war surrender <enemyNation>");
         sender.sendMessage("/party war release <enemyNation>");
         sender.sendMessage("/party war paydebt");
+        if (canUseStructureUndo(sender)) {
+            sender.sendMessage("/party structure undo");
+        }
         if (sender.hasPermission("leeseoltown.admin")) {
-            sender.sendMessage("/party federation create <name> <party1> [party2] [party3] [...]");
-            sender.sendMessage("/party federation disband");
             sender.sendMessage("/party war finish <winnerNation> <loserNation>");
+            sender.sendMessage("/party structure undo <player>");
+            sender.sendMessage("/party diag [fix]");
             sender.sendMessage("/party reload");
         }
     }
@@ -304,11 +398,25 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            List<String> options = new ArrayList<>(List.of("create", "invite", "accept", "deny", "join", "leave", "disband", "transfer", "kick", "claim", "unclaim", "info", "me", "chat", "nation", "war"));
+            List<String> options = new ArrayList<>(List.of("create", "invite", "accept", "deny", "join", "leave", "disband", "transfer", "kick", "claim", "claimprice", "unclaim", "info", "me", "chat", "nation", "war"));
+            if (canUseStructureUndo(sender)) {
+                options.add("structure");
+            }
             if (sender.hasPermission("leeseoltown.admin")) {
-                options.addAll(List.of("federation", "reload"));
+                options.addAll(List.of("diag", "reload"));
             }
             return filter(options, args[0]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("structure") && canUseStructureUndo(sender)) {
+            return filter(List.of("undo"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("structure")
+                && args[1].equalsIgnoreCase("undo")
+                && sender.hasPermission("leeseoltown.structure.admin")) {
+            return plugin.structureUndoService().playerNames().stream().filter(name -> starts(name, args[2])).toList();
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("diag") && sender.hasPermission("leeseoltown.admin")) {
+            return filter(List.of("fix"), args[1]);
         }
         if (args.length == 2 && List.of("invite", "transfer", "kick").contains(args[0].toLowerCase())) {
             return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> starts(name, args[1])).toList();
@@ -320,21 +428,18 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
             return filter(List.of("global", "party", "town", "nation"), args[1]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("nation")) {
-            return filter(List.of("create", "disband", "pvp", "build", "treasury", "deposit"), args[1]);
+            return filter(List.of("create", "disband", "pvp", "build", "treasury", "upkeep", "deposit", "claim", "buy", "claimprice", "price", "unclaim"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("nation") && args[1].equalsIgnoreCase("upkeep")) {
+            return filter(List.of("pay"), args[2]);
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("nation") && List.of("pvp", "build").contains(args[1].toLowerCase())) {
             return filter(List.of("on", "off"), args[2]);
         }
         if (args.length == 4 && args[0].equalsIgnoreCase("nation") && args[1].equalsIgnoreCase("create")) {
-            return filter(List.of("republic", "empire"), args[3]);
+            return filter(townService.nationColorKeys(), args[3]);
         }
         if (args.length >= 5 && args[0].equalsIgnoreCase("nation") && args[1].equalsIgnoreCase("create")) {
-            return townService.towns().stream().map(Town::name).filter(name -> starts(name, args[args.length - 1])).toList();
-        }
-        if (args.length == 2 && args[0].equalsIgnoreCase("federation")) {
-            return filter(List.of("create", "disband"), args[1]);
-        }
-        if (args.length >= 4 && args[0].equalsIgnoreCase("federation") && args[1].equalsIgnoreCase("create")) {
             return townService.towns().stream().map(Town::name).filter(name -> starts(name, args[args.length - 1])).toList();
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("war")) {
@@ -343,6 +448,9 @@ public final class TownCommand implements CommandExecutor, TabCompleter {
                 options.add("finish");
             }
             return filter(options, args[1]);
+        }
+        if (args.length == 4 && args[0].equalsIgnoreCase("war") && args[1].equalsIgnoreCase("declare")) {
+            return filter(List.of("invasion", "total"), args[3]);
         }
         if (args.length >= 3 && args[0].equalsIgnoreCase("war") && List.of("declare", "accept", "surrender", "release", "finish").contains(args[1].toLowerCase())) {
             return townService.nations().stream().map(nation -> nation.name()).filter(name -> starts(name, args[args.length - 1])).toList();

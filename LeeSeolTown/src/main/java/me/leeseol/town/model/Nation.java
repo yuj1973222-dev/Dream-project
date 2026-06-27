@@ -6,7 +6,7 @@ import java.util.Set;
 public final class Nation {
     private final String id;
     private String name;
-    private NationType type;
+    private NationColor color;
     private String capitalTownId;
     private final Set<String> townIds = new LinkedHashSet<>();
     private ClaimKey beaconClaim;
@@ -14,6 +14,8 @@ public final class Nation {
     private boolean buildProtectionEnabled = true;
     private int karma;
     private double treasury;
+    private String lastUpkeepPeriod;
+    private double upkeepDebt;
     private int surrenderWinStreak;
     private String debtCreditorNationId;
     private double debtAmount;
@@ -21,10 +23,10 @@ public final class Nation {
     private boolean functionsSuspended;
     private long createdAt;
 
-    public Nation(String id, String name, NationType type, String capitalTownId, long createdAt) {
+    public Nation(String id, String name, NationColor color, String capitalTownId, long createdAt) {
         this.id = id;
         this.name = name;
-        this.type = type;
+        this.color = color;
         this.capitalTownId = capitalTownId;
         this.createdAt = createdAt;
         if (capitalTownId != null && !capitalTownId.isBlank()) {
@@ -44,12 +46,12 @@ public final class Nation {
         this.name = name;
     }
 
-    public NationType type() {
-        return type;
+    public NationColor color() {
+        return color;
     }
 
-    public void setType(NationType type) {
-        this.type = type;
+    public void setColor(NationColor color) {
+        this.color = color;
     }
 
     public String capitalTownId() {
@@ -106,6 +108,22 @@ public final class Nation {
 
     public void setTreasury(double treasury) {
         this.treasury = Math.max(0.0D, treasury);
+    }
+
+    public String lastUpkeepPeriod() {
+        return lastUpkeepPeriod;
+    }
+
+    public void setLastUpkeepPeriod(String lastUpkeepPeriod) {
+        this.lastUpkeepPeriod = lastUpkeepPeriod;
+    }
+
+    public double upkeepDebt() {
+        return upkeepDebt;
+    }
+
+    public void setUpkeepDebt(double upkeepDebt) {
+        this.upkeepDebt = Math.max(0.0D, upkeepDebt);
     }
 
     public int surrenderWinStreak() {

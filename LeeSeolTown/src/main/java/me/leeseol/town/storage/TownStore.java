@@ -3,9 +3,11 @@ package me.leeseol.town.storage;
 import me.leeseol.town.model.ChatMode;
 import me.leeseol.town.model.ClaimKey;
 import me.leeseol.town.model.Nation;
-import me.leeseol.town.model.NationType;
+import me.leeseol.town.model.NationColor;
+import me.leeseol.town.model.NationColorPalette;
 import me.leeseol.town.model.Town;
 import me.leeseol.town.model.War;
+import me.leeseol.town.model.WarMode;
 import me.leeseol.town.model.WarStatus;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,8 +19,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class TownStore {
@@ -30,6 +34,7 @@ public final class TownStore {
     private final Map<UUID, String> playerTownIds = new HashMap<>();
     private final Map<ClaimKey, String> claimTownIds = new HashMap<>();
     private final Map<UUID, ChatMode> chatModes = new HashMap<>();
+    private boolean migratedNationColors;
 
     public TownStore(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -44,6 +49,7 @@ public final class TownStore {
         wars.clear();
         playerTownIds.clear();
         claimTownIds.clear();
+        migratedNationColors = false;
 
         if (!file.exists()) {
             save();
@@ -55,6 +61,9 @@ public final class TownStore {
         loadNations(data.getConfigurationSection("nations"));
         loadWars(data.getConfigurationSection("wars"));
         rebuildIndexes();
+        if (migratedNationColors) {
+            save();
+        }
         plugin.getLogger().info("LeeSeolTown loaded towns=" + towns.size() + ", nations=" + nations.size() + ", claims=" + claimTownIds.size());
     }
 
@@ -127,18 +136,34 @@ public final class TownStore {
             return;
         }
 
+        NationColorPalette palette = NationColorPalette.from(plugin.getConfig());
+        Set<String> usedColorKeys = new LinkedHashSet<>();
+
         for (String id : section.getKeys(false)) {
             String base = id + ".";
-            NationType type = NationType.parse(section.getString(base + "type"));
-            if (type == null) {
-                plugin.getLogger().warning("Skipping nation with invalid type: " + id);
-                continue;
+            ConfigurationSection colorSection = section.getConfigurationSection(base + "color");
+            String legacyType = section.getString(base + "type");
+            if (colorSection == null && legacyType != null && !legacyType.isBlank()) {
+                migratedNationColors = true;
             }
+            NationColor color = palette.resolveSaved(
+                    colorSection,
+                    legacyType,
+                    id,
+                    usedColorKeys
+            );
+            if (colorSection != null) {
+                String savedKey = NationColor.normalizeKey(colorSection.getString("key"));
+                if (!savedKey.equals(color.key())) {
+                    migratedNationColors = true;
+                }
+            }
+            usedColorKeys.add(color.key());
 
             Nation nation = new Nation(
                     id,
                     section.getString(base + "name", id),
-                    type,
+                    color,
                     section.getString(base + "capital-town"),
                     section.getLong(base + "created-at", System.currentTimeMillis())
             );
@@ -152,6 +177,8 @@ public final class TownStore {
             nation.setBuildProtectionEnabled(section.getBoolean(base + "build-protection-enabled", true));
             nation.setKarma(section.getInt(base + "karma", 0));
             nation.setTreasury(section.getDouble(base + "treasury", 0.0D));
+            nation.setLastUpkeepPeriod(blankToNull(section.getString(base + "upkeep.last-period")));
+            nation.setUpkeepDebt(section.getDouble(base + "upkeep.debt", 0.0D));
             nation.setSurrenderWinStreak(section.getInt(base + "surrender-win-streak", 0));
             nation.setDebtCreditorNationId(blankToNull(section.getString(base + "debt.creditor")));
             nation.setDebtAmount(section.getDouble(base + "debt.amount", 0.0D));
@@ -175,7 +202,8 @@ public final class TownStore {
                 plugin.getLogger().warning("Skipping invalid war: " + id);
                 continue;
             }
-            War war = new War(id, attacker, defender, status, section.getLong(base + "declared-at", System.currentTimeMillis()));
+            WarMode mode = WarMode.parseOrDefault(section.getString(base + "mode"));
+            War war = new War(id, attacker, defender, mode, status, section.getLong(base + "declared-at", System.currentTimeMillis()));
             war.setProtectionUntil(section.getLong(base + "protection-until", 0L));
             war.setDefenderProtectionActive(section.getBoolean(base + "defender-protection-active", false));
             wars.put(id, war);
@@ -200,7 +228,10 @@ public final class TownStore {
         for (Nation nation : nations.values()) {
             String base = "nations." + nation.id() + ".";
             data.set(base + "name", nation.name());
-            data.set(base + "type", nation.type().id());
+            data.set(base + "color.key", nation.color().key());
+            data.set(base + "color.display-name", nation.color().displayName());
+            data.set(base + "color.hex", nation.color().hex());
+            data.set(base + "color.gradient", nation.color().gradient().isEmpty() ? null : nation.color().gradient());
             data.set(base + "capital-town", nation.capitalTownId());
             data.set(base + "created-at", nation.createdAt());
             data.set(base + "towns", new ArrayList<>(nation.townIds()));
@@ -209,6 +240,8 @@ public final class TownStore {
             data.set(base + "build-protection-enabled", nation.buildProtectionEnabled());
             data.set(base + "karma", nation.karma());
             data.set(base + "treasury", nation.treasury());
+            data.set(base + "upkeep.last-period", nation.lastUpkeepPeriod());
+            data.set(base + "upkeep.debt", nation.upkeepDebt());
             data.set(base + "surrender-win-streak", nation.surrenderWinStreak());
             data.set(base + "debt.creditor", nation.debtCreditorNationId());
             data.set(base + "debt.amount", nation.debtAmount());
@@ -222,6 +255,7 @@ public final class TownStore {
             String base = "wars." + war.id() + ".";
             data.set(base + "attacker", war.attackerNationId());
             data.set(base + "defender", war.defenderNationId());
+            data.set(base + "mode", war.mode().id());
             data.set(base + "status", war.status().name());
             data.set(base + "declared-at", war.declaredAt());
             data.set(base + "protection-until", war.protectionUntil());

@@ -11,6 +11,7 @@ public final class VaultEconomyHook {
     private Object economy;
     private Method hasMethod;
     private Method withdrawMethod;
+    private Method balanceMethod;
     private Method formatMethod;
 
     public VaultEconomyHook(JavaPlugin plugin) {
@@ -22,6 +23,7 @@ public final class VaultEconomyHook {
         economy = null;
         hasMethod = null;
         withdrawMethod = null;
+        balanceMethod = null;
         formatMethod = null;
 
         if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
@@ -37,6 +39,7 @@ public final class VaultEconomyHook {
             economy = registration.getProvider();
             hasMethod = economyClass.getMethod("has", OfflinePlayer.class, double.class);
             withdrawMethod = economyClass.getMethod("withdrawPlayer", OfflinePlayer.class, double.class);
+            balanceMethod = economyClass.getMethod("getBalance", OfflinePlayer.class);
             formatMethod = economyClass.getMethod("format", double.class);
         } catch (ReflectiveOperationException exception) {
             plugin.getLogger().warning("Vault economy hook unavailable: " + exception.getMessage());
@@ -71,6 +74,19 @@ public final class VaultEconomyHook {
         } catch (ReflectiveOperationException exception) {
             plugin.getLogger().warning("Vault withdraw failed: " + exception.getMessage());
             return false;
+        }
+    }
+
+    public double balance(OfflinePlayer player) {
+        if (!available()) {
+            return 0.0D;
+        }
+        try {
+            Object value = balanceMethod.invoke(economy, player);
+            return value instanceof Number number ? number.doubleValue() : 0.0D;
+        } catch (ReflectiveOperationException exception) {
+            plugin.getLogger().warning("Vault balance read failed: " + exception.getMessage());
+            return 0.0D;
         }
     }
 
