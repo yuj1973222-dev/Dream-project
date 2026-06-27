@@ -1,0 +1,20 @@
+name: LeeSeolEnchanting
+version: 0.1.0
+main: me.leeseol.enchanting.LeeSeolEnchantingPlugin
+api-version: '26.1.2'
+description: Controlled custom-enchant routes for expedition survival.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - AdvancedEnchantments
+commands:
+  lsenchanting:
+    description: Admin command for LeeSeolEnchanting.
+    usage: /lsenchanting <reload|status|bookshelves|lore>
+    aliases:
+      - leeseolenchanting
+      - customenchanting
+permissions:
+  leeseolenchanting.admin:
+    description: Allows managing LeeSeolEnchanting.
+    default: op
