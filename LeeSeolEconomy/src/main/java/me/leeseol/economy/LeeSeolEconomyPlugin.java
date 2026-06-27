@@ -1,7 +1,10 @@
 package me.leeseol.economy;
 
 import me.leeseol.economy.command.EconomyCommand;
+import me.leeseol.economy.command.MarketCommand;
 import me.leeseol.economy.command.MenuBridgeCommand;
+import me.leeseol.economy.ledger.EconomyLedger;
+import me.leeseol.economy.market.MarketManager;
 import me.leeseol.economy.npc.NpcCommand;
 import me.leeseol.economy.npc.NpcManager;
 import me.leeseol.economy.servermenu.ServerMenuManager;
@@ -28,6 +31,8 @@ public final class LeeSeolEconomyPlugin extends JavaPlugin {
     private ShopManager shopManager;
     private NpcManager npcManager;
     private ServerMenuManager serverMenuManager;
+    private MarketManager marketManager;
+    private EconomyLedger ledger;
     private LeeSeolVaultEconomy vaultEconomy;
 
     @Override
@@ -48,6 +53,9 @@ public final class LeeSeolEconomyPlugin extends JavaPlugin {
         if (vaultEconomy != null) {
             getServer().getServicesManager().unregister(vaultEconomy);
         }
+        if (marketManager != null) {
+            marketManager.save();
+        }
         getServer().getMessenger().unregisterOutgoingPluginChannel(this, BUNGEE_CHANNEL);
     }
 
@@ -55,18 +63,22 @@ public final class LeeSeolEconomyPlugin extends JavaPlugin {
         reloadConfig();
         this.money = new Money(this);
         this.balanceStore = new BalanceStore(this, getConfig().getString("storage.balances-file"), getConfig().getLong("currency.starting-balance", 0L));
+        ledger.reload();
         shopManager.reload();
         npcManager.reload();
         serverMenuManager.reload();
+        marketManager.reload();
         registerVaultEconomy();
     }
 
     private void createManagers() {
         this.money = new Money(this);
         this.balanceStore = new BalanceStore(this, getConfig().getString("storage.balances-file"), getConfig().getLong("currency.starting-balance", 0L));
+        this.ledger = new EconomyLedger(this);
         this.shopManager = new ShopManager(this);
         this.npcManager = new NpcManager(this, shopManager);
         this.serverMenuManager = new ServerMenuManager(this);
+        this.marketManager = new MarketManager(this);
 
         getServer().getPluginManager().registerEvents(shopManager, this);
         getServer().getPluginManager().registerEvents(npcManager, this);
@@ -75,13 +87,16 @@ public final class LeeSeolEconomyPlugin extends JavaPlugin {
         shopManager.reload();
         npcManager.reload();
         serverMenuManager.reload();
+        marketManager.reload();
     }
 
     private void registerCommands() {
         EconomyCommand economyCommand = new EconomyCommand(this);
         register("won", economyCommand);
+        register("pay", economyCommand);
         register("shop", new ShopCommand(this, shopManager));
         register("wonnpc", new NpcCommand(this, npcManager));
+        register("market", new MarketCommand(this, marketManager));
         register("servermenu", serverMenuManager);
         register("leeseolmenu", new MenuBridgeCommand(this));
     }
@@ -138,6 +153,14 @@ public final class LeeSeolEconomyPlugin extends JavaPlugin {
 
     public ServerMenuManager serverMenuManager() {
         return serverMenuManager;
+    }
+
+    public MarketManager marketManager() {
+        return marketManager;
+    }
+
+    public EconomyLedger ledger() {
+        return ledger;
     }
 
     public boolean featureEnabled(String path) {

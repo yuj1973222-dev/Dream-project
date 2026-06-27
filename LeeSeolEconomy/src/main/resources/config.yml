@@ -4,13 +4,432 @@ features:
   shops: true
   npcs: true
   server-menu: true
+  market: true
+  ledger: true
 
 storage:
   balances-file: "/opt/minecraft/shared/economy/balances.properties"
+  market-file: "/opt/minecraft/shared/economy/market.yml"
+  ledger-file: "/opt/minecraft/shared/economy/ledger.yml"
 
 currency:
   name: "원"
   starting-balance: 10000
+
+ledger:
+  time-zone: "Asia/Seoul"
+
+market:
+  reset-time-zone: "Asia/Seoul"
+  # Prevent lobby inventory from being converted into survival money.
+  allowed-local-servers:
+    - "survival"
+  bank:
+    daily-total-budget: 5000000
+  memory:
+    rolling-days: 7
+    keep-days: 21
+  rotation:
+    enabled: true
+    default-active-offers-per-category: 4
+  stock:
+    # The server "uses" part of stocked items each day, so old pressure cools down slowly.
+    daily-decay-rate: 0.18
+    target-days: 3.0
+  pricing:
+    global-sold-discount-max: 0.45
+    rolling-sold-discount-max: 0.25
+    personal-sold-discount-max: 0.35
+    stock-discount-max: 0.30
+    budget-discount-max: 0.40
+  categories:
+    agriculture:
+      daily-budget: 900000
+      active-offers: 5
+    wood:
+      daily-budget: 500000
+      active-offers: 3
+    mining:
+      daily-budget: 1500000
+      active-offers: 5
+    hunting:
+      daily-budget: 900000
+      active-offers: 5
+    fishing:
+      daily-budget: 600000
+      active-offers: 4
+    exploration:
+      daily-budget: 600000
+      active-offers: 2
+  offers:
+    wheat:
+      category: agriculture
+      material: WHEAT
+      name: "밀"
+      base-price: 4
+      min-price: 1
+      daily-target-amount: 12000
+      personal-soft-amount: 1000
+    potato:
+      category: agriculture
+      material: POTATO
+      name: "감자"
+      base-price: 4
+      min-price: 1
+      daily-target-amount: 12000
+      personal-soft-amount: 1000
+    carrot:
+      category: agriculture
+      material: CARROT
+      name: "당근"
+      base-price: 4
+      min-price: 1
+      daily-target-amount: 12000
+      personal-soft-amount: 1000
+    beetroot:
+      category: agriculture
+      material: BEETROOT
+      name: "비트"
+      base-price: 5
+      min-price: 1
+      daily-target-amount: 6000
+      personal-soft-amount: 600
+    pumpkin:
+      category: agriculture
+      material: PUMPKIN
+      name: "호박"
+      base-price: 8
+      min-price: 2
+      daily-target-amount: 5000
+      personal-soft-amount: 500
+    melon_slice:
+      category: agriculture
+      material: MELON_SLICE
+      name: "수박 조각"
+      base-price: 2
+      min-price: 1
+      daily-target-amount: 18000
+      personal-soft-amount: 1500
+    sugar_cane:
+      category: agriculture
+      material: SUGAR_CANE
+      name: "사탕수수"
+      base-price: 3
+      min-price: 1
+      daily-target-amount: 16000
+      personal-soft-amount: 1200
+    cactus:
+      category: agriculture
+      material: CACTUS
+      name: "선인장"
+      base-price: 2
+      min-price: 1
+      daily-target-amount: 16000
+      personal-soft-amount: 1200
+    bamboo:
+      category: agriculture
+      material: BAMBOO
+      name: "대나무"
+      base-price: 1
+      min-price: 1
+      daily-target-amount: 24000
+      personal-soft-amount: 2000
+    kelp:
+      category: agriculture
+      material: KELP
+      name: "켈프"
+      base-price: 1
+      min-price: 1
+      daily-target-amount: 24000
+      personal-soft-amount: 2000
+    cocoa_beans:
+      category: agriculture
+      material: COCOA_BEANS
+      name: "코코아 콩"
+      base-price: 6
+      min-price: 2
+      daily-target-amount: 4000
+      personal-soft-amount: 400
+    nether_wart:
+      category: agriculture
+      material: NETHER_WART
+      name: "네더 와트"
+      base-price: 10
+      min-price: 3
+      daily-target-amount: 5000
+      personal-soft-amount: 500
+    oak_log:
+      category: wood
+      material: OAK_LOG
+      name: "참나무 원목"
+      base-price: 12
+      min-price: 4
+      daily-target-amount: 8000
+      personal-soft-amount: 800
+    spruce_log:
+      category: wood
+      material: SPRUCE_LOG
+      name: "가문비나무 원목"
+      base-price: 12
+      min-price: 4
+      daily-target-amount: 8000
+      personal-soft-amount: 800
+    birch_log:
+      category: wood
+      material: BIRCH_LOG
+      name: "자작나무 원목"
+      base-price: 12
+      min-price: 4
+      daily-target-amount: 8000
+      personal-soft-amount: 800
+    jungle_log:
+      category: wood
+      material: JUNGLE_LOG
+      name: "정글나무 원목"
+      base-price: 14
+      min-price: 5
+      daily-target-amount: 6000
+      personal-soft-amount: 600
+    acacia_log:
+      category: wood
+      material: ACACIA_LOG
+      name: "아카시아 원목"
+      base-price: 14
+      min-price: 5
+      daily-target-amount: 6000
+      personal-soft-amount: 600
+    dark_oak_log:
+      category: wood
+      material: DARK_OAK_LOG
+      name: "짙은 참나무 원목"
+      base-price: 14
+      min-price: 5
+      daily-target-amount: 6000
+      personal-soft-amount: 600
+    coal:
+      category: mining
+      material: COAL
+      name: "석탄"
+      base-price: 24
+      min-price: 8
+      daily-target-amount: 10000
+      personal-soft-amount: 800
+    raw_copper:
+      category: mining
+      material: RAW_COPPER
+      name: "원시 구리"
+      base-price: 16
+      min-price: 5
+      daily-target-amount: 12000
+      personal-soft-amount: 900
+    raw_iron:
+      category: mining
+      material: RAW_IRON
+      name: "원시 철"
+      base-price: 55
+      min-price: 18
+      daily-target-amount: 7000
+      personal-soft-amount: 500
+    raw_gold:
+      category: mining
+      material: RAW_GOLD
+      name: "원시 금"
+      base-price: 80
+      min-price: 25
+      daily-target-amount: 5000
+      personal-soft-amount: 350
+    redstone:
+      category: mining
+      material: REDSTONE
+      name: "레드스톤 가루"
+      base-price: 14
+      min-price: 4
+      daily-target-amount: 12000
+      personal-soft-amount: 1000
+    lapis_lazuli:
+      category: mining
+      material: LAPIS_LAZULI
+      name: "청금석"
+      base-price: 22
+      min-price: 7
+      daily-target-amount: 7000
+      personal-soft-amount: 600
+    quartz:
+      category: mining
+      material: QUARTZ
+      name: "네더 석영"
+      base-price: 16
+      min-price: 5
+      daily-target-amount: 10000
+      personal-soft-amount: 900
+    amethyst_shard:
+      category: mining
+      material: AMETHYST_SHARD
+      name: "자수정 조각"
+      base-price: 20
+      min-price: 6
+      daily-target-amount: 8000
+      personal-soft-amount: 700
+    diamond:
+      category: mining
+      material: DIAMOND
+      name: "다이아몬드"
+      base-price: 900
+      min-price: 250
+      daily-target-amount: 900
+      personal-soft-amount: 80
+    emerald:
+      category: mining
+      material: EMERALD
+      name: "에메랄드"
+      base-price: 500
+      min-price: 150
+      daily-target-amount: 800
+      personal-soft-amount: 80
+    ancient_debris:
+      category: mining
+      material: ANCIENT_DEBRIS
+      name: "고대 잔해"
+      base-price: 3500
+      min-price: 1000
+      daily-target-amount: 120
+      personal-soft-amount: 12
+    rotten_flesh:
+      category: hunting
+      material: ROTTEN_FLESH
+      name: "썩은 살점"
+      base-price: 5
+      min-price: 1
+      daily-target-amount: 16000
+      personal-soft-amount: 1200
+    bone:
+      category: hunting
+      material: BONE
+      name: "뼈"
+      base-price: 10
+      min-price: 3
+      daily-target-amount: 12000
+      personal-soft-amount: 900
+    string:
+      category: hunting
+      material: STRING
+      name: "실"
+      base-price: 8
+      min-price: 2
+      daily-target-amount: 10000
+      personal-soft-amount: 800
+    spider_eye:
+      category: hunting
+      material: SPIDER_EYE
+      name: "거미 눈"
+      base-price: 12
+      min-price: 3
+      daily-target-amount: 6000
+      personal-soft-amount: 500
+    gunpowder:
+      category: hunting
+      material: GUNPOWDER
+      name: "화약"
+      base-price: 35
+      min-price: 10
+      daily-target-amount: 8000
+      personal-soft-amount: 600
+    ender_pearl:
+      category: hunting
+      material: ENDER_PEARL
+      name: "엔더 진주"
+      base-price: 90
+      min-price: 25
+      daily-target-amount: 3000
+      personal-soft-amount: 250
+    slime_ball:
+      category: hunting
+      material: SLIME_BALL
+      name: "슬라임볼"
+      base-price: 50
+      min-price: 15
+      daily-target-amount: 4000
+      personal-soft-amount: 300
+    blaze_rod:
+      category: hunting
+      material: BLAZE_ROD
+      name: "블레이즈 막대"
+      base-price: 160
+      min-price: 45
+      daily-target-amount: 2500
+      personal-soft-amount: 200
+    ghast_tear:
+      category: hunting
+      material: GHAST_TEAR
+      name: "가스트 눈물"
+      base-price: 500
+      min-price: 150
+      daily-target-amount: 600
+      personal-soft-amount: 60
+    phantom_membrane:
+      category: hunting
+      material: PHANTOM_MEMBRANE
+      name: "팬텀 막"
+      base-price: 180
+      min-price: 50
+      daily-target-amount: 1200
+      personal-soft-amount: 100
+    cod:
+      category: fishing
+      material: COD
+      name: "대구"
+      base-price: 12
+      min-price: 3
+      daily-target-amount: 10000
+      personal-soft-amount: 800
+    salmon:
+      category: fishing
+      material: SALMON
+      name: "연어"
+      base-price: 16
+      min-price: 4
+      daily-target-amount: 8000
+      personal-soft-amount: 700
+    tropical_fish:
+      category: fishing
+      material: TROPICAL_FISH
+      name: "열대어"
+      base-price: 35
+      min-price: 10
+      daily-target-amount: 3000
+      personal-soft-amount: 250
+    pufferfish:
+      category: fishing
+      material: PUFFERFISH
+      name: "복어"
+      base-price: 55
+      min-price: 15
+      daily-target-amount: 2500
+      personal-soft-amount: 200
+    nautilus_shell:
+      category: fishing
+      material: NAUTILUS_SHELL
+      name: "앵무조개 껍데기"
+      base-price: 450
+      min-price: 120
+      daily-target-amount: 500
+      personal-soft-amount: 50
+    ink_sac:
+      category: fishing
+      material: INK_SAC
+      name: "먹물 주머니"
+      base-price: 12
+      min-price: 3
+      daily-target-amount: 8000
+      personal-soft-amount: 700
+    glow_ink_sac:
+      category: fishing
+      material: GLOW_INK_SAC
+      name: "발광 먹물 주머니"
+      base-price: 24
+      min-price: 8
+      daily-target-amount: 5000
+      personal-soft-amount: 400
 
 messages:
   prefix: "&b[경제] &f"
@@ -21,6 +440,7 @@ messages:
   balance-other: "&f%player%님의 보유 금액: &e%amount%"
   paid-sender: "&f%player%님에게 &e%amount%&f 원 보냈습니다."
   paid-receiver: "&f%player%님에게 &e%amount%&f 원 받았습니다."
+  pay-self: "&c자기 자신에게는 송금할 수 없습니다."
   not-enough-money: "&c돈이 부족합니다. 필요 금액: &e%amount%"
   player-not-found: "&c플레이어를 찾을 수 없습니다."
   reloaded: "&aLeeSeolEconomy 설정을 다시 불러왔습니다."
@@ -102,8 +522,8 @@ npcs:
     name: "&e상점"
 
 server-menu:
-  title: "&0서버 메뉴"
-  # Deployment scripts set this to lobby or survival on each backend.
+  title: "&0서바이벌 메뉴"
+  # Survival only. Lobby uses LeeSeolCore's movement-only menu.
   local-server: "survival"
   size: 27
   shortcut:
@@ -112,8 +532,6 @@ server-menu:
     cooldown-millis: 700
   external-menu:
     enabled: false
-    # Enable this after DeluxeMenus is installed and the menu id is finalized.
-    # Example: "dm open pixiestudios_gamemenu1 %player%"
     open-command: ""
   blocked-worlds:
     dungeon:
@@ -125,49 +543,26 @@ server-menu:
     name: " "
   items:
     lobby:
-      slot: 10
+      slot: 11
       server: "lobby"
-      material: SNOWBALL
-      name: "&#9ADBF5로비"
+      material: OAK_DOOR
+      name: "&b로비로 돌아가기"
       lore:
-        - "&7상점과 안내가 있는 대기 공간"
+        - "&7이동 전용 로비로 이동합니다."
+        - "&e클릭해서 이동"
+    survival_spawn:
+      slot: 13
+      command: "survivalspawn"
+      material: COMPASS
+      name: "&a서바이벌 스폰"
+      lore:
+        - "&7현재 서바이벌 서버의 스폰으로 이동합니다."
         - "&e클릭해서 이동"
     auction:
-      slot: 13
+      slot: 15
       command: "auction"
       material: GOLD_INGOT
-      name: "&#FFD166경매장"
+      name: "&6경매장"
       lore:
-        - "&7아이템을 맡기고 경매에 입찰합니다."
-        - "&7관리자가 열었을 때만 입찰 가능합니다."
+        - "&7서바이벌 경매장을 엽니다."
         - "&e클릭해서 열기"
-    survival:
-      slot: 16
-      server: "survival"
-      material: GRASS_BLOCK
-      name: "&#9BE7A1야생"
-      lore:
-        - "&7채집, 건축, 탐험을 하는 메인 월드"
-        - "&e클릭해서 이동"
-    admin_newworld:
-      slot: 21
-      server: "newworld"
-      permission: "leeseoldungeon.admin"
-      material: COMPASS
-      name: "&#B9E6FF신세계"
-      lore:
-        - "&c관리자 전용"
-        - "&7추후 데이터팩과 전용 맵을 넣을 신세계 서버"
-        - "&e클릭해서 이동"
-    admin_dungeon:
-      slot: 23
-      command: "dungeon enter"
-      permission: "leeseoldungeon.admin"
-      local-servers:
-        - "survival"
-      material: ENDER_EYE
-      name: "&#C7B9FF던전"
-      lore:
-        - "&c관리자 전용"
-        - "&7야생 서버 내부의 던전 월드로 이동합니다."
-        - "&e클릭해서 이동"

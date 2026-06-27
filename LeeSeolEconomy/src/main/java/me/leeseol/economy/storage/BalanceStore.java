@@ -35,6 +35,27 @@ public final class BalanceStore {
         return access(properties -> balanceOf(properties, uuid));
     }
 
+    public BalanceSnapshot snapshot() {
+        return access(properties -> {
+            int accounts = 0;
+            long total = 0L;
+            long highest = 0L;
+            for (String name : properties.stringPropertyNames()) {
+                long balance;
+                try {
+                    balance = Math.max(0L, Long.parseLong(properties.getProperty(name, "0")));
+                } catch (NumberFormatException exception) {
+                    continue;
+                }
+                accounts++;
+                total = safeAdd(total, balance);
+                highest = Math.max(highest, balance);
+            }
+            long average = accounts <= 0 ? 0L : total / accounts;
+            return new BalanceSnapshot(accounts, total, highest, average);
+        });
+    }
+
     public void setBalance(UUID uuid, long amount) {
         access(properties -> {
             properties.setProperty(uuid.toString(), Long.toString(Math.max(0L, amount)));

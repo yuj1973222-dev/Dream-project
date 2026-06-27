@@ -131,6 +131,7 @@ public final class LeeSeolVaultEconomy implements Economy {
         if (!store.withdraw(player.getUniqueId(), normalized)) {
             return response(normalized, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Not enough money");
         }
+        plugin.ledger().recordRemoved("vault_withdraw", normalized);
         return response(normalized, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
     }
 
@@ -156,6 +157,7 @@ public final class LeeSeolVaultEconomy implements Economy {
             return response(0D, getBalance(player), EconomyResponse.ResponseType.FAILURE, "Invalid amount");
         }
         store.deposit(player.getUniqueId(), normalized);
+        plugin.ledger().recordIssued("vault_deposit", normalized);
         return response(normalized, getBalance(player), EconomyResponse.ResponseType.SUCCESS, null);
     }
 

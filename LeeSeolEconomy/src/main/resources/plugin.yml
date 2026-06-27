@@ -13,6 +13,10 @@ commands:
   won:
     description: Shows and manages won balances.
     usage: /won
+  pay:
+    description: Sends won to another online player.
+    usage: /pay <player> <amount>
+    permission: leeseoleconomy.pay
   shop:
     description: Opens a LeeSeol shop GUI.
     usage: /shop [shop]
@@ -20,6 +24,9 @@ commands:
     description: Manages economy shop NPCs.
     usage: /wonnpc <create|remove|list>
     permission: leeseoleconomy.admin
+  market:
+    description: Opens the controlled server-bank item market.
+    usage: /market <list|price|sell|status>
   servermenu:
     description: Opens the server movement menu.
     usage: /servermenu
@@ -35,6 +42,9 @@ permissions:
     default: true
   leeseoleconomy.pay:
     description: Allows sending money to another player.
+    default: true
+  leeseoleconomy.market:
+    description: Allows selling configured items to the server-bank market.
     default: true
   leeseoleconomy.servermenu:
     description: Allows opening the Shift+F server menu.

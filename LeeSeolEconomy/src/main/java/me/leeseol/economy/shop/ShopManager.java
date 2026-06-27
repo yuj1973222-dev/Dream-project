@@ -132,6 +132,7 @@ public final class ShopManager implements Listener {
             player.sendMessage(plugin.msg("not-enough-money").replace("%amount%", plugin.money().format(item.buyPrice())));
             return;
         }
+        plugin.ledger().recordRemoved("shop_buy", item.buyPrice());
         player.getInventory().addItem(item.tradeStack());
         player.sendMessage(plugin.msg("buy-success")
             .replace("%item%", item.plainName())
@@ -150,6 +151,7 @@ public final class ShopManager implements Listener {
         }
         player.getInventory().removeItem(stack);
         plugin.balanceStore().deposit(player.getUniqueId(), item.sellPrice());
+        plugin.ledger().recordIssued("shop_sell", item.sellPrice());
         player.sendMessage(plugin.msg("sell-success")
             .replace("%item%", item.plainName())
             .replace("%amount%", Integer.toString(item.amount()))
