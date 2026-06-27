@@ -23,13 +23,13 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
 import me.leeseol.proxy.command.LobbyCommand;
 import me.leeseol.proxy.command.ServerListCommand;
 import me.leeseol.proxy.command.SurvivalQueueCommand;
+import me.leeseol.proxy.config.PropertiesConfigFile;
 import me.leeseol.proxy.network.NetworkSettings;
 import me.leeseol.proxy.queue.QueueSettings;
 import me.leeseol.proxy.queue.SurvivalQueueController;
@@ -49,6 +49,7 @@ public final class LeeSeolProxyPlugin {
     private final ProxyServer proxy;
     private final Logger logger;
     private final Path dataDirectory;
+    private final PropertiesConfigFile configFiles;
     private ResourcePackInfo resourcePackInfo;
     private ResourcePackOfferService resourcePackOfferService;
     private NetworkSettings networkSettings = NetworkSettings.defaults();
@@ -60,6 +61,7 @@ public final class LeeSeolProxyPlugin {
         this.proxy = proxy;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
+        this.configFiles = new PropertiesConfigFile(dataDirectory);
     }
 
     @Subscribe
@@ -196,74 +198,49 @@ public final class LeeSeolProxyPlugin {
     }
 
     private void loadResourcePackInfo() {
-        Path configPath = dataDirectory.resolve("resourcepack.properties");
-        Properties properties = new Properties();
-        ResourcePackSettings.defaults().writeDefaultsTo(properties);
-
+        Properties defaults = new Properties();
+        ResourcePackSettings.defaults().writeDefaultsTo(defaults);
         try {
-            Files.createDirectories(dataDirectory);
-            if (Files.exists(configPath)) {
-                try (var reader = Files.newBufferedReader(configPath)) {
-                    properties.load(reader);
-                }
-            } else {
-                try (var writer = Files.newBufferedWriter(configPath)) {
-                    properties.store(writer, "LeeSeolProxy resource pack settings");
-                }
-            }
+            Properties properties = configFiles.load(
+                    "resourcepack.properties",
+                    defaults,
+                    "LeeSeolProxy resource pack settings"
+            );
+            resourcePackInfo = resourcePackOfferService.reload(ResourcePackSettings.from(properties));
         } catch (IOException exception) {
             logger.warn("Failed to load resource pack config. Resource pack offer is disabled.", exception);
             resourcePackInfo = null;
-            return;
         }
-
-        resourcePackInfo = resourcePackOfferService.reload(ResourcePackSettings.from(properties));
     }
 
     private NetworkSettings loadNetworkSettings() {
-        Path configPath = dataDirectory.resolve("network.properties");
-        Properties properties = new Properties();
-        NetworkSettings.defaults().writeDefaultsTo(properties);
-
+        Properties defaults = new Properties();
+        NetworkSettings.defaults().writeDefaultsTo(defaults);
         try {
-            Files.createDirectories(dataDirectory);
-            if (Files.exists(configPath)) {
-                try (var reader = Files.newBufferedReader(configPath)) {
-                    properties.load(reader);
-                }
-            } else {
-                try (var writer = Files.newBufferedWriter(configPath)) {
-                    properties.store(writer, "LeeSeolProxy network settings");
-                }
-            }
+            return NetworkSettings.from(configFiles.load(
+                    "network.properties",
+                    defaults,
+                    "LeeSeolProxy network settings"
+            ));
         } catch (IOException exception) {
             logger.warn("Failed to load network settings. Using safe fallback defaults.", exception);
+            return NetworkSettings.from(defaults);
         }
-
-        return NetworkSettings.from(properties);
     }
 
     private QueueSettings loadQueueSettings() {
-        Path configPath = dataDirectory.resolve("queue.properties");
-        Properties properties = new Properties();
-        QueueSettings.defaults().writeDefaultsTo(properties);
-
+        Properties defaults = new Properties();
+        QueueSettings.defaults().writeDefaultsTo(defaults);
         try {
-            Files.createDirectories(dataDirectory);
-            if (Files.exists(configPath)) {
-                try (var reader = Files.newBufferedReader(configPath)) {
-                    properties.load(reader);
-                }
-            } else {
-                try (var writer = Files.newBufferedWriter(configPath)) {
-                    properties.store(writer, "LeeSeolProxy survival queue settings");
-                }
-            }
+            return QueueSettings.from(configFiles.load(
+                    "queue.properties",
+                    defaults,
+                    "LeeSeolProxy survival queue settings"
+            ));
         } catch (IOException exception) {
             logger.warn("Failed to load queue settings. Using safe defaults.", exception);
+            return QueueSettings.from(defaults);
         }
-
-        return QueueSettings.from(properties);
     }
 
 }
