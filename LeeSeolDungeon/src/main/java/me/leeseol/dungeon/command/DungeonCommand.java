@@ -96,7 +96,7 @@ public final class DungeonCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(plugin.msg("player-only"));
             return true;
         }
-        portalManager.teleportToReturn(player);
+        portalManager.teleportToReturnSpawn(player);
         sender.sendMessage(plugin.msg("dungeon-exited"));
         return true;
     }

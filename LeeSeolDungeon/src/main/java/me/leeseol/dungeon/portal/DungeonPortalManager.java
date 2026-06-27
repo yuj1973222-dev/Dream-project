@@ -98,6 +98,10 @@ public final class DungeonPortalManager {
         }
     }
 
+    public void teleportToReturnSpawn(Player player) {
+        teleport(player, plugin.worldManager().returnSpawn());
+    }
+
     private DungeonPortal loadPortal(String id, ConfigurationSection section) {
         String world = section.getString("world", "");
         String targetWorld = section.getString("target-world", section.getString("target-server", ""));
