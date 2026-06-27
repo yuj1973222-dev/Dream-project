@@ -53,6 +53,10 @@ public final class CoreCommand implements CommandExecutor {
             return handlePortalCommand(sender, args);
         }
 
+        if (args.length >= 2 && isServerNpcCommand(args[0])) {
+            return plugin.serverNpcManager().handleCommand(sender, args);
+        }
+
         sendHelp(sender);
         return true;
     }
@@ -415,6 +419,10 @@ public final class CoreCommand implements CommandExecutor {
         return value.equalsIgnoreCase("portal");
     }
 
+    private boolean isServerNpcCommand(String value) {
+        return value.equalsIgnoreCase("servernpc") || value.equalsIgnoreCase("npc");
+    }
+
     private void sendHelp(CommandSender sender) {
         sender.sendMessage("/leeseolcore reload");
         sender.sendMessage("/leeseolcore launchpad set <id> [forward] [upward] [cooldownSeconds]");
@@ -425,6 +433,10 @@ public final class CoreCommand implements CommandExecutor {
         sender.sendMessage("/leeseolcore portal create <id> <targetServer> [cooldownSeconds]");
         sender.sendMessage("/leeseolcore portal list");
         sender.sendMessage("/leeseolcore portal remove <id>");
+        sender.sendMessage("/leeseolcore servernpc create <id> <targetServer> [displayName]");
+        sender.sendMessage("/leeseolcore servernpc bind <id> <citizensNpcId> <targetServer>");
+        sender.sendMessage("/leeseolcore servernpc list");
+        sender.sendMessage("/leeseolcore servernpc remove <id>");
     }
 
     private String color(String message) {
