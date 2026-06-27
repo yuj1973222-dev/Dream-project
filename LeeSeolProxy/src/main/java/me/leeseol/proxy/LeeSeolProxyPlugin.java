@@ -25,14 +25,12 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
 import me.leeseol.proxy.command.LobbyCommand;
 import me.leeseol.proxy.command.ServerListCommand;
 import me.leeseol.proxy.command.SurvivalQueueCommand;
+import me.leeseol.proxy.network.NetworkSettings;
 import me.leeseol.proxy.queue.QueueSettings;
 import me.leeseol.proxy.queue.SurvivalQueueController;
 import net.kyori.adventure.text.Component;
@@ -258,13 +256,7 @@ public final class LeeSeolProxyPlugin {
     private NetworkSettings loadNetworkSettings() {
         Path configPath = dataDirectory.resolve("network.properties");
         Properties properties = new Properties();
-        properties.setProperty("maintenance", "false");
-        properties.setProperty("maintenance-message", "로비 점검 중입니다. 잠시 후 다시 접속해주세요.");
-        properties.setProperty("fallback-enabled", "true");
-        properties.setProperty("fallback-server", "lobby");
-        properties.setProperty("fallback-from", "survival,newworld");
-        properties.setProperty("fallback-message", "서버 연결이 끊겨 로비로 이동합니다.");
-        properties.setProperty("fallback-unavailable-message", "로비가 열려 있지 않아 접속할 수 없습니다.");
+        NetworkSettings.defaults().writeDefaultsTo(properties);
 
         try {
             Files.createDirectories(dataDirectory);
@@ -281,24 +273,7 @@ public final class LeeSeolProxyPlugin {
             logger.warn("Failed to load network settings. Using safe fallback defaults.", exception);
         }
 
-        boolean maintenance = Boolean.parseBoolean(properties.getProperty("maintenance", "false"));
-        boolean fallbackEnabled = Boolean.parseBoolean(properties.getProperty("fallback-enabled", "true"));
-        String fallbackServer = properties.getProperty("fallback-server", "lobby").trim();
-        Set<String> fallbackFrom = Arrays.stream(properties.getProperty("fallback-from", "survival,newworld").split(","))
-                .map(String::trim)
-                .filter(value -> !value.isBlank())
-                .map(value -> value.toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-
-        return new NetworkSettings(
-                maintenance,
-                properties.getProperty("maintenance-message", "로비 점검 중입니다. 잠시 후 다시 접속해주세요."),
-                fallbackEnabled,
-                fallbackServer.isBlank() ? "lobby" : fallbackServer,
-                fallbackFrom.isEmpty() ? Set.of("survival", "newworld") : fallbackFrom,
-                properties.getProperty("fallback-message", "서버 연결이 끊겨 로비로 이동합니다."),
-                properties.getProperty("fallback-unavailable-message", "로비가 열려 있지 않아 접속할 수 없습니다.")
-        );
+        return NetworkSettings.from(properties);
     }
 
     private QueueSettings loadQueueSettings() {
@@ -342,25 +317,4 @@ public final class LeeSeolProxyPlugin {
         return bytes;
     }
 
-    private record NetworkSettings(
-            boolean maintenance,
-            String maintenanceMessage,
-            boolean fallbackEnabled,
-            String fallbackServer,
-            Set<String> fallbackFrom,
-            String fallbackMessage,
-            String fallbackUnavailableMessage
-    ) {
-        private static NetworkSettings defaults() {
-            return new NetworkSettings(
-                    false,
-                    "로비 점검 중입니다. 잠시 후 다시 접속해주세요.",
-                    true,
-                    "lobby",
-                    Set.of("survival", "newworld"),
-                    "서버 연결이 끊겨 로비로 이동합니다.",
-                    "로비가 열려 있지 않아 접속할 수 없습니다."
-            );
-        }
-    }
 }
