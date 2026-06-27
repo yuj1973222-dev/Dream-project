@@ -1,8 +1,8 @@
 # PLUGIN_INDEX.md
 
-Use this file as the current plugin structure map. It exists to prevent broad
-code reads and cross-domain edits. Keep history, failed attempts, and date-based
-notes out of this file.
+Use this file as the current plugin structure and contract map. It exists to
+prevent broad code reads, cross-domain edits, and accidental contract drift. Keep
+history, failed attempts, and date-based notes out of this file.
 
 ## Work Scope Template
 
@@ -25,7 +25,26 @@ Verify:
   BlueMap.
 - If a contract changes, verify the affected consumers/bridges too.
 
+## Contract Rules
+
+- Treat `Integration Map` as the fixed shared-contract owner map. The `Primary`
+  plugin owns the behavior/data; consumers may only display or integrate it.
+- Contract changes include commands, permissions, placeholders, APIs/events,
+  plugin-message channels, shared config/data keys, GUI/display surfaces, deploy
+  targets, and external bridge expectations.
+- If a shared surface changes, update both the owning plugin row and the matching
+  integration/smoke-test row before finishing the task.
+- Prefer plugin APIs, Bukkit events, placeholders, commands, or documented shared
+  files over reading another plugin's private storage shape directly.
+- Run only the matching `Contract Smoke Tests` row for the changed surface. If no
+  row exists, add one before treating the new surface as stable.
+- Handle `LeeSeolCore`, `LeeSeolTown`, and `LeeSeolProxy` contract changes
+  sequentially because they own high-risk integration surfaces.
+
 ## Integration Map
+
+These rows are the current contract ownership map, not a roadmap. Add planned
+features only after code/config implements the shared surface.
 
 | Domain | Primary | Allowed consumers | Bridge/config |
 | --- | --- | --- | --- |
@@ -46,7 +65,8 @@ Verify:
 
 ## Contract Smoke Tests
 
-Run only the rows touched by the change.
+These are the required smoke gates for changed shared surfaces. Run only the rows
+touched by the change.
 
 | Contract | Shared surface | Smoke test |
 | --- | --- | --- |
