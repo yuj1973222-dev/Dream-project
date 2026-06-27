@@ -1,9 +1,13 @@
 package me.leeseol.cleanup.util;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public final class Text {
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+
     private Text() {
     }
 
@@ -19,5 +23,9 @@ public final class Text {
             return;
         }
         sender.sendMessage(color(message));
+    }
+
+    public static Component component(String message) {
+        return LEGACY.deserialize(color(message));
     }
 }

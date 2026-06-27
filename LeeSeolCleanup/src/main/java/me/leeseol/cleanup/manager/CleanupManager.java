@@ -3,20 +3,29 @@ package me.leeseol.cleanup.manager;
 import java.util.ArrayList;
 import java.util.List;
 import me.leeseol.cleanup.LeeSeolCleanupPlugin;
+import me.leeseol.cleanup.util.Text;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 public final class CleanupManager {
     private final LeeSeolCleanupPlugin plugin;
     private BukkitTask task;
+    private BukkitTask countdownTask;
     private boolean enabled;
     private int intervalMinutes;
     private List<String> worlds;
     private boolean broadcast;
     private int minimumAgeTicks;
     private long nextCleanupAtMillis;
+    private int warningSeconds;
+    private String warningActionBar;
+    private Sound warningSound;
+    private boolean warningSoundEnabled;
+    private boolean warningSoundPlayed;
 
     public CleanupManager(LeeSeolCleanupPlugin plugin) {
         this.plugin = plugin;
@@ -30,10 +39,16 @@ public final class CleanupManager {
         broadcast = plugin.getConfig().getBoolean("cleanup.broadcast", true);
         int minimumAgeSeconds = Math.max(0, plugin.getConfig().getInt("cleanup.minimum-age-seconds", 0));
         minimumAgeTicks = minimumAgeSeconds * 20;
+        warningSeconds = Math.max(1, plugin.getConfig().getInt("cleanup.warning.seconds", 10));
+        warningActionBar = plugin.getConfig().getString("cleanup.warning.actionbar", "&c곧 아이템이 삭제됩니다: &e%seconds%초");
+        warningSoundEnabled = plugin.getConfig().getBoolean("cleanup.warning.sound.enabled", true);
+        warningSound = parseSound(plugin.getConfig().getString("cleanup.warning.sound.name", "BLOCK_NOTE_BLOCK_PLING"));
+        warningSoundPlayed = false;
 
         if (enabled) {
             long intervalTicks = intervalMinutes * 60L * 20L;
             task = Bukkit.getScheduler().runTaskTimer(plugin, this::cleanupScheduled, intervalTicks, intervalTicks);
+            countdownTask = Bukkit.getScheduler().runTaskTimer(plugin, this::tickCountdown, 20L, 20L);
             nextCleanupAtMillis = System.currentTimeMillis() + intervalMinutes * 60L * 1000L;
         } else {
             nextCleanupAtMillis = 0L;
@@ -46,6 +61,10 @@ public final class CleanupManager {
         if (task != null) {
             task.cancel();
             task = null;
+        }
+        if (countdownTask != null) {
+            countdownTask.cancel();
+            countdownTask = null;
         }
     }
 
@@ -100,6 +119,37 @@ public final class CleanupManager {
             plugin.broadcastToCleanupWorlds("cleaned", "%count%", String.valueOf(removed));
         }
         nextCleanupAtMillis = System.currentTimeMillis() + intervalMinutes * 60L * 1000L;
+        warningSoundPlayed = false;
+    }
+
+    private void tickCountdown() {
+        long seconds = secondsUntilNextCleanup();
+        if (!CleanupCountdown.shouldShow(seconds, warningSeconds)) {
+            if (seconds > warningSeconds) {
+                warningSoundPlayed = false;
+            }
+            return;
+        }
+
+        boolean playSound = warningSoundEnabled
+                && warningSound != null
+                && CleanupCountdown.shouldPlayStartSound(seconds, warningSeconds, warningSoundPlayed);
+        String message = CleanupCountdown.render(warningActionBar, seconds);
+        for (String worldName : worlds) {
+            World world = Bukkit.getWorld(worldName);
+            if (world == null) {
+                continue;
+            }
+            for (Player player : world.getPlayers()) {
+                player.sendActionBar(Text.component(message));
+                if (playSound) {
+                    player.playSound(player.getLocation(), warningSound, 1.0F, 1.0F);
+                }
+            }
+        }
+        if (playSound) {
+            warningSoundPlayed = true;
+        }
     }
 
     private int cleanupWorld(World world) {
@@ -112,5 +162,17 @@ public final class CleanupManager {
             removed++;
         }
         return removed;
+    }
+
+    private Sound parseSound(String name) {
+        if (name == null || name.isBlank()) {
+            return Sound.BLOCK_NOTE_BLOCK_PLING;
+        }
+        try {
+            return Sound.valueOf(name.trim().toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+            plugin.getLogger().warning("Invalid cleanup warning sound: " + name);
+            return Sound.BLOCK_NOTE_BLOCK_PLING;
+        }
     }
 }
