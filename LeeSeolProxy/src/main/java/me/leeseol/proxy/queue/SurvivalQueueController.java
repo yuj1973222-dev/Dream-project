@@ -20,11 +20,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
-public final class SurvivalQueueController {
+public final class SurvivalQueueController implements QueuePluginMessageBridge.Handler {
     private final ProxyServer proxy;
     private final Object plugin;
     private final Logger logger;
     private final ChannelIdentifier channel;
+    private final QueuePluginMessageBridge messageBridge;
     private final SurvivalQueue queue = new SurvivalQueue();
     private final Map<UUID, PendingLimboRequest> pendingLimboRequests = new ConcurrentHashMap<>();
     private volatile QueueSettings settings;
@@ -44,6 +45,7 @@ public final class SurvivalQueueController {
         this.logger = logger;
         this.channel = channel;
         this.settings = settings;
+        this.messageBridge = new QueuePluginMessageBridge(channel, this::settings, this);
     }
 
     public void start() {
@@ -134,21 +136,7 @@ public final class SurvivalQueueController {
     }
 
     public void onPluginMessage(PluginMessageEvent event) {
-        if (!event.getIdentifier().equals(channel)) {
-            return;
-        }
-        event.setResult(PluginMessageEvent.ForwardResult.handled());
-        if (!(event.getSource() instanceof ServerConnection connection)
-                || !connection.getServerInfo().getName().equalsIgnoreCase(settings.lobbyServer())) {
-            return;
-        }
-        QueuePluginMessage.read(event.getData()).ifPresent(message -> {
-            if (QueuePluginMessage.LIMBO_RESULT.equals(message.action())) {
-                handleLimboResult(message);
-            } else if (QueuePluginMessage.QUEUE_LEAVE.equals(message.action())) {
-                handleQueueLeave(message.playerId());
-            }
-        });
+        messageBridge.handle(event);
     }
 
     public void onServerConnected(ServerConnectedEvent event) {
@@ -330,7 +318,8 @@ public final class SurvivalQueueController {
                 send(player, settings.limboMoveFailedMessage(), NamedTextColor.RED));
     }
 
-    private void handleLimboResult(QueuePluginMessage.Message message) {
+    @Override
+    public void handleLimboResult(QueuePluginMessage.Message message) {
         PendingLimboRequest pending = pendingLimboRequests.get(message.playerId());
         if (pending == null || !pending.requestId().equals(message.requestId())) {
             return;
@@ -357,7 +346,8 @@ public final class SurvivalQueueController {
         processQueue();
     }
 
-    private void handleQueueLeave(UUID playerId) {
+    @Override
+    public void handleQueueLeave(UUID playerId) {
         Optional<Player> player = proxy.getPlayer(playerId);
         boolean removed = removeQueuedState(playerId);
         if (removed) {

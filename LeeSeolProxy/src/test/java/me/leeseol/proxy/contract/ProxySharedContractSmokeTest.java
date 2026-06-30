@@ -108,7 +108,7 @@ public final class ProxySharedContractSmokeTest {
         String servicesSource = readText("src/main/java/me/leeseol/proxy/ProxyServices.java");
         String registrarSource = readText("src/main/java/me/leeseol/proxy/command/ProxyCommandRegistrar.java");
 
-        assertTrue(servicesSource.contains("new ProxyCommandRegistrar(proxy, plugin, queueController).registerAll();"));
+        assertTrue(servicesSource.contains("new ProxyCommandRegistrar(proxy, plugin, queueCoordinator.controller()).registerAll();"));
         assertFalse(servicesSource.contains("metaBuilder(\"lobby\")"));
         assertFalse(servicesSource.contains("metaBuilder(\"survival\")"));
         assertFalse(servicesSource.contains("registerLobbyCommand"));
@@ -139,6 +139,43 @@ public final class ProxySharedContractSmokeTest {
         assertTrue(coordinatorSource.contains("configRepository.loadResourcePackSettings()"));
         assertTrue(coordinatorSource.contains("offerService.reload"));
         assertTrue(coordinatorSource.contains("player.sendResourcePackOffer(packInfo)"));
+    }
+
+    @Test
+    public void queueCoordinatorOwnsChannelLifecycleAndEventWiring() throws IOException {
+        String servicesSource = readText("src/main/java/me/leeseol/proxy/ProxyServices.java");
+        String coordinatorSource = readText("src/main/java/me/leeseol/proxy/queue/QueueCoordinator.java");
+
+        assertTrue(servicesSource.contains("new QueueCoordinator(proxy, plugin, logger, configRepository)"));
+        assertTrue(servicesSource.contains("queueCoordinator.start();"));
+        assertTrue(servicesSource.contains("queueCoordinator.close();"));
+        assertTrue(servicesSource.contains("queueCoordinator.handlePluginMessage(event);"));
+        assertTrue(servicesSource.contains("queueCoordinator.handleServerConnected(event);"));
+        assertTrue(servicesSource.contains("queueCoordinator.handleDisconnect(event);"));
+        assertFalse(servicesSource.contains("MinecraftChannelIdentifier"));
+        assertFalse(servicesSource.contains("loadQueueSettings"));
+        assertFalse(servicesSource.contains("new SurvivalQueueController"));
+
+        assertTrue(coordinatorSource.contains("configRepository.loadQueueSettings()"));
+        assertTrue(coordinatorSource.contains("MinecraftChannelIdentifier.from"));
+        assertTrue(coordinatorSource.contains("proxy.getChannelRegistrar().register(queueChannel)"));
+        assertTrue(coordinatorSource.contains("new SurvivalQueueController"));
+    }
+
+    @Test
+    public void queuePluginMessageBridgeOwnsQueueChannelRouting() throws IOException {
+        String controllerSource = readText("src/main/java/me/leeseol/proxy/queue/SurvivalQueueController.java");
+        String bridgeSource = readText("src/main/java/me/leeseol/proxy/queue/QueuePluginMessageBridge.java");
+
+        assertTrue(controllerSource.contains("implements QueuePluginMessageBridge.Handler"));
+        assertTrue(controllerSource.contains("new QueuePluginMessageBridge(channel, this::settings, this)"));
+        assertTrue(controllerSource.contains("messageBridge.handle(event);"));
+
+        assertTrue(bridgeSource.contains("PluginMessageEvent.ForwardResult.handled()"));
+        assertTrue(bridgeSource.contains("QueuePluginMessage.LIMBO_RESULT"));
+        assertTrue(bridgeSource.contains("QueuePluginMessage.QUEUE_LEAVE"));
+        assertTrue(bridgeSource.contains("handler.handleLimboResult(message)"));
+        assertTrue(bridgeSource.contains("handler.handleQueueLeave(message.playerId())"));
     }
 
     private static String readText(String path) throws IOException {

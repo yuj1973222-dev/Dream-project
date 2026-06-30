@@ -8,14 +8,11 @@ import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
-import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import java.io.IOException;
 import java.nio.file.Path;
 import me.leeseol.proxy.command.ProxyCommandRegistrar;
 import me.leeseol.proxy.config.ProxyConfigRepository;
 import me.leeseol.proxy.network.NetworkRouteService;
-import me.leeseol.proxy.queue.QueueSettings;
+import me.leeseol.proxy.queue.QueueCoordinator;
 import me.leeseol.proxy.queue.SurvivalQueueController;
 import me.leeseol.proxy.resourcepack.ResourcePackCoordinator;
 import org.slf4j.Logger;
@@ -27,8 +24,7 @@ final class ProxyServices {
     private final ProxyConfigRepository configRepository;
     private ResourcePackCoordinator resourcePackCoordinator;
     private NetworkRouteService networkRouteService;
-    private SurvivalQueueController queueController;
-    private ChannelIdentifier queueChannel;
+    private QueueCoordinator queueCoordinator;
 
     ProxyServices(LeeSeolProxyPlugin plugin, ProxyServer proxy, Logger logger, Path dataDirectory) {
         this.plugin = plugin;
@@ -40,25 +36,18 @@ final class ProxyServices {
     void start() {
         resourcePackCoordinator = new ResourcePackCoordinator(proxy, logger, configRepository);
         networkRouteService = new NetworkRouteService(proxy, logger, configRepository);
+        queueCoordinator = new QueueCoordinator(proxy, plugin, logger, configRepository);
         resourcePackCoordinator.reload();
         networkRouteService.reload();
+        queueCoordinator.start();
 
-        QueueSettings queueSettings = loadQueueSettings();
-        queueChannel = MinecraftChannelIdentifier.from(queueSettings.pluginMessageChannel());
-        proxy.getChannelRegistrar().register(queueChannel);
-        queueController = new SurvivalQueueController(proxy, plugin, logger, queueChannel, queueSettings);
-        queueController.start();
-
-        new ProxyCommandRegistrar(proxy, plugin, queueController).registerAll();
+        new ProxyCommandRegistrar(proxy, plugin, queueCoordinator.controller()).registerAll();
         logger.info("LeeSeolProxy enabled.");
     }
 
     void close() {
-        if (queueController != null) {
-            queueController.close();
-        }
-        if (queueChannel != null) {
-            proxy.getChannelRegistrar().unregister(queueChannel);
+        if (queueCoordinator != null) {
+            queueCoordinator.close();
         }
     }
 
@@ -79,33 +68,24 @@ final class ProxyServices {
     }
 
     void handlePluginMessage(PluginMessageEvent event) {
-        if (queueController != null) {
-            queueController.onPluginMessage(event);
+        if (queueCoordinator != null) {
+            queueCoordinator.handlePluginMessage(event);
         }
     }
 
     void handleServerConnected(ServerConnectedEvent event) {
-        if (queueController != null) {
-            queueController.onServerConnected(event);
+        if (queueCoordinator != null) {
+            queueCoordinator.handleServerConnected(event);
         }
     }
 
     void handleDisconnect(DisconnectEvent event) {
-        if (queueController != null) {
-            queueController.onDisconnect(event);
+        if (queueCoordinator != null) {
+            queueCoordinator.handleDisconnect(event);
         }
     }
 
     SurvivalQueueController queueController() {
-        return queueController;
-    }
-
-    private QueueSettings loadQueueSettings() {
-        try {
-            return configRepository.loadQueueSettings();
-        } catch (IOException exception) {
-            logger.warn("Failed to load queue settings. Using safe defaults.", exception);
-            return QueueSettings.defaults();
-        }
+        return queueCoordinator == null ? null : queueCoordinator.controller();
     }
 }
