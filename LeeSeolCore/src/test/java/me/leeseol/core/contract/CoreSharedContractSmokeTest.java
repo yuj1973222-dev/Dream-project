@@ -117,6 +117,20 @@ public final class CoreSharedContractSmokeTest {
         assertTrue(servicesSource.contains("NetworkMovePort networkMovePort()"));
     }
 
+    @Test
+    public void networkMoveServiceWrapsOnlyThePaperConnectBridge() throws IOException {
+        String pluginSource = readText("src/main/java/me/leeseol/core/LeeSeolCorePlugin.java");
+        String servicesSource = readText("src/main/java/me/leeseol/core/CoreServices.java");
+        String networkMoveSource = readText("src/main/java/me/leeseol/core/networkmove/NetworkMoveService.java");
+
+        assertTrue(servicesSource.contains("new NetworkMoveService(new BungeeCordNetworkMovePort(plugin))"));
+        assertTrue(pluginSource.contains("services.networkMoveService().move(player, targetServer);"));
+        assertTrue(networkMoveSource.contains("move(Player player, String targetServer)"));
+        assertTrue(networkMoveSource.contains("movePort.requestMove(player, targetServer);"));
+        assertFalse(networkMoveSource.toLowerCase().contains("queue"));
+        assertFalse(networkMoveSource.toLowerCase().contains("resource"));
+    }
+
     private static YamlConfiguration loadYaml(String path) {
         return YamlConfiguration.loadConfiguration(projectPath(path).toFile());
     }

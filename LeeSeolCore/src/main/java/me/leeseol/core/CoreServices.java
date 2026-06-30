@@ -7,6 +7,7 @@ import me.leeseol.core.content.WorldGuardContentRegionService;
 import me.leeseol.core.launchpad.LaunchPadManager;
 import me.leeseol.core.menu.CoreServerMenuManager;
 import me.leeseol.core.networkmove.BungeeCordNetworkMovePort;
+import me.leeseol.core.networkmove.NetworkMoveService;
 import me.leeseol.core.networkmove.NetworkMovePort;
 import me.leeseol.core.portal.PortalManager;
 import me.leeseol.core.servernpc.ServerNpcManager;
@@ -23,7 +24,7 @@ final class CoreServices {
     private final SurvivalSpawnManager survivalSpawnManager;
     private final ContentService contentService;
     private final BlueMapContentMarkers blueMapContentMarkers;
-    private final NetworkMovePort networkMovePort;
+    private final NetworkMoveService networkMoveService;
 
     CoreServices(LeeSeolCorePlugin plugin) {
         this.plugin = plugin;
@@ -33,7 +34,7 @@ final class CoreServices {
         this.serverMenuManager = new CoreServerMenuManager(plugin);
         this.serverNpcManager = new ServerNpcManager(plugin);
         this.survivalSpawnManager = new SurvivalSpawnManager(plugin);
-        this.networkMovePort = new BungeeCordNetworkMovePort(plugin);
+        this.networkMoveService = new NetworkMoveService(new BungeeCordNetworkMovePort(plugin));
         this.contentService = new ContentService(plugin, new WorldGuardContentRegionService(plugin));
         this.blueMapContentMarkers = new BlueMapContentMarkers(plugin, contentService);
         this.contentService.setAfterChange(blueMapContentMarkers::refreshLater);
@@ -92,7 +93,11 @@ final class CoreServices {
         return blueMapContentMarkers;
     }
 
+    NetworkMoveService networkMoveService() {
+        return networkMoveService;
+    }
+
     NetworkMovePort networkMovePort() {
-        return networkMovePort;
+        return networkMoveService.movePort();
     }
 }

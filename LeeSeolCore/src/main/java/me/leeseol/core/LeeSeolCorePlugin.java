@@ -76,7 +76,7 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
     }
 
     public void sendPlayerToServer(Player player, String targetServer) {
-        services.networkMovePort().requestMove(player, targetServer);
+        services.networkMoveService().move(player, targetServer);
     }
 
     public NetworkMovePort networkMovePort() {
