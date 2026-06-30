@@ -26,17 +26,17 @@ public final class ProxySharedContractSmokeTest {
 
     @Test
     public void proxyOwnsVelocityCommandSurfaceAndPropertiesFiles() throws IOException {
-        String pluginSource = readText("src/main/java/me/leeseol/proxy/LeeSeolProxyPlugin.java");
+        String proxySources = readJavaSources("src/main/java/me/leeseol/proxy");
 
-        assertTrue(pluginSource.contains("metaBuilder(\"servers\")"));
-        assertTrue(pluginSource.contains(".aliases(\"serverlist\", \"network\")"));
-        assertTrue(pluginSource.contains("metaBuilder(\"lobby\")"));
-        assertTrue(pluginSource.contains(".aliases(\"hub\""));
-        assertTrue(pluginSource.contains("metaBuilder(\"survival\")"));
-        assertTrue(pluginSource.contains(".aliases(\"wild\""));
-        assertTrue(pluginSource.contains("\"network.properties\""));
-        assertTrue(pluginSource.contains("\"queue.properties\""));
-        assertTrue(pluginSource.contains("\"resourcepack.properties\""));
+        assertTrue(proxySources.contains("metaBuilder(\"servers\")"));
+        assertTrue(proxySources.contains(".aliases(\"serverlist\", \"network\")"));
+        assertTrue(proxySources.contains("metaBuilder(\"lobby\")"));
+        assertTrue(proxySources.contains(".aliases(\"hub\""));
+        assertTrue(proxySources.contains("metaBuilder(\"survival\")"));
+        assertTrue(proxySources.contains(".aliases(\"wild\""));
+        assertTrue(proxySources.contains("\"network.properties\""));
+        assertTrue(proxySources.contains("\"queue.properties\""));
+        assertTrue(proxySources.contains("\"resourcepack.properties\""));
     }
 
     @Test
@@ -70,6 +70,21 @@ public final class ProxySharedContractSmokeTest {
         assertFalse(proxySources.contains("/content"));
         assertFalse(proxySources.contains("contents.yml"));
         assertFalse(proxySources.contains("survival-spawn-return"));
+    }
+
+    @Test
+    public void pluginBootstrapDelegatesLifecycleToProxyServices() throws IOException {
+        String pluginSource = readText("src/main/java/me/leeseol/proxy/LeeSeolProxyPlugin.java");
+        String servicesSource = readText("src/main/java/me/leeseol/proxy/ProxyServices.java");
+
+        assertTrue(pluginSource.contains("private ProxyServices services;"));
+        assertTrue(pluginSource.contains("services = new ProxyServices(this, proxy, logger, dataDirectory);"));
+        assertTrue(pluginSource.contains("services.start();"));
+        assertTrue(pluginSource.contains("services.close();"));
+        assertTrue(servicesSource.contains("final class ProxyServices"));
+        assertTrue(servicesSource.contains("void start()"));
+        assertTrue(servicesSource.contains("void close()"));
+        assertTrue(servicesSource.contains("SurvivalQueueController queueController()"));
     }
 
     private static String readText(String path) throws IOException {
