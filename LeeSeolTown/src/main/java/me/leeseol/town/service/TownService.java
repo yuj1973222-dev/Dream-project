@@ -69,244 +69,39 @@ public final class TownService {
     }
 
     public boolean createTown(Player player, String name) {
-        store.load();
-        if (store.playerTown(player.getUniqueId()) != null) {
-            player.sendMessage(plugin.msg("already-in-town"));
-            return true;
-        }
-
-        String id = TownStore.idFromName(name);
-        if (id.isBlank()) {
-            player.sendMessage("/party create <name>");
-            return true;
-        }
-        if (store.town(id) != null) {
-            player.sendMessage(plugin.msg("town-exists"));
-            return true;
-        }
-
-        Town town = new Town(id, name, player.getUniqueId(), System.currentTimeMillis());
-        store.addTown(town);
-        store.save();
-        updateIdentity(player);
-        player.sendMessage(plugin.msg("town-created").replace("%party%", town.name()).replace("%town%", town.name()));
-        return true;
+        return membershipService.createTown(player, name);
     }
 
     public boolean invite(Player sender, String targetName) {
-        if (targetName == null || targetName.isBlank()) {
-            sender.sendMessage("/party invite <player>");
-            return true;
-        }
-        store.load();
-        Town town = requireLeaderTown(sender);
-        if (town == null) {
-            return true;
-        }
-        Player localTarget = Bukkit.getPlayerExact(targetName);
-        UUID targetId = localTarget == null ? resolveOfflineUuid(targetName) : localTarget.getUniqueId();
-        if (targetId != null && store.playerTown(targetId) != null) {
-            sender.sendMessage(plugin.msg("already-in-town"));
-            return true;
-        }
-        if (town.members().size() >= plugin.partyMaxMembers()) {
-            sender.sendMessage(plugin.msg("party-full").replace("%count%", String.valueOf(plugin.partyMaxMembers())));
-            return true;
-        }
-
-        if (targetId != null) {
-            town.invites().add(targetId);
-        }
-        town.inviteNames().add(TownStore.normalizeName(targetName));
-        store.save();
-        sender.sendMessage(plugin.msg("invite-sent").replace("%player%", targetName));
-        if (localTarget != null) {
-            localTarget.sendMessage(inviteMessage(town));
-        } else {
-            sendRemoteInvite(sender, targetName, town);
-        }
-        return true;
+        return membershipService.invite(sender, targetName);
     }
 
     public boolean joinTown(Player player, String townName) {
-        return acceptInvite(player, townName);
+        return membershipService.joinTown(player, townName);
     }
 
     public boolean acceptInvite(Player player, String townName) {
-        store.load();
-        if (store.playerTown(player.getUniqueId()) != null) {
-            player.sendMessage(plugin.msg("already-in-town"));
-            return true;
-        }
-
-        Town town = store.town(TownStore.idFromName(townName));
-        if (town == null) {
-            player.sendMessage(plugin.msg("town-not-found").replace("%town%", townName));
-            return true;
-        }
-        if (town.members().size() >= plugin.partyMaxMembers()) {
-            player.sendMessage(plugin.msg("party-full").replace("%count%", String.valueOf(plugin.partyMaxMembers())));
-            return true;
-        }
-        boolean invitedByUuid = town.invites().remove(player.getUniqueId());
-        boolean invitedByName = town.inviteNames().remove(TownStore.normalizeName(player.getName()));
-        if (!invitedByUuid && !invitedByName && !player.hasPermission("leeseoltown.admin")) {
-            player.sendMessage(plugin.msg("no-invite"));
-            return true;
-        }
-
-        town.members().add(player.getUniqueId());
-        store.rebuildIndexes();
-        store.save();
-        updateIdentity(player);
-        player.sendMessage(plugin.msg("joined").replace("%party%", town.name()).replace("%town%", town.name()));
-        broadcastTown(town, Text.component(plugin.msgRaw("party-joined")
-                .replace("%player%", player.getName())
-                .replace("%party%", town.name())
-                .replace("%town%", town.name())), player);
-        return true;
+        return membershipService.acceptInvite(player, townName);
     }
 
     public boolean denyInvite(Player player, String townName) {
-        store.load();
-        Town town = store.town(TownStore.idFromName(townName));
-        if (town == null) {
-            player.sendMessage(plugin.msg("town-not-found").replace("%town%", townName));
-            return true;
-        }
-
-        boolean removedByUuid = town.invites().remove(player.getUniqueId());
-        boolean removedByName = town.inviteNames().remove(TownStore.normalizeName(player.getName()));
-        if (!removedByUuid && !removedByName) {
-            player.sendMessage(plugin.msg("no-invite"));
-            return true;
-        }
-
-        store.save();
-        player.sendMessage(plugin.msg("invite-denied").replace("%party%", town.name()).replace("%town%", town.name()));
-        return true;
+        return membershipService.denyInvite(player, townName);
     }
 
     public boolean leaveTown(Player player) {
-        store.load();
-        Town town = store.playerTown(player.getUniqueId());
-        if (town == null) {
-            player.sendMessage(plugin.msg("not-in-town"));
-            return true;
-        }
-        if (town.isLeader(player.getUniqueId())) {
-            player.sendMessage(plugin.msg("leader-cannot-leave"));
-            return true;
-        }
-
-        town.members().remove(player.getUniqueId());
-        town.invites().remove(player.getUniqueId());
-        town.inviteNames().remove(TownStore.normalizeName(player.getName()));
-        store.rebuildIndexes();
-        store.save();
-        updateIdentity(player);
-        player.sendMessage(plugin.msg("left"));
-        broadcastTown(town, Text.component(plugin.msgRaw("party-left-broadcast")
-                .replace("%player%", player.getName())
-                .replace("%party%", town.name())
-                .replace("%town%", town.name())), player);
-        return true;
+        return membershipService.leaveTown(player);
     }
 
     public boolean disbandTown(Player player) {
-        store.load();
-        Town town = requireStrictLeaderTown(player);
-        if (town == null) {
-            return true;
-        }
-        if (!confirmDisband(player, "town", town.id(), "disband-town-warning", "/party disband", town.name())) {
-            return true;
-        }
-
-        Set<UUID> memberIds = new LinkedHashSet<>(town.members());
-        store.removeTown(town);
-        store.save();
-        for (Player member : onlineMembers(memberIds)) {
-            updateIdentity(member);
-        }
-        broadcastMembers(memberIds, Text.component(plugin.msgRaw("disbanded")
-                .replace("%party%", town.name())
-                .replace("%town%", town.name())), player);
-        return true;
+        return membershipService.disbandTown(player);
     }
 
     public boolean transferLeader(Player player, String targetName) {
-        store.load();
-        Town town = requireStrictLeaderTown(player);
-        if (town == null) {
-            return true;
-        }
-
-        UUID targetId = resolveOfflineUuid(targetName);
-        if (targetId == null || !town.isMember(targetId)) {
-            player.sendMessage(plugin.msg("party-member-not-found").replace("%player%", targetName));
-            return true;
-        }
-        if (targetId.equals(player.getUniqueId())) {
-            player.sendMessage(plugin.msg("party-transfer-self"));
-            return true;
-        }
-
-        String confirmId = town.id() + ":" + targetId;
-        if (!confirmAction(player, "transfer", confirmId, "party-transfer-warning", "/party transfer " + targetName, targetName)) {
-            return true;
-        }
-
-        town.setLeader(targetId);
-        store.save();
-        updateAllIdentities();
-        broadcastTown(town, Text.component(plugin.msgRaw("party-transfer-done")
-                .replace("%player%", targetName)
-                .replace("%party%", town.name())
-                .replace("%town%", town.name())), player);
-        return true;
+        return membershipService.transferLeader(player, targetName);
     }
 
     public boolean kickMember(Player player, String targetName) {
-        store.load();
-        Town town = requireStrictLeaderTown(player);
-        if (town == null) {
-            return true;
-        }
-
-        UUID targetId = resolveOfflineUuid(targetName);
-        if (targetId == null || !town.isMember(targetId)) {
-            player.sendMessage(plugin.msg("party-member-not-found").replace("%player%", targetName));
-            return true;
-        }
-        if (targetId.equals(player.getUniqueId())) {
-            player.sendMessage(plugin.msg("party-kick-self"));
-            return true;
-        }
-
-        Player target = Bukkit.getPlayer(targetId);
-        String displayName = target == null || target.getName() == null ? targetName : target.getName();
-        town.members().remove(targetId);
-        town.invites().remove(targetId);
-        town.inviteNames().remove(TownStore.normalizeName(displayName));
-        store.rebuildIndexes();
-        store.save();
-
-        if (target != null) {
-            updateIdentity(target);
-            target.sendMessage(plugin.msg("party-kick-target")
-                    .replace("%party%", town.name())
-                    .replace("%town%", town.name()));
-        } else {
-            sendRemoteMessage(player, displayName, plainJson(Text.stripColor(plugin.msg("party-kick-target")
-                    .replace("%party%", town.name())
-                    .replace("%town%", town.name()))));
-        }
-        broadcastTown(town, Text.component(plugin.msgRaw("party-kicked")
-                .replace("%player%", displayName)
-                .replace("%party%", town.name())
-                .replace("%town%", town.name())), player);
-        return true;
+        return membershipService.kickMember(player, targetName);
     }
 
     public boolean claimChunk(Player player) {
