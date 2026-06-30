@@ -42,11 +42,25 @@ public final class TownService {
 
     private final LeeSeolTownPlugin plugin;
     private final TownStore store;
+    private final TownDomainQuery domainQuery;
+    private final TownConfirmationService confirmationService;
+    private final TownDisplayService displayService;
+    private final TownMembershipService membershipService;
+    private final NationService nationService;
+    private final ClaimService claimService;
+    private final WarService warService;
     private final Map<UUID, PendingDisband> pendingDisbands = new HashMap<>();
 
     public TownService(LeeSeolTownPlugin plugin, TownStore store) {
         this.plugin = plugin;
         this.store = store;
+        this.domainQuery = new TownDomainQuery(store);
+        this.confirmationService = new TownConfirmationService(plugin);
+        this.displayService = new TownDisplayService(plugin, store, domainQuery);
+        this.membershipService = new TownMembershipService(plugin, store, domainQuery, confirmationService, displayService);
+        this.nationService = new NationService(plugin, store, domainQuery, confirmationService, displayService);
+        this.claimService = new ClaimService(plugin, store, domainQuery, nationService, displayService);
+        this.warService = new WarService(plugin, store, domainQuery, nationService, displayService);
     }
 
     public void reload() {
