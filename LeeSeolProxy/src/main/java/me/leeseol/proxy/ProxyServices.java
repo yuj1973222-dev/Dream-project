@@ -19,11 +19,10 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
-import java.util.Properties;
 import me.leeseol.proxy.command.LobbyCommand;
 import me.leeseol.proxy.command.ServerListCommand;
 import me.leeseol.proxy.command.SurvivalQueueCommand;
-import me.leeseol.proxy.config.PropertiesConfigFile;
+import me.leeseol.proxy.config.ProxyConfigRepository;
 import me.leeseol.proxy.network.NetworkSettings;
 import me.leeseol.proxy.queue.QueueSettings;
 import me.leeseol.proxy.queue.SurvivalQueueController;
@@ -36,7 +35,7 @@ final class ProxyServices {
     private final LeeSeolProxyPlugin plugin;
     private final ProxyServer proxy;
     private final Logger logger;
-    private final PropertiesConfigFile configFiles;
+    private final ProxyConfigRepository configRepository;
     private ResourcePackInfo resourcePackInfo;
     private ResourcePackOfferService resourcePackOfferService;
     private NetworkSettings networkSettings = NetworkSettings.defaults();
@@ -47,7 +46,7 @@ final class ProxyServices {
         this.plugin = plugin;
         this.proxy = proxy;
         this.logger = logger;
-        this.configFiles = new PropertiesConfigFile(dataDirectory);
+        this.configRepository = new ProxyConfigRepository(dataDirectory);
     }
 
     void start() {
@@ -179,15 +178,8 @@ final class ProxyServices {
     }
 
     private void loadResourcePackInfo() {
-        Properties defaults = new Properties();
-        ResourcePackSettings.defaults().writeDefaultsTo(defaults);
         try {
-            Properties properties = configFiles.load(
-                    "resourcepack.properties",
-                    defaults,
-                    "LeeSeolProxy resource pack settings"
-            );
-            resourcePackInfo = resourcePackOfferService.reload(ResourcePackSettings.from(properties));
+            resourcePackInfo = resourcePackOfferService.reload(configRepository.loadResourcePackSettings());
         } catch (IOException exception) {
             logger.warn("Failed to load resource pack config. Resource pack offer is disabled.", exception);
             resourcePackInfo = null;
@@ -195,32 +187,20 @@ final class ProxyServices {
     }
 
     private NetworkSettings loadNetworkSettings() {
-        Properties defaults = new Properties();
-        NetworkSettings.defaults().writeDefaultsTo(defaults);
         try {
-            return NetworkSettings.from(configFiles.load(
-                    "network.properties",
-                    defaults,
-                    "LeeSeolProxy network settings"
-            ));
+            return configRepository.loadNetworkSettings();
         } catch (IOException exception) {
             logger.warn("Failed to load network settings. Using safe fallback defaults.", exception);
-            return NetworkSettings.from(defaults);
+            return NetworkSettings.defaults();
         }
     }
 
     private QueueSettings loadQueueSettings() {
-        Properties defaults = new Properties();
-        QueueSettings.defaults().writeDefaultsTo(defaults);
         try {
-            return QueueSettings.from(configFiles.load(
-                    "queue.properties",
-                    defaults,
-                    "LeeSeolProxy survival queue settings"
-            ));
+            return configRepository.loadQueueSettings();
         } catch (IOException exception) {
             logger.warn("Failed to load queue settings. Using safe defaults.", exception);
-            return QueueSettings.from(defaults);
+            return QueueSettings.defaults();
         }
     }
 }
