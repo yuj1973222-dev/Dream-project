@@ -156,7 +156,7 @@ public final class NationService {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
         if (!ensureNationActive(player, nation)) {
             return true;
         }
@@ -179,7 +179,7 @@ public final class NationService {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
         if (!ensureNationActive(player, nation)) {
             return true;
         }
@@ -206,7 +206,7 @@ public final class NationService {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
         if (!plugin.economy().available()) {
             player.sendMessage(plugin.msg("economy-missing"));
             return true;
@@ -232,7 +232,7 @@ public final class NationService {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
         player.sendMessage(plugin.msg("nation-treasury-info")
                 .replace("%nation%", nation.name())
                 .replace("%treasury%", plugin.formatMoney(nation.treasury()))
@@ -246,7 +246,7 @@ public final class NationService {
 
     public boolean sendNationUpkeep(Player player) {
         store.load();
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
         Town town = query.playerTown(player);
         Nation nation = town == null || town.nationId() == null ? null : store.nation(town.nationId());
         if (town == null || nation == null) {
@@ -264,7 +264,7 @@ public final class NationService {
 
     public boolean payNationUpkeep(Player player) {
         store.load();
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
         Town town = query.playerTown(player);
         Nation nation = requireNationLeader(player, town);
         if (nation == null) {
@@ -299,7 +299,7 @@ public final class NationService {
             return;
         }
         store.load();
-        processExpiredWarState();
+        plugin.townService().processExpiredWarState();
 
         boolean changed = false;
         String period = plugin.currentUpkeepPeriod();
@@ -461,60 +461,7 @@ public final class NationService {
         player.sendMessage(plugin.msg("nation-beacon-given"));
     }
 
-    private void processExpiredWarState() {
-        long now = System.currentTimeMillis();
-        boolean changed = false;
-
-        for (War war : store.wars()) {
-            if (war.status() == WarStatus.ACTIVE
-                    && war.defenderProtectionActive()
-                    && war.protectionUntil() > 0L
-                    && now >= war.protectionUntil()) {
-                war.setDefenderProtectionActive(false);
-                war.setProtectionUntil(0L);
-                changed = true;
-                Nation defender = store.nation(war.defenderNationId());
-                Nation attacker = store.nation(war.attackerNationId());
-                if (defender != null) {
-                    broadcastNation(defender, Text.component(plugin.msgRaw("war-protection-expired")
-                            .replace("%nation%", defender.name())
-                            .replace("%enemy%", attacker == null ? "-" : attacker.name())));
-                }
-                if (attacker != null && defender != null) {
-                    broadcastNation(attacker, Text.component(plugin.msgRaw("war-protection-expired-enemy")
-                            .replace("%nation%", defender.name())
-                            .replace("%enemy%", attacker.name())));
-                }
-            }
-        }
-
-        for (Nation nation : query.nations()) {
-            if (nation.debtAmount() <= 0.0D || nation.debtDeadline() <= 0L || now < nation.debtDeadline() || nation.functionsSuspended()) {
-                continue;
-            }
-            nation.setFunctionsSuspended(true);
-            changed = true;
-            for (War war : store.wars()) {
-                if (war.status() == WarStatus.ACTIVE && war.defenderNationId().equals(nation.id())) {
-                    war.setDefenderProtectionActive(false);
-                    war.setProtectionUntil(0L);
-                }
-            }
-            broadcastNation(nation, Text.component(plugin.msgRaw("war-debt-expired")
-                    .replace("%nation%", nation.name())
-                    .replace("%amount%", plugin.formatMoney(nation.debtAmount()))));
-            Nation creditor = store.nation(nation.debtCreditorNationId());
-            if (creditor != null) {
-                broadcastNation(creditor, Text.component(plugin.msgRaw("war-debt-expired-creditor")
-                        .replace("%nation%", nation.name())
-                        .replace("%amount%", plugin.formatMoney(nation.debtAmount()))));
-            }
-        }
-
-        if (changed) {
-            store.save();
-        }
-    }
+    
 
     private long nationTax(Nation nation) {
         return dailyNationUpkeep(nation);
