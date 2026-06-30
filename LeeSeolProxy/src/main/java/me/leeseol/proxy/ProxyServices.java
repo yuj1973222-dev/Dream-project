@@ -7,11 +7,9 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import java.io.IOException;
 import java.nio.file.Path;
 import me.leeseol.proxy.command.ProxyCommandRegistrar;
@@ -19,7 +17,7 @@ import me.leeseol.proxy.config.ProxyConfigRepository;
 import me.leeseol.proxy.network.NetworkRouteService;
 import me.leeseol.proxy.queue.QueueSettings;
 import me.leeseol.proxy.queue.SurvivalQueueController;
-import me.leeseol.proxy.resourcepack.ResourcePackOfferService;
+import me.leeseol.proxy.resourcepack.ResourcePackCoordinator;
 import org.slf4j.Logger;
 
 final class ProxyServices {
@@ -27,8 +25,7 @@ final class ProxyServices {
     private final ProxyServer proxy;
     private final Logger logger;
     private final ProxyConfigRepository configRepository;
-    private ResourcePackInfo resourcePackInfo;
-    private ResourcePackOfferService resourcePackOfferService;
+    private ResourcePackCoordinator resourcePackCoordinator;
     private NetworkRouteService networkRouteService;
     private SurvivalQueueController queueController;
     private ChannelIdentifier queueChannel;
@@ -41,9 +38,9 @@ final class ProxyServices {
     }
 
     void start() {
-        resourcePackOfferService = new ResourcePackOfferService(proxy, logger);
+        resourcePackCoordinator = new ResourcePackCoordinator(proxy, logger, configRepository);
         networkRouteService = new NetworkRouteService(proxy, logger, configRepository);
-        loadResourcePackInfo();
+        resourcePackCoordinator.reload();
         networkRouteService.reload();
 
         QueueSettings queueSettings = loadQueueSettings();
@@ -70,22 +67,11 @@ final class ProxyServices {
     }
 
     void handlePostLogin(PostLoginEvent event) {
-        ResourcePackInfo packInfo = resourcePackInfo;
-        if (packInfo == null) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        player.sendResourcePackOffer(packInfo);
-        logger.info("Sent network resource pack offer to {}", player.getUsername());
+        resourcePackCoordinator.handlePostLogin(event);
     }
 
     void handleResourcePackStatus(PlayerResourcePackStatusEvent event) {
-        logger.info(
-                "Resource pack status for {}: {}",
-                event.getPlayer().getUsername(),
-                event.getStatus()
-        );
+        resourcePackCoordinator.handleResourcePackStatus(event);
     }
 
     void handleKickedFromServer(KickedFromServerEvent event) {
@@ -112,15 +98,6 @@ final class ProxyServices {
 
     SurvivalQueueController queueController() {
         return queueController;
-    }
-
-    private void loadResourcePackInfo() {
-        try {
-            resourcePackInfo = resourcePackOfferService.reload(configRepository.loadResourcePackSettings());
-        } catch (IOException exception) {
-            logger.warn("Failed to load resource pack config. Resource pack offer is disabled.", exception);
-            resourcePackInfo = null;
-        }
     }
 
     private QueueSettings loadQueueSettings() {

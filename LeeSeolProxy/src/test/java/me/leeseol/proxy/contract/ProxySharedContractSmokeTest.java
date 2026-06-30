@@ -123,6 +123,24 @@ public final class ProxySharedContractSmokeTest {
         assertFalse(Files.exists(projectPath("src/main/java/me/leeseol/proxy/command/SwitchServerCommand.java")));
     }
 
+    @Test
+    public void resourcePackCoordinatorOwnsVelocityOfferFlow() throws IOException {
+        String servicesSource = readText("src/main/java/me/leeseol/proxy/ProxyServices.java");
+        String coordinatorSource = readText("src/main/java/me/leeseol/proxy/resourcepack/ResourcePackCoordinator.java");
+
+        assertTrue(servicesSource.contains("new ResourcePackCoordinator(proxy, logger, configRepository)"));
+        assertTrue(servicesSource.contains("resourcePackCoordinator.reload();"));
+        assertTrue(servicesSource.contains("resourcePackCoordinator.handlePostLogin(event);"));
+        assertTrue(servicesSource.contains("resourcePackCoordinator.handleResourcePackStatus(event);"));
+        assertFalse(servicesSource.contains("sendResourcePackOffer"));
+        assertFalse(servicesSource.contains("loadResourcePackInfo"));
+        assertFalse(servicesSource.contains("ResourcePackInfo resourcePackInfo"));
+
+        assertTrue(coordinatorSource.contains("configRepository.loadResourcePackSettings()"));
+        assertTrue(coordinatorSource.contains("offerService.reload"));
+        assertTrue(coordinatorSource.contains("player.sendResourcePackOffer(packInfo)"));
+    }
+
     private static String readText(String path) throws IOException {
         return Files.readString(projectPath(path), StandardCharsets.UTF_8);
     }

@@ -17,6 +17,7 @@ public final class ResourcePackSettingsTest {
         assertEquals("http://34.64.126.179:8163/generated.zip", settings.url());
         assertEquals("6484feef71105bfd2a2d6acdcc2af6a1bde2f598", settings.sha1());
         assertFalse(settings.force());
+        assertEquals("리소스팩을 적용하면 커스텀 아이템과 UI가 정상적으로 표시됩니다.", settings.prompt());
     }
 
     @Test
