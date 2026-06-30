@@ -352,12 +352,12 @@ public final class TownService {
             player.sendMessage(plugin.msg("claim-owned"));
             return true;
         }
-        if (!isAdjacentToNationClaim(nation, claim)) {
+        if (!domainQuery.isAdjacentToNationClaim(nation, claim)) {
             player.sendMessage(plugin.msg("claim-adjacent-required"));
             return true;
         }
 
-        int nextClaimCount = nationClaimCount(nation) + 1;
+        int nextClaimCount = domainQuery.nationClaimCount(nation) + 1;
         double cost = plugin.chunkClaimCost(claim, nation, nextClaimCount);
         if (!player.hasPermission("leeseoltown.admin") && plugin.economyEnabled() && cost > 0.0D) {
             if (!plugin.economy().available()) {
@@ -405,7 +405,7 @@ public final class TownService {
                     .replace("%buffer%", String.valueOf(neutralZone.claimBufferChunks())));
             return true;
         }
-        int nextClaimCount = nationClaimCount(nation) + 1;
+        int nextClaimCount = domainQuery.nationClaimCount(nation) + 1;
         player.sendMessage(plugin.msg("claim-price")
                 .replace("%chunk%", claim.display())
                 .replace("%zone%", plugin.claimZoneName(claim))
@@ -737,7 +737,7 @@ public final class TownService {
         if (attacker == null || !ensureNationActive(player, attacker)) {
             return true;
         }
-        Nation defender = nationByName(targetNationName);
+        Nation defender = domainQuery.nationByName(targetNationName);
         if (defender == null) {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
@@ -746,7 +746,7 @@ public final class TownService {
             player.sendMessage(plugin.msg("war-self"));
             return true;
         }
-        if (findWarBetween(attacker.id(), defender.id()) != null) {
+        if (domainQuery.findWarBetween(attacker.id(), defender.id()) != null) {
             player.sendMessage(plugin.msg("war-already-exists"));
             return true;
         }
@@ -773,12 +773,12 @@ public final class TownService {
         if (defender == null || !ensureNationActive(player, defender)) {
             return true;
         }
-        Nation attacker = nationByName(attackerNationName);
+        Nation attacker = domainQuery.nationByName(attackerNationName);
         if (attacker == null) {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        War war = findPendingWar(attacker.id(), defender.id());
+        War war = domainQuery.findPendingWar(attacker.id(), defender.id());
         if (war == null) {
             player.sendMessage(plugin.msg("war-not-found"));
             return true;
@@ -810,12 +810,12 @@ public final class TownService {
         if (!ensureNationActive(player, surrenderer)) {
             return true;
         }
-        Nation winner = nationByName(enemyNationName);
+        Nation winner = domainQuery.nationByName(enemyNationName);
         if (winner == null) {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        War war = findWarBetween(surrenderer.id(), winner.id());
+        War war = domainQuery.findWarBetween(surrenderer.id(), winner.id());
         if (war == null) {
             player.sendMessage(plugin.msg("war-not-found"));
             return true;
@@ -855,12 +855,12 @@ public final class TownService {
         if (defender == null) {
             return true;
         }
-        Nation attacker = nationByName(enemyNationName);
+        Nation attacker = domainQuery.nationByName(enemyNationName);
         if (attacker == null) {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        War war = findWarBetween(attacker.id(), defender.id());
+        War war = domainQuery.findWarBetween(attacker.id(), defender.id());
         if (war == null || war.status() != WarStatus.ACTIVE || !war.defenderNationId().equals(defender.id()) || !war.defenderProtectionActive()) {
             player.sendMessage(plugin.msg("war-protection-not-active"));
             return true;
@@ -922,13 +922,13 @@ public final class TownService {
         }
         store.load();
         processExpiredWarState();
-        Nation winner = nationByName(winnerName);
-        Nation loser = nationByName(loserName);
+        Nation winner = domainQuery.nationByName(winnerName);
+        Nation loser = domainQuery.nationByName(loserName);
         if (winner == null || loser == null) {
             player.sendMessage(plugin.msg("nation-not-found"));
             return true;
         }
-        War war = findWarBetween(winner.id(), loser.id());
+        War war = domainQuery.findWarBetween(winner.id(), loser.id());
         if (war == null) {
             player.sendMessage(plugin.msg("war-not-found"));
             return true;
@@ -1100,7 +1100,7 @@ public final class TownService {
         if (!nation.buildProtectionEnabled()) {
             return true;
         }
-        return isNationMember(player.getUniqueId(), nation);
+        return domainQuery.isNationMember(player.getUniqueId(), nation);
     }
 
     public boolean shouldCancelNationBeaconPlace(Player player, ClaimKey claim) {
@@ -1221,10 +1221,10 @@ public final class TownService {
     }
 
     public boolean shouldApplyBeaconFatigue(Player player, ClaimKey claim) {
-        Nation nation = nationForBeaconClaim(claim);
+        Nation nation = domainQuery.nationForBeaconClaim(claim);
         return nation != null
                 && !nation.functionsSuspended()
-                && !isNationMember(player.getUniqueId(), nation)
+                && !domainQuery.isNationMember(player.getUniqueId(), nation)
                 && !player.hasPermission("leeseoltown.admin");
     }
 
@@ -1250,31 +1250,19 @@ public final class TownService {
     }
 
     public Nation nationForClaim(ClaimKey claim) {
-        Town owner = store.claimTown(claim);
-        return owner == null || owner.nationId() == null ? null : store.nation(owner.nationId());
+        return domainQuery.nationForClaim(claim);
     }
 
     public String nationIdForClaim(ClaimKey claim) {
-        Nation nation = nationForClaim(claim);
-        return nation == null ? null : nation.id();
+        return domainQuery.nationIdForClaim(claim);
     }
 
     public boolean nationHasOpenWar(Nation nation) {
-        if (nation == null) {
-            return false;
-        }
-        processExpiredWarState();
-        for (War war : store.wars()) {
-            if ((war.status() == WarStatus.PENDING || war.status() == WarStatus.ACTIVE)
-                    && war.involves(nation.id())) {
-                return true;
-            }
-        }
-        return false;
+        return domainQuery.nationHasOpenWar(nation);
     }
 
     public Town claimTown(ClaimKey claim) {
-        return store.claimTown(claim);
+        return domainQuery.claimTown(claim);
     }
 
     public ChatMode chatMode(Player player) {
@@ -1282,20 +1270,19 @@ public final class TownService {
     }
 
     public Town playerTown(Player player) {
-        return store.playerTown(player.getUniqueId());
+        return domainQuery.playerTown(player);
     }
 
     public Nation playerNation(Player player) {
-        Town town = playerTown(player);
-        return town == null || town.nationId() == null ? null : store.nation(town.nationId());
+        return domainQuery.playerNation(player);
     }
 
     public Collection<Town> towns() {
-        return store.towns();
+        return domainQuery.towns();
     }
 
     public Collection<Nation> nations() {
-        return store.nations();
+        return domainQuery.nations();
     }
 
     public void sendSelfInfo(Player player) {
@@ -1320,7 +1307,7 @@ public final class TownService {
         } else {
             player.sendMessage(Text.component("&7국가: " + nation.color().legacyPrefix() + nation.name()
                     + " &8(" + nation.color().displayName() + ")"));
-            int memberCount = nationMemberCount(nation);
+            int memberCount = domainQuery.nationMemberCount(nation);
             player.sendMessage(Text.component("&7국가 인원: &f" + memberCount));
             player.sendMessage(Text.component("&7카르마: &f" + nation.karma()));
             player.sendMessage(Text.component("&7국고: &e" + plugin.formatMoney(nation.treasury())));
@@ -1350,40 +1337,6 @@ public final class TownService {
         if (plugin.blueMapNationClaimMarkers() != null) {
             plugin.blueMapNationClaimMarkers().refreshLater();
         }
-    }
-
-    private boolean isNationMember(UUID playerId, Nation nation) {
-        if (nation == null) {
-            return false;
-        }
-        for (String townId : nation.townIds()) {
-            Town town = store.town(townId);
-            if (town != null && town.isMember(playerId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Nation nationForBeaconClaim(ClaimKey claim) {
-        for (Nation nation : store.nations()) {
-            if (claim.equals(nation.beaconClaim())) {
-                return nation;
-            }
-        }
-        return null;
-    }
-
-    private boolean isAdjacentToNationClaim(Nation nation, ClaimKey claim) {
-        return isNationClaim(nation, new ClaimKey(claim.world(), claim.x() + 1, claim.z()))
-                || isNationClaim(nation, new ClaimKey(claim.world(), claim.x() - 1, claim.z()))
-                || isNationClaim(nation, new ClaimKey(claim.world(), claim.x(), claim.z() + 1))
-                || isNationClaim(nation, new ClaimKey(claim.world(), claim.x(), claim.z() - 1));
-    }
-
-    private boolean isNationClaim(Nation nation, ClaimKey claim) {
-        Town owner = store.claimTown(claim);
-        return owner != null && owner.nationId() != null && owner.nationId().equals(nation.id());
     }
 
     private void giveNationBeacon(Player player) {
@@ -1431,40 +1384,6 @@ public final class TownService {
                 .replace("%nation%", nation.name())
                 .replace("%amount%", plugin.formatMoney(nation.debtAmount())));
         return false;
-    }
-
-    private Nation nationByName(String name) {
-        String id = TownStore.idFromName(name);
-        Nation nation = store.nation(id);
-        if (nation != null) {
-            return nation;
-        }
-        for (Nation candidate : store.nations()) {
-            if (candidate.name().equalsIgnoreCase(name)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
-
-    private War findWarBetween(String firstNationId, String secondNationId) {
-        for (War war : store.wars()) {
-            if (war.between(firstNationId, secondNationId)) {
-                return war;
-            }
-        }
-        return null;
-    }
-
-    private War findPendingWar(String attackerNationId, String defenderNationId) {
-        for (War war : store.wars()) {
-            if (war.status() == WarStatus.PENDING
-                    && war.attackerNationId().equals(attackerNationId)
-                    && war.defenderNationId().equals(defenderNationId)) {
-                return war;
-            }
-        }
-        return null;
     }
 
     private void applySurrenderPayment(Nation surrenderer, Nation winner) {
@@ -1632,10 +1551,10 @@ public final class TownService {
         if (nation == null || !plugin.upkeepEnabled()) {
             return 0L;
         }
-        long total = safeAdd(plugin.dailyBaseNationUpkeep(), plugin.dailyMemberUpkeep(nationMemberCount(nation)));
+        long total = safeAdd(plugin.dailyBaseNationUpkeep(), plugin.dailyMemberUpkeep(domainQuery.nationMemberCount(nation)));
         List<Long> claimCosts = new ArrayList<>();
-        int claimCount = nationClaimCount(nation);
-        for (ClaimKey claim : nationClaims(nation)) {
+        int claimCount = domainQuery.nationClaimCount(nation);
+        for (ClaimKey claim : domainQuery.nationClaims(nation)) {
             claimCosts.add(plugin.dailyChunkUpkeep(claim, claimCount));
         }
         claimCosts.sort(Long::compareTo);
@@ -1659,24 +1578,6 @@ public final class TownService {
         return nation.debtAmount() > 0.0D
                 && nation.debtDeadline() > 0L
                 && System.currentTimeMillis() >= nation.debtDeadline();
-    }
-
-    private int nationClaimCount(Nation nation) {
-        return nationClaims(nation).size();
-    }
-
-    private List<ClaimKey> nationClaims(Nation nation) {
-        List<ClaimKey> claims = new ArrayList<>();
-        if (nation == null) {
-            return claims;
-        }
-        for (String townId : nation.townIds()) {
-            Town town = store.town(townId);
-            if (town != null) {
-                claims.addAll(town.claims());
-            }
-        }
-        return claims;
     }
 
     private long safeAdd(long left, long right) {
@@ -1885,17 +1786,6 @@ public final class TownService {
                 + " &7members=&f" + town.members().size() + "/" + plugin.partyMaxMembers()
                 + " &7claims=&f" + town.claims().size()
                 + " &7nation=&f" + nationText);
-    }
-
-    private int nationMemberCount(Nation nation) {
-        int count = 0;
-        for (String townId : nation.townIds()) {
-            Town town = store.town(townId);
-            if (town != null) {
-                count += town.members().size();
-            }
-        }
-        return count;
     }
 
     private record PendingDisband(String kind, String id, long expiresAt) {
