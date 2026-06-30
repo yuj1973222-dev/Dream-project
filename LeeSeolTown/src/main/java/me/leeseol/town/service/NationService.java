@@ -238,9 +238,9 @@ public final class NationService {
                 .replace("%treasury%", plugin.formatMoney(nation.treasury()))
                 .replace("%karma%", String.valueOf(nation.karma()))
                 .replace("%debt%", plugin.formatMoney(nation.debtAmount())));
-        player.sendMessage(Text.component("&7?쇱씪 ?좎?鍮? &e" + plugin.formatMoney(dailyNationUpkeep(nation))
-                + " &7| ?좎?鍮?泥대궔: &c" + plugin.formatMoney(nation.upkeepDebt())
-                + " &7| ?뺤궛?? &f" + (nation.lastUpkeepPeriod() == null ? "-" : nation.lastUpkeepPeriod())));
+        player.sendMessage(Text.component("&7일일 유지비: &e" + plugin.formatMoney(dailyNationUpkeep(nation))
+                + " &7| 유지비 체납: &c" + plugin.formatMoney(nation.upkeepDebt())
+                + " &7| 정산일: &f" + (nation.lastUpkeepPeriod() == null ? "-" : nation.lastUpkeepPeriod())));
         return true;
     }
 

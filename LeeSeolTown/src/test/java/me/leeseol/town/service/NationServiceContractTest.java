@@ -95,6 +95,25 @@ public final class NationServiceContractTest {
         }
     }
 
+    @Test
+    public void treasuryStatusDisplayStringsStayReadableKorean() throws IOException {
+        String service = source("NationService.java");
+
+        for (String snippet : List.of(
+                "&7일일 유지비: &e",
+                " &7| 유지비 체납: &c",
+                " &7| 정산일: &f"
+        )) {
+            assertTrue("Unreadable or missing treasury display string: " + snippet,
+                    service.contains(snippet));
+        }
+
+        for (String mojibake : List.of("\uF9D0", "\u7B4C", "\u91AB")) {
+            assertFalse("Treasury display contains mojibake: " + mojibake,
+                    service.contains(mojibake));
+        }
+    }
+
     private static String source(String fileName) throws IOException {
         return Files.readString(Path.of("src", "main", "java", "me", "leeseol", "town", "service", fileName));
     }

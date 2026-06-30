@@ -143,41 +143,41 @@ public final class TownDisplayService {
         Town town = query.playerTown(player);
         Nation nation = query.playerNation(player);
 
-        player.sendMessage(Text.component("&#BEEBFF[?뚯냽 ?뺣낫]"));
+        player.sendMessage(Text.component("&#BEEBFF[소속 정보]"));
         if (town == null) {
-            player.sendMessage(Text.component("&7?뚰떚: &f?놁쓬"));
-            player.sendMessage(Text.component("&7援??: &f?놁쓬"));
-            player.sendMessage(Text.component("&7?곹깭: &f?뚰떚瑜??앹꽦?섍굅??珥덈?瑜?諛쏆븘 媛?낇븷 ???덉뒿?덈떎."));
+            player.sendMessage(Text.component("&7파티: &f없음"));
+            player.sendMessage(Text.component("&7국가: &f없음"));
+            player.sendMessage(Text.component("&7상태: &f파티를 생성하거나 초대를 받아 가입할 수 있습니다."));
             return;
         }
 
-        String role = town.isLeader(player.getUniqueId()) ? "leader" : "member";
-        player.sendMessage(Text.component("&7?뚰떚: &#8FD9A8" + town.name() + " &8(" + role + ")"));
-        player.sendMessage(Text.component("&7?뚰떚 ?몄썝: &f" + town.members().size() + "/" + plugin.partyMaxMembers()));
-        player.sendMessage(Text.component("&7?뚯쑀 泥?겕: &f" + town.claims().size()));
+        String role = town.isLeader(player.getUniqueId()) ? "대표" : "구성원";
+        player.sendMessage(Text.component("&7파티: &#8FD9A8" + town.name() + " &8(" + role + ")"));
+        player.sendMessage(Text.component("&7파티 인원: &f" + town.members().size() + "/" + plugin.partyMaxMembers()));
+        player.sendMessage(Text.component("&7소유 청크: &f" + town.claims().size()));
 
         if (nation == null) {
-            player.sendMessage(Text.component("&7援??: &f?놁쓬"));
+            player.sendMessage(Text.component("&7국가: &f없음"));
         } else {
-            player.sendMessage(Text.component("&7援??: " + nation.color().legacyPrefix() + nation.name()
+            player.sendMessage(Text.component("&7국가: " + nation.color().legacyPrefix() + nation.name()
                     + " &8(" + nation.color().displayName() + ")"));
             int memberCount = query.nationMemberCount(nation);
-            player.sendMessage(Text.component("&7援?? ?몄썝: &f" + memberCount));
-            player.sendMessage(Text.component("&7移대Ⅴ留? &f" + nation.karma()));
-            player.sendMessage(Text.component("&7援?퀬: &e" + plugin.formatMoney(nation.treasury())));
-            player.sendMessage(Text.component("&7?쇱씪 援?? ?좎?鍮? &e"
+            player.sendMessage(Text.component("&7국가 인원: &f" + memberCount));
+            player.sendMessage(Text.component("&7카르마: &f" + nation.karma()));
+            player.sendMessage(Text.component("&7국고: &e" + plugin.formatMoney(nation.treasury())));
+            player.sendMessage(Text.component("&7일일 국가 유지비: &e"
                     + plugin.formatMoney(plugin.townService().dailyNationUpkeep(nation))));
             if (nation.upkeepDebt() > 0.0D) {
-                player.sendMessage(Text.component("&7?좎?鍮?泥대궔: &c" + plugin.formatMoney(nation.upkeepDebt())));
+                player.sendMessage(Text.component("&7유지비 체납: &c" + plugin.formatMoney(nation.upkeepDebt())));
             }
             if (nation.debtAmount() > 0.0D) {
-                player.sendMessage(Text.component("&7?꾩웳 泥대궔: &c" + plugin.formatMoney(nation.debtAmount())));
+                player.sendMessage(Text.component("&7전쟁 체납: &c" + plugin.formatMoney(nation.debtAmount())));
             }
             if (nation.functionsSuspended()) {
-                player.sendMessage(Text.component("&c援?? 湲곕뒫 ?뺤? ?곹깭"));
+                player.sendMessage(Text.component("&c국가 기능 정지 상태"));
             }
         }
-        player.sendMessage(Text.component("&7梨꾪똿 紐⑤뱶: &f" + store.chatMode(player.getUniqueId()).displayName()));
+        player.sendMessage(Text.component("&7채팅 모드: &f" + store.chatMode(player.getUniqueId()).displayName()));
     }
 
     public String info(Town town) {

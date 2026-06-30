@@ -63,6 +63,37 @@ public final class TownDisplayServiceContractTest {
         }
     }
 
+    @Test
+    public void selfInfoDisplayStringsStayReadableKorean() throws IOException {
+        String service = source("TownDisplayService.java");
+
+        for (String snippet : List.of(
+                "&#BEEBFF[소속 정보]",
+                "&7파티: &f없음",
+                "&7국가: &f없음",
+                "&7상태: &f파티를 생성하거나 초대를 받아 가입할 수 있습니다.",
+                "? \"대표\" : \"구성원\"",
+                "&7파티 인원: &f",
+                "&7소유 청크: &f",
+                "&7국가 인원: &f",
+                "&7카르마: &f",
+                "&7국고: &e",
+                "&7일일 국가 유지비: &e",
+                "&7유지비 체납: &c",
+                "&7전쟁 체납: &c",
+                "&c국가 기능 정지 상태",
+                "&7채팅 모드: &f"
+        )) {
+            assertTrue("Unreadable or missing self-info display string: " + snippet,
+                    service.contains(snippet));
+        }
+
+        for (String mojibake : List.of("\uF9D0", "\uF9CF", "\u7B4C", "\u91AB", "\u71C1", "\u8881")) {
+            assertFalse("Self-info display contains mojibake: " + mojibake,
+                    service.contains(mojibake));
+        }
+    }
+
     private static String source(String fileName) throws IOException {
         return Files.readString(Path.of("src", "main", "java", "me", "leeseol", "town", "service", fileName));
     }
