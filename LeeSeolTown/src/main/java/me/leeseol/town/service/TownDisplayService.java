@@ -31,4 +31,10 @@ public final class TownDisplayService {
             updateIdentity(player);
         }
     }
+
+    public void refreshNationClaimMarkers() {
+        if (plugin.blueMapNationClaimMarkers() != null) {
+            plugin.blueMapNationClaimMarkers().refreshLater();
+        }
+    }
 }

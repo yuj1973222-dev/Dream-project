@@ -257,266 +257,39 @@ public final class TownService {
     }
 
     public boolean createNation(Player player, String name, String colorKey, List<String> extraPartyNames) {
-        if (colorKey == null || colorKey.isBlank()) {
-            player.sendMessage("/party nation create <name> <color> [party...]");
-            return true;
-        }
-
-        store.load();
-        NationColorPalette palette = NationColorPalette.from(plugin.getConfig());
-        NationColor color = palette.resolve(colorKey, usedNationColorKeys());
-        if (color == null) {
-            if (palette.keys().contains(NationColor.normalizeKey(colorKey))) {
-                player.sendMessage(plugin.msg("nation-color-taken").replace("%color%", colorKey));
-            } else {
-                player.sendMessage(plugin.msg("nation-color-invalid").replace("%colors%", String.join(", ", palette.keys())));
-            }
-            return true;
-        }
-
-        Town town = player.hasPermission("leeseoltown.admin") ? requireLeaderTown(player) : requireStrictLeaderTown(player);
-        if (town == null) {
-            return true;
-        }
-        if (town.nationId() != null) {
-            player.sendMessage(plugin.msg("already-in-nation"));
-            return true;
-        }
-        Set<Town> nationParties = new LinkedHashSet<>();
-        nationParties.add(town);
-        if (!extraPartyNames.isEmpty() && !player.hasPermission("leeseoltown.admin")) {
-            player.sendMessage(plugin.msg("nation-extra-party-admin-only"));
-            return true;
-        }
-        for (String partyName : extraPartyNames) {
-            Town extra = store.town(TownStore.idFromName(partyName));
-            if (extra == null) {
-                player.sendMessage(plugin.msg("town-not-found").replace("%town%", partyName));
-                return true;
-            }
-            if (extra.nationId() != null) {
-                player.sendMessage(plugin.msg("party-already-in-nation").replace("%party%", extra.name()).replace("%town%", extra.name()));
-                return true;
-            }
-            nationParties.add(extra);
-        }
-        int memberCount = nationParties.stream().mapToInt(candidate -> candidate.members().size()).sum();
-        boolean bypassRequirements = player.hasPermission("leeseoltown.admin");
-        if (!bypassRequirements && memberCount < plugin.nationRequiredMembers()) {
-            player.sendMessage(plugin.msg("nation-member-required").replace("%count%", String.valueOf(plugin.nationRequiredMembers())));
-            return true;
-        }
-
-        String id = TownStore.idFromName(name);
-        Nation nation = new Nation(id, name, color, town.id(), System.currentTimeMillis());
-        nation.setLastUpkeepPeriod(plugin.currentUpkeepPeriod());
-        nation.townIds().clear();
-        for (Town party : nationParties) {
-            nation.townIds().add(party.id());
-            party.setNationId(id);
-        }
-        store.addNation(nation);
-        store.save();
-        refreshNationClaimMarkers();
-        updateAllIdentities();
-        giveNationBeacon(player);
-        broadcastNation(nation, Text.component(plugin.msgRaw("nation-created")
-                .replace("%nation%", nation.name())
-                .replace("%color%", nation.color().displayName())
-                .replace("%members%", String.valueOf(memberCount))
-                .replace("%tax%", plugin.formatMoney(dailyNationUpkeep(nation)))));
-        return true;
+        return nationService.createNation(player, name, colorKey, extraPartyNames);
     }
 
     public List<String> nationColorKeys() {
-        return NationColorPalette.from(plugin.getConfig()).keys();
-    }
-
-    private Set<String> usedNationColorKeys() {
-        Set<String> keys = new LinkedHashSet<>();
-        for (Nation nation : store.nations()) {
-            if (nation.color() != null) {
-                keys.add(nation.color().key());
-            }
-        }
-        return keys;
+        return nationService.nationColorKeys();
     }
 
     public boolean disbandNation(Player player) {
-        store.load();
-        Town town = player.hasPermission("leeseoltown.admin") ? requireLeaderTown(player) : requireStrictLeaderTown(player);
-        if (town == null) {
-            return true;
-        }
-
-        Nation nation = town.nationId() == null ? null : store.nation(town.nationId());
-        if (nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return true;
-        }
-        if (!player.hasPermission("leeseoltown.admin") && !town.id().equals(nation.capitalTownId())) {
-            player.sendMessage(plugin.msg("not-nation-leader"));
-            return true;
-        }
-        if (!confirmDisband(player, "nation", nation.id(), "disband-nation-warning", "/party nation disband", nation.name())) {
-            return true;
-        }
-
-        List<Player> onlineMembers = onlineNationMembers(nation);
-        store.removeNation(nation);
-        store.save();
-        refreshNationClaimMarkers();
-        updateAllIdentities();
-        for (Player member : onlineMembers) {
-            member.sendMessage(plugin.msg("nation-disbanded").replace("%nation%", nation.name()));
-        }
-        return true;
+        return nationService.disbandNation(player);
     }
 
     public boolean setNationPvp(Player player, boolean enabled) {
-        store.load();
-        Town town = store.playerTown(player.getUniqueId());
-        Nation nation = town == null || town.nationId() == null ? null : store.nation(town.nationId());
-        if (town == null || nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return true;
-        }
-        processExpiredWarState();
-        if (!ensureNationActive(player, nation)) {
-            return true;
-        }
-        if (!canManageNation(player, town, nation)) {
-            player.sendMessage(plugin.msg("not-nation-leader"));
-            return true;
-        }
-        nation.setPvpEnabled(enabled);
-        store.save();
-        broadcastNation(nation, Text.component(plugin.msgRaw(enabled ? "nation-pvp-on" : "nation-pvp-off")
-                .replace("%nation%", nation.name())));
-        return true;
+        return nationService.setNationPvp(player, enabled);
     }
 
     public boolean setNationBuildProtection(Player player, boolean enabled) {
-        store.load();
-        Town town = store.playerTown(player.getUniqueId());
-        Nation nation = town == null || town.nationId() == null ? null : store.nation(town.nationId());
-        if (town == null || nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return true;
-        }
-        processExpiredWarState();
-        if (!ensureNationActive(player, nation)) {
-            return true;
-        }
-        if (!canManageNation(player, town, nation)) {
-            player.sendMessage(plugin.msg("not-nation-leader"));
-            return true;
-        }
-        nation.setBuildProtectionEnabled(enabled);
-        store.save();
-        broadcastNation(nation, Text.component(plugin.msgRaw(enabled ? "nation-build-protection-on" : "nation-build-protection-off")
-                .replace("%nation%", nation.name())));
-        return true;
+        return nationService.setNationBuildProtection(player, enabled);
     }
 
     public boolean depositNationTreasury(Player player, double amount) {
-        if (amount <= 0.0D) {
-            player.sendMessage("/party nation deposit <amount>");
-            return true;
-        }
-        store.load();
-        Town town = store.playerTown(player.getUniqueId());
-        Nation nation = town == null || town.nationId() == null ? null : store.nation(town.nationId());
-        if (town == null || nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return true;
-        }
-        processExpiredWarState();
-        if (!plugin.economy().available()) {
-            player.sendMessage(plugin.msg("economy-missing"));
-            return true;
-        }
-        if (!plugin.economy().has(player, amount) || !plugin.economy().withdraw(player, amount)) {
-            player.sendMessage(plugin.msg("not-enough-money").replace("%cost%", plugin.formatMoney(amount)));
-            return true;
-        }
-        nation.setTreasury(nation.treasury() + amount);
-        store.save();
-        broadcastNation(nation, Text.component(plugin.msgRaw("nation-treasury-deposited")
-                .replace("%player%", player.getName())
-                .replace("%amount%", plugin.formatMoney(amount))
-                .replace("%treasury%", plugin.formatMoney(nation.treasury()))));
-        return true;
+        return nationService.depositNationTreasury(player, amount);
     }
 
     public boolean sendNationTreasury(Player player) {
-        store.load();
-        Town town = store.playerTown(player.getUniqueId());
-        Nation nation = town == null || town.nationId() == null ? null : store.nation(town.nationId());
-        if (town == null || nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return true;
-        }
-        processExpiredWarState();
-        player.sendMessage(plugin.msg("nation-treasury-info")
-                .replace("%nation%", nation.name())
-                .replace("%treasury%", plugin.formatMoney(nation.treasury()))
-                .replace("%karma%", String.valueOf(nation.karma()))
-                .replace("%debt%", plugin.formatMoney(nation.debtAmount())));
-        player.sendMessage(Text.component("&7일일 유지비: &e" + plugin.formatMoney(dailyNationUpkeep(nation))
-                + " &7| 유지비 체납: &c" + plugin.formatMoney(nation.upkeepDebt())
-                + " &7| 정산일: &f" + (nation.lastUpkeepPeriod() == null ? "-" : nation.lastUpkeepPeriod())));
-        return true;
+        return nationService.sendNationTreasury(player);
     }
 
     public boolean sendNationUpkeep(Player player) {
-        store.load();
-        processExpiredWarState();
-        Town town = store.playerTown(player.getUniqueId());
-        Nation nation = town == null || town.nationId() == null ? null : store.nation(town.nationId());
-        if (town == null || nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return true;
-        }
-        player.sendMessage(plugin.msg("nation-upkeep-info")
-                .replace("%nation%", nation.name())
-                .replace("%upkeep%", plugin.formatMoney(dailyNationUpkeep(nation)))
-                .replace("%treasury%", plugin.formatMoney(nation.treasury()))
-                .replace("%debt%", plugin.formatMoney(nation.upkeepDebt()))
-                .replace("%period%", nation.lastUpkeepPeriod() == null ? "-" : nation.lastUpkeepPeriod()));
-        return true;
+        return nationService.sendNationUpkeep(player);
     }
 
     public boolean payNationUpkeep(Player player) {
-        store.load();
-        processExpiredWarState();
-        Town town = store.playerTown(player.getUniqueId());
-        Nation nation = requireNationLeader(player, town);
-        if (nation == null) {
-            return true;
-        }
-        if (nation.upkeepDebt() <= 0.0D) {
-            player.sendMessage(plugin.msg("nation-upkeep-no-debt"));
-            return true;
-        }
-        if (nation.treasury() < nation.upkeepDebt()) {
-            player.sendMessage(plugin.msg("nation-upkeep-not-enough")
-                    .replace("%amount%", plugin.formatMoney(nation.upkeepDebt()))
-                    .replace("%treasury%", plugin.formatMoney(nation.treasury())));
-            return true;
-        }
-        double amount = nation.upkeepDebt();
-        nation.setTreasury(nation.treasury() - amount);
-        nation.setUpkeepDebt(0.0D);
-        if (!hasExpiredWarDebt(nation)) {
-            nation.setFunctionsSuspended(false);
-        }
-        store.save();
-        broadcastNation(nation, Text.component(plugin.msgRaw("nation-upkeep-paid")
-                .replace("%nation%", nation.name())
-                .replace("%amount%", plugin.formatMoney(amount))
-                .replace("%treasury%", plugin.formatMoney(nation.treasury()))));
-        return true;
+        return nationService.payNationUpkeep(player);
     }
 
     public boolean declareWar(Player player, String targetNationName) {
@@ -1120,12 +893,8 @@ public final class TownService {
         player.sendMessage(Text.component("&7채팅 모드: &f" + chatMode(player).displayName()));
     }
 
-    private boolean canManageNation(Player player, Town town, Nation nation) {
-        return player.hasPermission("leeseoltown.admin")
-                || (town != null
-                && nation != null
-                && town.id().equals(nation.capitalTownId())
-                && town.isLeader(player.getUniqueId()));
+    public boolean canManageNation(Player player, Town town, Nation nation) {
+        return nationService.canManageNation(player, town, nation);
     }
 
     private void refreshNationClaimMarkers() {
@@ -1148,37 +917,12 @@ public final class TownService {
         player.sendMessage(plugin.msg("nation-beacon-given"));
     }
 
-    private Nation requireNationLeader(Player player, Town town) {
-        if (town == null) {
-            player.sendMessage(plugin.msg("not-in-town"));
-            return null;
-        }
-        Nation nation = town.nationId() == null ? null : store.nation(town.nationId());
-        if (nation == null) {
-            player.sendMessage(plugin.msg("nation-not-found"));
-            return null;
-        }
-        if (!canManageNation(player, town, nation)) {
-            player.sendMessage(plugin.msg("not-nation-leader"));
-            return null;
-        }
-        return nation;
+    public Nation requireNationLeader(Player player, Town town) {
+        return nationService.requireNationLeader(player, town);
     }
 
-    private boolean ensureNationActive(Player player, Nation nation) {
-        if (nation == null || !nation.functionsSuspended()) {
-            return true;
-        }
-        if (nation.upkeepDebt() > 0.0D) {
-            player.sendMessage(plugin.msg("nation-upkeep-suspended")
-                    .replace("%nation%", nation.name())
-                    .replace("%amount%", plugin.formatMoney(nation.upkeepDebt())));
-            return false;
-        }
-        player.sendMessage(plugin.msg("nation-suspended")
-                .replace("%nation%", nation.name())
-                .replace("%amount%", plugin.formatMoney(nation.debtAmount())));
-        return false;
+    public boolean ensureNationActive(Player player, Nation nation) {
+        return nationService.ensureNationActive(player, nation);
     }
 
     private void applySurrenderPayment(Nation surrenderer, Nation winner) {
@@ -1286,78 +1030,11 @@ public final class TownService {
     }
 
     public void collectDueUpkeep(boolean force) {
-        if (!plugin.upkeepEnabled()) {
-            return;
-        }
-        store.load();
-        processExpiredWarState();
-
-        boolean changed = false;
-        String period = plugin.currentUpkeepPeriod();
-        for (Nation nation : store.nations()) {
-            if (!force && period.equals(nation.lastUpkeepPeriod())) {
-                continue;
-            }
-            if (!force && (nation.lastUpkeepPeriod() == null || nation.lastUpkeepPeriod().isBlank())) {
-                nation.setLastUpkeepPeriod(period);
-                changed = true;
-                continue;
-            }
-            if (!force && inUpkeepGrace(nation)) {
-                nation.setLastUpkeepPeriod(period);
-                changed = true;
-                continue;
-            }
-
-            long upkeep = dailyNationUpkeep(nation);
-            nation.setLastUpkeepPeriod(period);
-            if (upkeep <= 0L) {
-                changed = true;
-                continue;
-            }
-
-            double paid = Math.min(nation.treasury(), upkeep);
-            if (paid > 0.0D) {
-                nation.setTreasury(nation.treasury() - paid);
-            }
-            double unpaid = upkeep - paid;
-            if (unpaid > 0.0D) {
-                nation.setUpkeepDebt(nation.upkeepDebt() + unpaid);
-                nation.setFunctionsSuspended(true);
-                broadcastNation(nation, Text.component(plugin.msgRaw("nation-upkeep-failed")
-                        .replace("%nation%", nation.name())
-                        .replace("%amount%", plugin.formatMoney(upkeep))
-                        .replace("%debt%", plugin.formatMoney(nation.upkeepDebt()))));
-            } else {
-                broadcastNation(nation, Text.component(plugin.msgRaw("nation-upkeep-collected")
-                        .replace("%nation%", nation.name())
-                        .replace("%amount%", plugin.formatMoney(upkeep))
-                        .replace("%treasury%", plugin.formatMoney(nation.treasury()))));
-            }
-            changed = true;
-        }
-
-        if (changed) {
-            store.save();
-        }
+        nationService.collectDueUpkeep(force);
     }
 
-    private long dailyNationUpkeep(Nation nation) {
-        if (nation == null || !plugin.upkeepEnabled()) {
-            return 0L;
-        }
-        long total = safeAdd(plugin.dailyBaseNationUpkeep(), plugin.dailyMemberUpkeep(domainQuery.nationMemberCount(nation)));
-        List<Long> claimCosts = new ArrayList<>();
-        int claimCount = domainQuery.nationClaimCount(nation);
-        for (ClaimKey claim : domainQuery.nationClaims(nation)) {
-            claimCosts.add(plugin.dailyChunkUpkeep(claim, claimCount));
-        }
-        claimCosts.sort(Long::compareTo);
-        int freeChunks = plugin.freeUpkeepChunks();
-        for (int index = freeChunks; index < claimCosts.size(); index++) {
-            total = safeAdd(total, claimCosts.get(index));
-        }
-        return total;
+    public long dailyNationUpkeep(Nation nation) {
+        return nationService.dailyNationUpkeep(nation);
     }
 
     private boolean inUpkeepGrace(Nation nation) {
