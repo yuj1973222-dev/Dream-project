@@ -103,6 +103,26 @@ public final class ProxySharedContractSmokeTest {
         assertTrue(routeSource.contains("fallbackFrom().contains(kickedServer)"));
     }
 
+    @Test
+    public void commandRegistrarOwnsVelocityCommandsAndDropsLegacySwitchCommand() throws IOException {
+        String servicesSource = readText("src/main/java/me/leeseol/proxy/ProxyServices.java");
+        String registrarSource = readText("src/main/java/me/leeseol/proxy/command/ProxyCommandRegistrar.java");
+
+        assertTrue(servicesSource.contains("new ProxyCommandRegistrar(proxy, plugin, queueController).registerAll();"));
+        assertFalse(servicesSource.contains("metaBuilder(\"lobby\")"));
+        assertFalse(servicesSource.contains("metaBuilder(\"survival\")"));
+        assertFalse(servicesSource.contains("registerLobbyCommand"));
+        assertFalse(servicesSource.contains("registerSurvivalCommand"));
+
+        assertTrue(registrarSource.contains("metaBuilder(\"servers\")"));
+        assertTrue(registrarSource.contains(".aliases(\"serverlist\", \"network\")"));
+        assertTrue(registrarSource.contains("metaBuilder(\"lobby\")"));
+        assertTrue(registrarSource.contains(".aliases(\"hub\")"));
+        assertTrue(registrarSource.contains("metaBuilder(\"survival\")"));
+        assertTrue(registrarSource.contains(".aliases(\"wild\")"));
+        assertFalse(Files.exists(projectPath("src/main/java/me/leeseol/proxy/command/SwitchServerCommand.java")));
+    }
+
     private static String readText(String path) throws IOException {
         return Files.readString(projectPath(path), StandardCharsets.UTF_8);
     }

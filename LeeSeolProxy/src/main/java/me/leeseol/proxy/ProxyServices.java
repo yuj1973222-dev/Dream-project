@@ -1,11 +1,9 @@
 package me.leeseol.proxy;
 
-import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
-import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerResourcePackStatusEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
@@ -16,9 +14,7 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import java.io.IOException;
 import java.nio.file.Path;
-import me.leeseol.proxy.command.LobbyCommand;
-import me.leeseol.proxy.command.ServerListCommand;
-import me.leeseol.proxy.command.SurvivalQueueCommand;
+import me.leeseol.proxy.command.ProxyCommandRegistrar;
 import me.leeseol.proxy.config.ProxyConfigRepository;
 import me.leeseol.proxy.network.NetworkRouteService;
 import me.leeseol.proxy.queue.QueueSettings;
@@ -45,25 +41,18 @@ final class ProxyServices {
     }
 
     void start() {
-        CommandManager commandManager = proxy.getCommandManager();
-
-        CommandMeta serversMeta = commandManager.metaBuilder("servers")
-                .aliases("serverlist", "network")
-                .plugin(plugin)
-                .build();
-        commandManager.register(serversMeta, new ServerListCommand(proxy));
-
         resourcePackOfferService = new ResourcePackOfferService(proxy, logger);
         networkRouteService = new NetworkRouteService(proxy, logger, configRepository);
         loadResourcePackInfo();
         networkRouteService.reload();
+
         QueueSettings queueSettings = loadQueueSettings();
         queueChannel = MinecraftChannelIdentifier.from(queueSettings.pluginMessageChannel());
         proxy.getChannelRegistrar().register(queueChannel);
         queueController = new SurvivalQueueController(proxy, plugin, logger, queueChannel, queueSettings);
         queueController.start();
-        registerLobbyCommand(commandManager);
-        registerSurvivalCommand(commandManager);
+
+        new ProxyCommandRegistrar(proxy, plugin, queueController).registerAll();
         logger.info("LeeSeolProxy enabled.");
     }
 
@@ -123,22 +112,6 @@ final class ProxyServices {
 
     SurvivalQueueController queueController() {
         return queueController;
-    }
-
-    private void registerLobbyCommand(CommandManager commandManager) {
-        CommandMeta meta = commandManager.metaBuilder("lobby")
-                .aliases("hub", "濡쒕퉬")
-                .plugin(plugin)
-                .build();
-        commandManager.register(meta, new LobbyCommand(queueController));
-    }
-
-    private void registerSurvivalCommand(CommandManager commandManager) {
-        CommandMeta meta = commandManager.metaBuilder("survival")
-                .aliases("wild", "?쇱깮?낆옣")
-                .plugin(plugin)
-                .build();
-        commandManager.register(meta, new SurvivalQueueCommand(queueController));
     }
 
     private void loadResourcePackInfo() {
