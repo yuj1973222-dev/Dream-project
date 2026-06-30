@@ -36,7 +36,7 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LaunchPadListener(services.configManager(), services.launchPadManager()), this);
         getServer().getPluginManager().registerEvents(services.serverMenuManager(), this);
         getServer().getPluginManager().registerEvents(services.survivalSpawnManager(), this);
-        registerCommand("serverinfo", new ServerInfoCommand(this));
+        registerCommand("serverinfo", new ServerInfoCommand(services.serverStatusService()));
         registerCommand("survivalspawn", services.survivalSpawnManager());
         CoreCommand coreCommand = new CoreCommand(this);
         registerCommand("lscore", coreCommand);

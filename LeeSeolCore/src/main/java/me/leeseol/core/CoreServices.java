@@ -12,6 +12,7 @@ import me.leeseol.core.networkmove.NetworkMovePort;
 import me.leeseol.core.portal.PortalManager;
 import me.leeseol.core.servernpc.ServerNpcManager;
 import me.leeseol.core.spawn.SurvivalSpawnManager;
+import me.leeseol.core.status.ServerStatusService;
 import org.bukkit.event.HandlerList;
 
 final class CoreServices {
@@ -25,6 +26,7 @@ final class CoreServices {
     private final ContentService contentService;
     private final BlueMapContentMarkers blueMapContentMarkers;
     private final NetworkMoveService networkMoveService;
+    private final ServerStatusService serverStatusService;
 
     CoreServices(LeeSeolCorePlugin plugin) {
         this.plugin = plugin;
@@ -35,6 +37,7 @@ final class CoreServices {
         this.serverNpcManager = new ServerNpcManager(plugin);
         this.survivalSpawnManager = new SurvivalSpawnManager(plugin);
         this.networkMoveService = new NetworkMoveService(new BungeeCordNetworkMovePort(plugin));
+        this.serverStatusService = new ServerStatusService(plugin);
         this.contentService = new ContentService(plugin, new WorldGuardContentRegionService(plugin));
         this.blueMapContentMarkers = new BlueMapContentMarkers(plugin, contentService);
         this.contentService.setAfterChange(blueMapContentMarkers::refreshLater);
@@ -99,5 +102,9 @@ final class CoreServices {
 
     NetworkMovePort networkMovePort() {
         return networkMoveService.movePort();
+    }
+
+    ServerStatusService serverStatusService() {
+        return serverStatusService;
     }
 }
