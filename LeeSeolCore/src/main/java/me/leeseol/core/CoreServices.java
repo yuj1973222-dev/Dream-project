@@ -1,6 +1,7 @@
 package me.leeseol.core;
 
 import me.leeseol.core.config.ConfigManager;
+import me.leeseol.core.config.CoreConfigWriter;
 import me.leeseol.core.content.BlueMapContentMarkers;
 import me.leeseol.core.content.ContentService;
 import me.leeseol.core.content.WorldGuardContentRegionService;
@@ -23,6 +24,7 @@ final class CoreServices {
     private final CoreServerMenuManager serverMenuManager;
     private final ServerNpcManager serverNpcManager;
     private final SurvivalSpawnManager survivalSpawnManager;
+    private final CoreConfigWriter configWriter;
     private final ContentService contentService;
     private final BlueMapContentMarkers blueMapContentMarkers;
     private final NetworkMoveService networkMoveService;
@@ -36,6 +38,7 @@ final class CoreServices {
         this.serverMenuManager = new CoreServerMenuManager(plugin);
         this.serverNpcManager = new ServerNpcManager(plugin);
         this.survivalSpawnManager = new SurvivalSpawnManager(plugin);
+        this.configWriter = new CoreConfigWriter(plugin);
         this.networkMoveService = new NetworkMoveService(new BungeeCordNetworkMovePort(plugin));
         this.serverStatusService = new ServerStatusService(plugin);
         this.contentService = new ContentService(plugin, new WorldGuardContentRegionService(plugin));
@@ -86,6 +89,10 @@ final class CoreServices {
 
     SurvivalSpawnManager survivalSpawnManager() {
         return survivalSpawnManager;
+    }
+
+    CoreConfigWriter configWriter() {
+        return configWriter;
     }
 
     ContentService contentService() {

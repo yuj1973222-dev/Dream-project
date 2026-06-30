@@ -131,6 +131,26 @@ public final class CoreSharedContractSmokeTest {
         assertFalse(networkMoveSource.toLowerCase().contains("resource"));
     }
 
+    @Test
+    public void coreAdminCommandRoutesToDedicatedHandlersAndConfigWriter() throws IOException {
+        String coreCommandSource = readText("src/main/java/me/leeseol/core/command/CoreCommand.java");
+        String portalAdminSource = readText("src/main/java/me/leeseol/core/command/PortalAdminCommand.java");
+        String launchPadAdminSource = readText("src/main/java/me/leeseol/core/command/LaunchPadAdminCommand.java");
+        String configWriterSource = readText("src/main/java/me/leeseol/core/config/CoreConfigWriter.java");
+
+        assertTrue(coreCommandSource.contains("new LaunchPadAdminCommand(plugin, configWriter)"));
+        assertTrue(coreCommandSource.contains("new PortalAdminCommand(plugin, configWriter)"));
+        assertTrue(coreCommandSource.contains("launchPadAdminCommand.handle(sender, args)"));
+        assertTrue(coreCommandSource.contains("portalAdminCommand.handle(sender, args)"));
+        assertFalse(coreCommandSource.contains("PortalSelection"));
+        assertFalse(coreCommandSource.contains("findLaunchPadBlock"));
+
+        assertTrue(portalAdminSource.contains("portal-triggers.portals."));
+        assertTrue(launchPadAdminSource.contains("launch-pads.pads."));
+        assertTrue(configWriterSource.contains("void saveAndReload()"));
+        assertTrue(configWriterSource.contains("void addEnabledWorld(String worldName)"));
+    }
+
     private static YamlConfiguration loadYaml(String path) {
         return YamlConfiguration.loadConfiguration(projectPath(path).toFile());
     }
