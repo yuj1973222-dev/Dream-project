@@ -2,7 +2,6 @@ package me.leeseol.proxy;
 
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
@@ -15,20 +14,16 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Locale;
 import me.leeseol.proxy.command.LobbyCommand;
 import me.leeseol.proxy.command.ServerListCommand;
 import me.leeseol.proxy.command.SurvivalQueueCommand;
 import me.leeseol.proxy.config.ProxyConfigRepository;
-import me.leeseol.proxy.network.NetworkSettings;
+import me.leeseol.proxy.network.NetworkRouteService;
 import me.leeseol.proxy.queue.QueueSettings;
 import me.leeseol.proxy.queue.SurvivalQueueController;
 import me.leeseol.proxy.resourcepack.ResourcePackOfferService;
-import me.leeseol.proxy.resourcepack.ResourcePackSettings;
-import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
 final class ProxyServices {
@@ -38,7 +33,7 @@ final class ProxyServices {
     private final ProxyConfigRepository configRepository;
     private ResourcePackInfo resourcePackInfo;
     private ResourcePackOfferService resourcePackOfferService;
-    private NetworkSettings networkSettings = NetworkSettings.defaults();
+    private NetworkRouteService networkRouteService;
     private SurvivalQueueController queueController;
     private ChannelIdentifier queueChannel;
 
@@ -59,8 +54,9 @@ final class ProxyServices {
         commandManager.register(serversMeta, new ServerListCommand(proxy));
 
         resourcePackOfferService = new ResourcePackOfferService(proxy, logger);
+        networkRouteService = new NetworkRouteService(proxy, logger, configRepository);
         loadResourcePackInfo();
-        networkSettings = loadNetworkSettings();
+        networkRouteService.reload();
         QueueSettings queueSettings = loadQueueSettings();
         queueChannel = MinecraftChannelIdentifier.from(queueSettings.pluginMessageChannel());
         proxy.getChannelRegistrar().register(queueChannel);
@@ -81,11 +77,7 @@ final class ProxyServices {
     }
 
     void handleLogin(LoginEvent event) {
-        NetworkSettings settings = loadNetworkSettings();
-        networkSettings = settings;
-        if (settings.maintenance()) {
-            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(settings.maintenanceMessage())));
-        }
+        networkRouteService.handleLogin(event);
     }
 
     void handlePostLogin(PostLoginEvent event) {
@@ -108,35 +100,7 @@ final class ProxyServices {
     }
 
     void handleKickedFromServer(KickedFromServerEvent event) {
-        NetworkSettings settings = loadNetworkSettings();
-        networkSettings = settings;
-
-        String kickedServer = event.getServer().getServerInfo().getName().toLowerCase(Locale.ROOT);
-        if (!settings.fallbackEnabled() || !settings.fallbackFrom().contains(kickedServer)) {
-            return;
-        }
-
-        if (settings.maintenance()) {
-            event.setResult(KickedFromServerEvent.DisconnectPlayer.create(Component.text(settings.maintenanceMessage())));
-            return;
-        }
-
-        String fallbackServerName = settings.fallbackServer().toLowerCase(Locale.ROOT);
-        if (kickedServer.equals(fallbackServerName)) {
-            event.setResult(KickedFromServerEvent.DisconnectPlayer.create(Component.text(settings.fallbackUnavailableMessage())));
-            return;
-        }
-
-        RegisteredServer fallbackServer = proxy.getServer(settings.fallbackServer()).orElse(null);
-        if (fallbackServer == null) {
-            event.setResult(KickedFromServerEvent.DisconnectPlayer.create(Component.text(settings.fallbackUnavailableMessage())));
-            return;
-        }
-
-        event.setResult(KickedFromServerEvent.RedirectPlayer.create(
-                fallbackServer,
-                Component.text(settings.fallbackMessage())
-        ));
+        networkRouteService.handleKickedFromServer(event);
     }
 
     void handlePluginMessage(PluginMessageEvent event) {
@@ -183,15 +147,6 @@ final class ProxyServices {
         } catch (IOException exception) {
             logger.warn("Failed to load resource pack config. Resource pack offer is disabled.", exception);
             resourcePackInfo = null;
-        }
-    }
-
-    private NetworkSettings loadNetworkSettings() {
-        try {
-            return configRepository.loadNetworkSettings();
-        } catch (IOException exception) {
-            logger.warn("Failed to load network settings. Using safe fallback defaults.", exception);
-            return NetworkSettings.defaults();
         }
     }
 

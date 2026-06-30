@@ -87,6 +87,22 @@ public final class ProxySharedContractSmokeTest {
         assertTrue(servicesSource.contains("SurvivalQueueController queueController()"));
     }
 
+    @Test
+    public void networkRouteServiceOwnsMaintenanceAndFallback() throws IOException {
+        String servicesSource = readText("src/main/java/me/leeseol/proxy/ProxyServices.java");
+        String routeSource = readText("src/main/java/me/leeseol/proxy/network/NetworkRouteService.java");
+
+        assertTrue(servicesSource.contains("new NetworkRouteService(proxy, logger, configRepository)"));
+        assertTrue(servicesSource.contains("networkRouteService.handleLogin(event);"));
+        assertTrue(servicesSource.contains("networkRouteService.handleKickedFromServer(event);"));
+        assertFalse(servicesSource.contains("KickedFromServerEvent.DisconnectPlayer"));
+
+        assertTrue(routeSource.contains("void handleLogin(LoginEvent event)"));
+        assertTrue(routeSource.contains("void handleKickedFromServer(KickedFromServerEvent event)"));
+        assertTrue(routeSource.contains("configRepository.loadNetworkSettings()"));
+        assertTrue(routeSource.contains("fallbackFrom().contains(kickedServer)"));
+    }
+
     private static String readText(String path) throws IOException {
         return Files.readString(projectPath(path), StandardCharsets.UTF_8);
     }
