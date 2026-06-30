@@ -1,0 +1,50 @@
+name: LeeSeolCrafting
+version: 0.1.0
+main: me.leeseol.crafting.LeeSeolCraftingPlugin
+api-version: '26.1.2'
+description: Crafting, processing, disassembly, and money-based repair for expedition.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - Vault
+  - LeeSeolEconomy
+  - LeeSeolQuest
+  - LeeSeolRanks
+commands:
+  craftmenu:
+    description: Open crafting menu.
+    usage: /craftmenu
+  forge:
+    description: Open forge menu.
+    usage: /forge
+  process:
+    description: Open processing menu.
+    usage: /process
+  disassemble:
+    description: Open disassemble menu.
+    usage: /disassemble
+  repair:
+    description: Open repair confirmation menu.
+    usage: /repair
+  lscrafting:
+    description: Admin command for LeeSeolCrafting.
+    usage: /lscrafting <reload|recipe>
+permissions:
+  leeseolcrafting.use:
+    description: Allows using crafting menus.
+    default: true
+  leeseolcrafting.repair:
+    description: Allows using money-based repair.
+    default: true
+  leeseolcrafting.admin:
+    description: Allows managing LeeSeolCrafting.
+    default: op
+  leeseolcrafting.bypass.rank:
+    description: Bypasses recipe rank requirements.
+    default: op
+  leeseolcrafting.bypass.cost:
+    description: Bypasses crafting and repair costs.
+    default: op
+  leeseolcrafting.bypass.world:
+    description: Bypasses crafting world restrictions.
+    default: op

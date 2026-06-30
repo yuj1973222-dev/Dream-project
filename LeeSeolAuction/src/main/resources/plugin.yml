@@ -1,0 +1,31 @@
+name: LeeSeolAuction
+version: 0.1.0
+main: me.leeseol.auction.LeeSeolAuctionPlugin
+api-version: '26.1.2'
+description: Admin-opened GUI auction house for LeeSeol Network.
+author: lee_seol
+depend:
+  - Vault
+softdepend:
+  - LeeSeolEconomy
+load: POSTWORLD
+commands:
+  auction:
+    description: Opens and manages the LeeSeol auction house.
+    usage: /auction
+    aliases:
+      - ah
+      - auc
+permissions:
+  leeseolauction.use:
+    description: Allows opening the auction GUI and bidding.
+    default: true
+  leeseolauction.submit:
+    description: Allows submitting items to the auction queue.
+    default: true
+  leeseolauction.admin:
+    description: Allows opening/closing auctions and selecting lots.
+    default: op
+  leeseolauction.world-bypass:
+    description: Allows using the auction in worlds blocked by config.
+    default: false

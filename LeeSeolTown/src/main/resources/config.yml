@@ -1,0 +1,348 @@
+settings:
+  min-town-members: 2
+  party-max-members: 4
+  nation-required-members: 5
+
+nation:
+  colors:
+    red:
+      display-name: "빨강"
+      hex: "#FF5C7A"
+    orange:
+      display-name: "주황"
+      hex: "#FFB86B"
+    yellow:
+      display-name: "노랑"
+      hex: "#FFD166"
+    green:
+      display-name: "초록"
+      hex: "#8FD9A8"
+    blue:
+      display-name: "파랑"
+      hex: "#8EC5FF"
+    purple:
+      display-name: "보라"
+      hex: "#C7A8FF"
+
+storage:
+  data-file: "/opt/minecraft/shared/town/data.yml"
+
+scoreboard:
+  enabled: true
+  update-interval-ticks: 40
+  title: "&#8FD9A8EXPEDITION"
+
+neutral-zones:
+  data-file: "/opt/minecraft/shared/town/neutral-zones.yml"
+  core-content-file: "plugins/LeeSeolCore/contents.yml"
+  default-claim-buffer-chunks: 2
+  worldguard:
+    enabled: true
+    region-prefix: "leeseol_neutral_"
+    priority: 50
+    flags:
+      build: DENY
+      block-break: DENY
+      block-place: DENY
+      pvp: DENY
+  protection:
+    block-break: true
+    block-place: true
+    pvp: true
+  bluemap:
+    enabled: true
+    marker-set-id: "leeseol-neutral-zones"
+    marker-set-label: "중립구역"
+    default-hidden: false
+    sorting: 20
+    line-width: 2
+    depth-test: false
+    line-color: "#8FD9A8"
+    line-alpha: 0.9
+    fill-color: "#8FD9A8"
+    fill-alpha: 0.18
+    map-overrides:
+      world: "overworld"
+
+nation-claims:
+  bluemap:
+    enabled: true
+    marker-set-id: "leeseol-nation-claims"
+    marker-set-label: "Nation Territory"
+    default-hidden: false
+    sorting: 30
+    line-width: 1
+    depth-test: false
+    min-y: 60
+    max-y: 320
+    line-alpha: 0.85
+    fill-alpha: 0.12
+    map-overrides:
+      world: "overworld"
+
+economy:
+  enabled: true
+  time-zone: "Asia/Seoul"
+  chunk-claim-cost: 25000
+  claim-scaling:
+    free-claims: 4
+    step-claims: 8
+    rate: 0.08
+    max-multiplier: 2.5
+  nation-tax-base: 15000
+  nation-member-tax: 1500
+  upkeep:
+    enabled: true
+    check-interval-minutes: 60
+    grace-days: 3
+    base-nation-fee: 15000
+    member-fee: 1500
+    base-per-chunk: 1200
+    free-chunks: 6
+    claim-scale-step: 8
+    claim-scale-rate: 0.12
+    max-claim-multiplier: 3.0
+  premium-zones:
+    spawn_core:
+      name: "스폰 중심 상권"
+      world: "world"
+      min-x: -4
+      max-x: 4
+      min-z: -4
+      max-z: 4
+      claim-cost-multiplier: 4.0
+      upkeep-multiplier: 4.0
+    spawn_ring:
+      name: "스폰 인접권"
+      world: "world"
+      min-x: -12
+      max-x: 12
+      min-z: -12
+      max-z: 12
+      claim-cost-multiplier: 2.0
+      upkeep-multiplier: 2.0
+
+war:
+  surrender-payment: 100000
+  protection-minutes: 10
+  debt-hours: 12
+  modes:
+    invasion:
+      display-name: "침략전"
+      direction: "소규모 / 제한 손실 / 짧은 전투"
+    total:
+      display-name: "총력전"
+      direction: "대규모 / 큰 손실 / 긴 전쟁"
+
+structures:
+  enabled: true
+  schematic-directory: "structures"
+  itemsadder:
+    required: true
+    allowed-core-blocks:
+      - "leeseolwar:capital_core"
+      - "leeseolwar:border_outpost_core"
+      - "leeseolwar:supply_depot_core"
+  soft-overwrite-blocks:
+    - AIR
+    - CAVE_AIR
+    - VOID_AIR
+    - SHORT_GRASS
+    - TALL_GRASS
+    - FERN
+    - LARGE_FERN
+    - SNOW
+  types:
+    nation_core:
+      name: "&b국가 코어"
+      icon: BEACON
+      itemsadder-block: "leeseolwar:capital_core"
+      schematic: ""
+      category: "nation-core"
+      permission: "leeseoltown.structure.nation_core"
+      width: 15
+      height: 12
+      length: 15
+      offset-x: -7
+      offset-y: 0
+      offset-z: -7
+      marker-offset-x: 0
+      marker-offset-y: 0
+      marker-offset-z: 0
+    outpost:
+      name: "&a전초기지"
+      icon: CAMPFIRE
+      itemsadder-block: "leeseolwar:border_outpost_core"
+      schematic: "outpost.schem"
+      category: "normal"
+      permission: "leeseoltown.structure.outpost"
+      width: 24
+      height: 10
+      length: 24
+      offset-x: -12
+      offset-y: 0
+      offset-z: -12
+      marker-offset-x: 0
+      marker-offset-y: 0
+      marker-offset-z: 0
+    supply_depot:
+      name: "&a보급 창고"
+      icon: BARREL
+      itemsadder-block: "leeseolwar:supply_depot_core"
+      schematic: "supply_depot.schem"
+      category: "normal"
+      permission: "leeseoltown.structure.supply_depot"
+      width: 16
+      height: 8
+      length: 16
+      offset-x: -8
+      offset-y: 0
+      offset-z: -8
+      marker-offset-x: 0
+      marker-offset-y: 0
+      marker-offset-z: 0
+
+prefix:
+  town: "&#8FD9A8%town% "
+  nation: "%nation_color%%nation% "
+
+chat:
+  global-format: "%rank%%affiliation%&f%player%&7: &f%message%"
+  town-format: "&a[파티] %rank%%affiliation%&f%player%&7: &f%message%"
+  nation-format: "&6[국가] %rank%%affiliation%&f%player%&7: &f%message%"
+
+messages:
+  territory-enter-actionbar: "&#8FD9A8국가 영토 입장 &7| &f%nation%"
+  territory-wilderness-actionbar: "&#B8B8B8야생 진입"
+  structure-nation-core-exists: "&c이미 국가 코어가 설치되어 있습니다: &e%chunk%"
+  nation-core-custom-required: "&c국가 코어는 신호기가 아니라 전용 커스텀 코어 블록으로 설치해야 합니다."
+  structure-no-permission: "&c이 구조물을 사용할 권한이 없습니다."
+  structure-core-required: "&c구조물 코어를 손에 들고 선택하세요."
+  structure-selected: "&a구조물을 선택했습니다: &e%structure%"
+  structure-select-first: "&c먼저 구조물 코어를 우클릭해 종류를 선택하세요."
+  structure-not-in-nation: "&c국가에 소속되어 있어야 구조물을 설치할 수 있습니다."
+  structure-placement-chunk-not-owned: "&c설치한 청크가 내 국가 영토가 아닙니다."
+  structure-nation-in-war: "&c전쟁 선포 또는 진행 중에는 구조물을 설치할 수 없습니다."
+  structure-core-outside-chunk: "&c국가 코어 구조물은 설치 청크 안에만 들어가야 합니다."
+  structure-outside-territory: "&c구조물이 내 국가 영토 밖으로 벗어납니다."
+  structure-obstructed: "&c설치 위치에 단단한 블록이나 보호된 블록이 있어 설치할 수 없습니다."
+  structure-schematic-unlinked: "&e연결된 schem 파일이 없습니다: &f%structure%"
+  structure-missing-schematic: "&c구조물 파일을 찾을 수 없습니다: &e%structure%"
+  structure-missing-itemsadder-block: "&cItemsAdder 커스텀 블록을 찾을 수 없습니다: &e%structure%"
+  structure-paste-failed: "&c구조물 설치 중 오류가 발생했습니다: &e%structure%"
+  structure-placed: "&a구조물을 설치했습니다: &e%structure%"
+  structure-undo-usage: "&e/party structure undo [player]"
+  structure-undo-empty: "&c되돌릴 최근 구조물 설치 기록이 없습니다."
+  structure-undo-success: "&a최근 구조물 설치를 되돌렸습니다: &e%structure%"
+  structure-undo-admin-success: "&a%player%님의 최근 구조물 설치를 되돌렸습니다: &e%structure%"
+  structure-undo-target-not-found: "&c해당 플레이어의 undo 기록을 찾을 수 없습니다: &e%player%"
+  structure-undo-failed: "&c구조물 undo 중 오류가 발생했습니다: &e%reason%"
+  nation-treasury-deposited: "&a%player%님이 국고에 &e%amount%&a 입금했습니다. 현재 국고: &e%treasury%"
+  nation-treasury-info: "&a%nation% 국고: &e%treasury% &7| 카르마: &f%karma% &7| 전쟁 체납: &c%debt%"
+  nation-upkeep-info: "&a%nation% 일일 유지비: &e%upkeep% &7| 국고: &e%treasury% &7| 유지비 체납: &c%debt% &7| 마지막 정산: &f%period%"
+  nation-upkeep-collected: "&a국가 유지비 &e%amount%&a 이 국고에서 정산되었습니다. 남은 국고: &e%treasury%"
+  nation-upkeep-failed: "&c국고 부족으로 국가 유지비 &e%amount%&c 을 전부 납부하지 못했습니다. 유지비 체납: &e%debt%"
+  nation-upkeep-paid: "&a유지비 체납 &e%amount%&a 을 납부했습니다. 남은 국고: &e%treasury%"
+  nation-upkeep-no-debt: "&a현재 유지비 체납이 없습니다."
+  nation-upkeep-not-enough: "&c국고가 부족합니다. 필요: &e%amount% &7현재: &e%treasury%"
+  nation-upkeep-suspended: "&c%nation% 국가는 유지비 체납으로 기능이 정지되었습니다. 체납액: &e%amount% &7국고 입금 후 &e/party nation upkeep pay&7 를 사용하세요."
+  nation-suspended: "&c%nation% 국가는 전쟁 배상금 체납으로 기능이 정지되었습니다. 체납액: &e%amount%"
+  war-self: "&c자기 국가에는 전쟁을 선포할 수 없습니다."
+  war-already-exists: "&c이미 해당 국가와 진행 중인 전쟁 또는 선포가 있습니다."
+  war-not-found: "&c해당 국가와의 전쟁을 찾을 수 없습니다."
+  war-declared-attacker: "&c%defender% 국가에 %mode%을 선포했습니다."
+  war-declared-defender: "&c%attacker% 국가가 %mode%을 선포했습니다. &e/party war accept %attacker% &7또는 &e/party war surrender %attacker%"
+  war-accepted-attacker: "&c%defender% 국가가 전쟁을 수락했습니다. 10분 동안 해당 국가 영토 보호가 적용됩니다."
+  war-accepted-defender: "&a전쟁을 수락했습니다. %minutes%분 동안 적군은 영토에 진입할 수 없습니다."
+  war-surrendered: "&c%loser% 국가가 %winner% 국가에 항복했습니다. 카르마: &e%karma%"
+  war-surrender-received: "&a%loser% 국가의 항복을 받았습니다. 배상금: &e%amount% &7| 카르마: &e%karma%"
+  war-surrender-received-streak: "&e%loser% 국가의 항복을 받았습니다. 연속 항복 3회 수령으로 카르마 패널티가 적용되었습니다. 카르마: &e%karma%"
+  war-debt-created: "&c국고가 부족해 배상금 &e%amount%&c 체납이 등록되었습니다. &e%hours%시간&c 안에 국고를 채우고 /party war paydebt 를 사용하세요."
+  war-no-debt: "&a현재 전쟁 배상금 체납이 없습니다."
+  war-debt-not-enough: "&c국고가 부족합니다. 필요: &e%amount% &7현재: &e%treasury%"
+  war-debt-paid: "&a전쟁 배상금 &e%amount%&a 을 납부했습니다."
+  war-debt-paid-creditor: "&a%nation% 국가가 전쟁 배상금 &e%amount%&a 을 납부했습니다."
+  war-debt-expired: "&c전쟁 배상금 &e%amount%&c 체납 기한이 지나 국가 기능이 정지되고 영토 보호가 해제되었습니다."
+  war-debt-expired-creditor: "&e%nation% 국가가 배상금을 기한 내 납부하지 못해 국가 기능이 정지되었습니다."
+  war-protection-not-active: "&c해제할 전쟁 보호가 없습니다."
+  war-protection-released-self: "&e%nation% 국가가 전쟁 영토 보호를 해제했습니다."
+  war-protection-released-enemy: "&e%nation% 국가가 전쟁 영토 보호를 해제했습니다. 이제 진입이 가능합니다."
+  war-protection-expired: "&e전쟁 영토 보호 시간이 종료되었습니다."
+  war-protection-expired-enemy: "&e%nation% 국가의 전쟁 영토 보호 시간이 종료되었습니다."
+  war-entry-blocked: "&c전쟁 보호 중인 적국 영토에는 진입할 수 없습니다."
+  war-finished-winner: "&a전쟁 종료: %winner% 국가가 승리했습니다. 카르마: &e%karma%"
+  war-finished-loser: "&c전쟁 종료: %loser% 국가가 패배했습니다."
+  claim-nation-required: "&c파티 상태에서는 청크를 구매할 수 없습니다. 국가로 승급한 뒤 이용하세요."
+  claim-beacon-required: "&c국가 코어를 먼저 설치해야 청크를 구매할 수 있습니다."
+  claim-adjacent-required: "&c새 청크는 기존 국가 땅에 상하좌우로 붙어 있어야 합니다."
+  claim-beacon-cannot-unclaim: "&c국가 코어 청크는 해제할 수 없습니다. 국가 해산으로 처리하세요."
+  beacon-nation-leader-required: "&c국가장 또는 관리자만 국가 코어를 설치할 수 있습니다."
+  beacon-placed: "&a국가 코어가 설치되었습니다. &e%chunk%&a 청크가 &e%nation%&a 국가의 첫 땅이 되었습니다."
+  nation-beacon-given: "&a국가 코어 1개를 지급했습니다. 우클릭으로 구조물을 선택한 뒤 설치하세요."
+  nation-pvp-on: "&c%nation% 국가 내부 PVP가 켜졌습니다."
+  nation-pvp-off: "&a%nation% 국가 내부 PVP가 꺼졌습니다."
+  nation-build-protection-on: "&a%nation% 국가 내부 건축 보호가 켜졌습니다."
+  nation-build-protection-off: "&e%nation% 국가 내부 건축 보호가 꺼졌습니다. 외부인도 설치/파괴할 수 있습니다."
+  nation-pvp-disabled: "&c이 국가 땅에서는 PVP가 꺼져 있습니다."
+  prefix: "&#8FD9A8[파티] &f"
+  no-permission: "&c권한이 없습니다."
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  player-not-found: "&c플레이어를 찾을 수 없습니다."
+  reloaded: "&aLeeSeolTown 설정을 다시 불러왔습니다."
+  town-created: "&a파티를 만들었습니다: &e%party% &7(최대 4명)"
+  town-exists: "&c이미 같은 이름의 파티가 있습니다."
+  already-in-town: "&c이미 하나의 파티에 소속되어 있어 새 파티 생성/참여가 불가능합니다."
+  not-in-town: "&c소속된 파티가 없습니다."
+  not-town-leader: "&c파티 대표만 사용할 수 있습니다."
+  not-nation-leader: "&c국가 수도 파티의 대표만 사용할 수 있습니다."
+  invite-sent: "&a%player%님을 파티에 초대했습니다."
+  invited: "&e%party%&f 파티에서 초대가 왔습니다."
+  invite-accept-button: "&#8FD9A8[수락]"
+  invite-accept-hover: "&f클릭해서 &e%party%&f 파티에 참가합니다."
+  invite-deny-button: "&#FF9AA2[거절]"
+  invite-deny-hover: "&f클릭해서 &e%party%&f 파티 초대를 거절합니다."
+  invite-denied: "&c%party% 파티 초대를 거절했습니다."
+  no-invite: "&c그 파티에서 받은 초대가 없습니다."
+  joined: "&a%party% 파티에 가입했습니다."
+  party-joined: "&a%player%님이 %party% 파티에 가입했습니다."
+  party-full: "&c파티는 최대 %count%명까지만 가입할 수 있습니다."
+  left: "&a파티에서 탈퇴했습니다."
+  party-left-broadcast: "&e%player%님이 %party% 파티에서 나갔습니다."
+  leader-cannot-leave: "&c파티 대표는 /party disband로 파티를 해산해야 합니다."
+  disbanded: "&c파티를 해산했습니다: &e%party%"
+  disband-town-warning: "&c정말 &e%name%&c 파티를 해산할까요? &7%seconds%초 안에 &e%command%&7 를 한 번 더 입력하면 해산됩니다."
+  party-member-not-found: "&c파티원을 찾을 수 없습니다: &e%player%"
+  party-transfer-self: "&c자기 자신에게 파티장 권한을 위임할 수 없습니다."
+  party-transfer-warning: "&c정말 &e%name%&c 님에게 파티장 권한을 위임할까요? &7%seconds%초 안에 &e%command%&7 를 한 번 더 입력하면 위임됩니다."
+  party-transfer-done: "&a%player%님이 %party% 파티장이 되었습니다."
+  party-kick-self: "&c자기 자신을 추방할 수 없습니다. 파티를 나가려면 /party leave 를 사용하세요."
+  party-kicked: "&c%player%님이 %party% 파티에서 추방되었습니다."
+  party-kick-target: "&c%party% 파티에서 추방되었습니다."
+  recognized-required: "&c정식 파티는 최소 %count%명 이상이어야 합니다."
+  claim-price: "&a현재 청크 &e%chunk% &7(%zone%&7) &a구매비: &e%cost% &7| 일일 유지비: &e%upkeep%"
+  claim-bought: "&a청크를 구매했습니다. 비용: &e%cost% &7| 지역: &f%zone% &7| 일일 유지비: &e%upkeep%"
+  claim-owned: "&c이미 다른 파티가 소유한 청크입니다."
+  claim-not-owned: "&c이 청크는 당신의 파티 소유가 아닙니다."
+  claim-removed: "&a청크 소유를 해제했습니다."
+  neutral-zone-protected: "&c이곳은 중립구역 &e%zone%&c 입니다. 블럭을 변경할 수 없습니다."
+  neutral-zone-pvp-denied: "&c중립구역 &e%zone%&c 안에서는 PVP를 할 수 없습니다."
+  neutral-zone-claim-blocked: "&c중립구역 &e%zone%&c 주변 %buffer%청크 안에서는 땅을 점령할 수 없습니다."
+  neutral-zone-enter-actionbar: "&#8FD9A8중립구역 입장 &7| &f%zone%"
+  neutral-zone-exit-actionbar: "&#FF9AA2중립구역 이탈 &7| &f%zone%"
+  not-enough-money: "&c청크 구매 비용이 부족합니다. 필요 금액: &e%cost%"
+  economy-missing: "&c경제 플러그인과 연결되지 않아 구매할 수 없습니다."
+  protected: "&c이 땅은 &e%town%&c 파티 소유입니다."
+  nation-created: "&a국가를 세웠습니다: &e%nation% &7(%color%, 인원 %members%명, 예상 유지세 %tax%)"
+  nation-disbanded: "&c국가를 해산했습니다: &e%nation%"
+  disband-nation-warning: "&c정말 &e%name%&c 국가를 해산할까요? &7%seconds%초 안에 &e%command%&7 를 한 번 더 입력하면 해산됩니다."
+  nation-member-required: "&c국가 인정은 총 인원 %count%명 이상부터 가능합니다."
+  nation-extra-party-admin-only: "&c다른 파티를 묶어 국가를 만드는 기능은 현재 관리자만 사용할 수 있습니다."
+  nation-color-invalid: "&c사용할 수 없는 국가 색상입니다. 가능: &e%colors%"
+  nation-color-taken: "&c이미 다른 국가가 사용 중인 색상입니다: &e%color%"
+  party-already-in-nation: "&c이미 국가에 소속된 파티입니다: &e%party%"
+  already-in-nation: "&c이미 국가에 소속되어 있습니다."
+  town-not-found: "&c파티를 찾을 수 없습니다: &e%town%"
+  nation-not-found: "&c국가를 찾을 수 없습니다."
+  chat-mode: "&a채팅 모드: &e%mode%"
+  chat-no-town: "&c파티 채팅을 사용하려면 파티에 소속되어 있어야 합니다."
+  chat-no-nation: "&c국가 채팅을 사용하려면 국가에 소속되어 있어야 합니다."

@@ -1,0 +1,35 @@
+name: LeeSeolHUD
+version: 0.1.0
+main: me.leeseol.hud.LeeSeolHudPlugin
+api-version: '26.1.2'
+description: BossBar HUD for expedition survival.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - PlaceholderAPI
+commands:
+  hud:
+    description: Manage personal HUD settings.
+    usage: /hud [compass|target] [on|off]
+  compasshud:
+    description: Toggle the compass HUD.
+    usage: /compasshud <on|off>
+  lshud:
+    description: Admin command for LeeSeolHUD.
+    usage: /lshud <reload|status>
+permissions:
+  leeseolhud.use:
+    description: Allows using HUD commands.
+    default: true
+  leeseolhud.compass:
+    description: Allows compass HUD.
+    default: true
+  leeseolhud.target-health:
+    description: Allows target health HUD.
+    default: true
+  leeseolhud.below-name-health:
+    description: Allows below-name health bar display.
+    default: true
+  leeseolhud.admin:
+    description: Allows managing LeeSeolHUD.
+    default: op

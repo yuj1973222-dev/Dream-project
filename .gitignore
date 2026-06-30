@@ -1,0 +1,62 @@
+# Java / Maven build output
+**/target/
+**/*.class
+
+# Packaged or generated artifacts
+*.jar
+*.zip
+*.pdf
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+
+# Runtime logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.swp
+*~
+
+# Local git worktree sandboxes
+.worktrees/
+worktrees/
+
+# Server/config backups created during deployment
+*.before-*
+*.before_*
+*.backup
+*.disabled
+plugins.disabled/
+
+# Generated visual/resource-pack artifacts
+assets/generated/
+assets/backup/
+previews/
+resourcepacks/
+diagnostics/
+outputs/
+
+# Generated translation/reference exports
+ADVANCED_ENCHANTMENTS_*.tsv
+ADVANCED_ENCHANTMENTS_*LIST.md
+AdvancedEnchantments_*.xlsx
+tools/retranslate_advanced_enchantments.py
+
+# IDE/editor noise
+.idea/
+.vscode/
+*.iml
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local environment files
+.env
+.env.*
+!.env.example

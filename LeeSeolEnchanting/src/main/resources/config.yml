@@ -1,0 +1,250 @@
+settings:
+  enabled: true
+  allowed-worlds:
+    - world
+  debug: false
+
+bookshelves:
+  # Count the vanilla-style 5x5 outer ring on the enchanting-table level and one
+  # block above it. This gives a custom maximum of 32 bookshelves.
+  materials:
+    - BOOKSHELF
+  require-clear-inner-space: true
+
+rolls:
+  # The highest matching band wins.
+  # Keep PvP-control enchants such as stun, silence, teleblock, trap, disarm, and
+  # soul enchants out of the enchanting-table route. Those belong to dungeon or
+  # recipe progression later.
+  bands:
+    low_room:
+      min-bookshelves: 24
+      chance-percent: 6.0
+      output: APPLY_TO_ITEM
+      candidates:
+        - enchant: jellylegs
+          min-level: 1
+          max-level: 1
+          weight: 12
+        - enchant: aquatic
+          min-level: 1
+          max-level: 1
+          weight: 10
+        - enchant: rebreather
+          min-level: 1
+          max-level: 1
+          weight: 10
+        - enchant: glowing
+          min-level: 1
+          max-level: 1
+          weight: 8
+        - enchant: smelting
+          min-level: 1
+          max-level: 1
+          weight: 8
+        - enchant: hasten
+          min-level: 1
+          max-level: 1
+          weight: 8
+        - enchant: experience
+          min-level: 1
+          max-level: 2
+          weight: 6
+        - enchant: autoreel
+          min-level: 1
+          max-level: 1
+          weight: 6
+        - enchant: allurement
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: adrenaline
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: foraging
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: zombiecrusher
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: skullcrusher
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: incinerate
+          min-level: 1
+          max-level: 1
+          weight: 4
+    refined_room:
+      min-bookshelves: 30
+      chance-percent: 10.0
+      output: APPLY_TO_ITEM
+      candidates:
+        - enchant: jellylegs
+          min-level: 1
+          max-level: 2
+          weight: 12
+        - enchant: aquatic
+          min-level: 1
+          max-level: 1
+          weight: 10
+        - enchant: rebreather
+          min-level: 1
+          max-level: 2
+          weight: 10
+        - enchant: glowing
+          min-level: 1
+          max-level: 1
+          weight: 8
+        - enchant: springs
+          min-level: 1
+          max-level: 1
+          weight: 5
+        - enchant: smelting
+          min-level: 1
+          max-level: 2
+          weight: 8
+        - enchant: hasten
+          min-level: 1
+          max-level: 2
+          weight: 8
+        - enchant: haste
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: experience
+          min-level: 1
+          max-level: 3
+          weight: 6
+        - enchant: infernaltouch
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: oxygenate
+          min-level: 1
+          max-level: 1
+          weight: 5
+        - enchant: waterborne
+          min-level: 1
+          max-level: 1
+          weight: 5
+        - enchant: alacrity
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: autoreel
+          min-level: 1
+          max-level: 2
+          weight: 6
+        - enchant: allurement
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: bait
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: lucky
+          min-level: 1
+          max-level: 1
+          weight: 4
+        - enchant: adrenaline
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: blazereaper
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: enderslayer
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: netherslayer
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: enderbane
+          min-level: 1
+          max-level: 2
+          weight: 5
+        - enchant: cubism
+          min-level: 1
+          max-level: 2
+          weight: 4
+        - enchant: zombiecrusher
+          min-level: 1
+          max-level: 2
+          weight: 4
+        - enchant: skullcrusher
+          min-level: 1
+          max-level: 2
+          weight: 4
+        - enchant: incinerate
+          min-level: 1
+          max-level: 2
+          weight: 4
+        - enchant: beastslayer
+          min-level: 1
+          max-level: 1
+          weight: 3
+        - enchant: hunter
+          min-level: 1
+          max-level: 2
+          weight: 4
+        - enchant: slayer
+          min-level: 1
+          max-level: 2
+          weight: 4
+
+lore-descriptions:
+  enabled: true
+  refresh-on-inventory-click: true
+  line-format: "&8- &7%description%"
+  descriptions:
+    jellylegs: "낙하 피해를 줄이거나 무시할 확률이 생깁니다."
+    aquatic: "수중에서 숨을 쉴 수 있습니다."
+    rebreather: "수중 채굴 중 산소를 회복할 확률이 생깁니다."
+    glowing: "상시 야간 시야 효과를 얻습니다."
+    smelting: "채굴한 블록이 일정 확률로 제련됩니다."
+    hasten: "블록을 캘 때 일정 확률로 성급함을 얻습니다."
+    haste: "도구 사용 속도가 빨라집니다."
+    experience: "광석 채굴 시 추가 경험치를 얻을 확률이 생깁니다."
+    autoreel: "물고기가 물면 낚싯대를 자동으로 감습니다."
+    allurement: "낚시 보상을 두 배로 받을 확률이 생깁니다."
+    bait: "낚시 보상을 두 배로 받을 확률이 생깁니다."
+    lucky: "낚시 중 일정 확률로 행운이 증가합니다."
+    adrenaline: "몹에게 피격될 때 힘 효과를 얻습니다."
+    foraging: "나뭇잎 드롭이 증가할 확률이 생깁니다."
+    springs: "점프력이 증가합니다."
+    infernaltouch: "채굴한 블록이 일정 확률로 제련됩니다."
+    oxygenate: "수중 채굴 중 산소를 회복합니다."
+    waterborne: "수중에서 산소를 회복하는 데 도움을 줍니다."
+    alacrity: "도구를 더 빠르게 사용할 수 있습니다."
+    blazereaper: "네더 생물에게 주는 피해가 증가합니다."
+    enderslayer: "엔더맨과 엔더 드래곤에게 주는 피해가 증가합니다."
+    netherslayer: "네더 몹에게 주는 피해가 증가합니다."
+    enderbane: "엔더 계열 몹에게 주는 피해가 증가합니다."
+    cubism: "슬라임과 마그마 큐브에게 더 큰 피해를 줍니다."
+    zombiecrusher: "좀비에게 주는 피해가 증가합니다."
+    skullcrusher: "스켈레톤에게 주는 피해가 증가합니다."
+    incinerate: "거미에게 주는 피해가 증가합니다."
+    beastslayer: "적대적 몹에게 주는 피해가 증가합니다."
+    hunter: "비선공 몹에게 주는 원거리 피해가 증가합니다."
+    slayer: "비선공 몹에게 주는 근접 피해가 증가합니다."
+
+messages:
+  prefix: "&7[&b인챈트&7] "
+  reloaded: "&aLeeSeolEnchanting 설정을 다시 불러왔습니다."
+  status: "&f활성화: &b%enabled% &7| 월드: &b%worlds% &7| 밴드: &b%bands%"
+  no-permission: "&c권한이 없습니다."
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  not-enchanting-table: "&c바라보는 블록이 마법부여대가 아닙니다."
+  bookshelf-count: "&a이 마법부여대의 커스텀 책장 수: &e%count%&7/32"
+  custom-applied: "&a고급 마법부여실의 힘으로 &e%enchant% %level%&a 효과가 추가되었습니다."
+  lore-updated: "&a손에 든 아이템의 커스텀 인챈트 설명을 갱신했습니다."
+  lore-no-item: "&c설명을 갱신할 아이템을 손에 들어주세요."
+  lore-no-custom-enchants: "&c이 아이템에는 설명을 붙일 커스텀 인챈트가 없습니다."

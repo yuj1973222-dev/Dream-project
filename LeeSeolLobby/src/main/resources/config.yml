@@ -1,0 +1,66 @@
+world: world
+
+spawn:
+  use-world-spawn: true
+  x: 0.5
+  y: 64.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+  teleport-delay-ticks: 5
+
+rules:
+  force-peaceful: true
+  force-adventure: true
+  prevent-block-break: true
+  prevent-block-place: true
+  prevent-damage: true
+  prevent-hunger: true
+  prevent-mob-spawning: true
+  prevent-item-drop: true
+  disable-pvp: true
+
+void-return:
+  enabled: true
+  y: -16.0
+
+limbo:
+  world: limbo
+  create-if-missing: true
+  allowed-commands:
+    - lobby
+    - "\uB85C\uBE44"
+  spawn:
+    use-world-spawn: true
+    x: 0.5
+    y: 64.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
+tab-header:
+  enabled: true
+  interval-ticks: 40
+  # Uses assets/minecraft/font/default.json from the shared network resource pack.
+  logo-font: "minecraft:default"
+  logo-glyph: "\\uE301"
+  logo-leading-lines: 4
+  logo-trailing-spaces: 0
+  logo-ping-gap-lines: 2
+  ping-label: "PING : "
+  ping-color: "#87DFFF"
+  footer: "\uC628\uB77C\uC778 \uC811\uC18D\uC790 : "
+  footer-color: "#D8C6A3"
+  max-display-players: 500
+messages:
+  limbo-entered: "&e야생 서버가 가득 차 limbo 대기실로 이동했습니다."
+  limbo-left: "&a로비로 돌아왔습니다."
+  limbo-restricted: "&c대기실에서는 이 행동을 할 수 없습니다."
+  limbo-command-denied: "&c대기실에서는 /lobby 또는 /로비만 사용할 수 있습니다."
+  limbo-world-missing: "&c대기실 월드(limbo)를 찾을 수 없습니다. 관리자에게 문의해주세요."
+  limbo-teleport-failed: "&c대기실 이동에 실패했습니다. 잠시 후 다시 시도해주세요."
+  limbo-player-missing: "&c대기실로 이동할 플레이어를 찾을 수 없습니다."
+  build-denied: "&c로비에서는 블록을 변경할 수 없습니다."
+  item-drop-denied: "&c로비에서는 아이템을 버릴 수 없습니다."
+  void-return: "&e로비 밖으로 떨어져 스폰으로 돌아왔습니다."
+  spawn-set: "&a로비 스폰 위치를 현재 위치로 저장했습니다."

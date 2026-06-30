@@ -1,0 +1,37 @@
+name: LeeSeolJobs
+version: 0.1.0
+main: me.leeseol.jobs.LeeSeolJobsPlugin
+api-version: '26.1.2'
+description: Activity and exploration income loop for expedition survival.
+author: lee_seol
+load: POSTWORLD
+softdepend:
+  - Vault
+  - LeeSeolEconomy
+  - LeeSeolQuest
+  - LeeSeolRanks
+commands:
+  jobs:
+    description: Show expedition activity stats.
+    usage: /activity [stats|top]
+    aliases:
+      - activity
+      - activities
+      - expedition
+      - explore
+  lsjobs:
+    description: Admin command for LeeSeolJobs.
+    usage: /lsjobs <reload|stats|reset>
+permissions:
+  leeseoljobs.use:
+    description: Allows using LeeSeolJobs.
+    default: true
+  leeseoljobs.admin:
+    description: Allows managing LeeSeolJobs.
+    default: op
+  leeseoljobs.bypass.cooldown:
+    description: Bypasses reward cooldowns.
+    default: op
+  leeseoljobs.bypass.daily-limit:
+    description: Bypasses daily reward limits.
+    default: op

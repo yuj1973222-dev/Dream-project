@@ -1,0 +1,23 @@
+name: LeeSeolDungeon
+version: 0.1.0
+main: me.leeseol.dungeon.LeeSeolDungeonPlugin
+api-version: '26.1.2'
+description: Dungeon portals, shared survival-dungeon inventories, dungeon protection, and loot chests.
+author: lee_seol
+load: POSTWORLD
+commands:
+  dungeon:
+    description: Manages LeeSeol dungeon features.
+    usage: /dungeon
+    aliases:
+      - lsdungeon
+permissions:
+  leeseoldungeon.use:
+    description: Allows using dungeon features.
+    default: true
+  leeseoldungeon.admin:
+    description: Allows dungeon administration.
+    default: op
+  leeseoldungeon.bypass:
+    description: Allows bypassing dungeon protection.
+    default: op

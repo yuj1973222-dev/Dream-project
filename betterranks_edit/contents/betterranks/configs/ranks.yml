@@ -1,0 +1,136 @@
+info:
+  namespace: betterranks
+font_images:
+  admin:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "admin.png"
+    scale_ratio: 9
+    y_position: 8
+  mod:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "mod.png"
+    scale_ratio: 9
+    y_position: 8
+  helper:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "helper.png"
+    scale_ratio: 9
+    y_position: 8
+  player:
+    permission: "betterranks.player"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "player.png"
+    scale_ratio: 9
+    y_position: 8
+  builder:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "builder.png"
+    scale_ratio: 9
+    y_position: 8
+  youtube:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "youtube.png"
+    scale_ratio: 9
+    y_position: 8
+  patreon:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "patreon.png"
+    scale_ratio: 9
+    y_position: 8
+  patreon2:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "patreon2.png"
+    scale_ratio: 9
+    y_position: 8
+  java:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "java.png"
+    scale_ratio: 9
+    y_position: 8
+  skript:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "skript.png"
+    scale_ratio: 9
+    y_position: 8
+  developer:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "developer.png"
+    scale_ratio: 9
+    y_position: 8
+  dev:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "dev.png"
+    scale_ratio: 9
+    y_position: 8
+  vip:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "vip.png"
+    scale_ratio: 9
+    y_position: 8
+  vipplus:
+    permission: "betterranks.admin"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "vipplus.png"
+    scale_ratio: 9
+    y_position: 8
+  rank_s:
+    permission: "leeseolranks.rank.s"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "rank_s.png"
+    scale_ratio: 9
+    y_position: 8
+  rank_a:
+    permission: "leeseolranks.rank.a"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "rank_a.png"
+    scale_ratio: 9
+    y_position: 8
+  rank_b:
+    permission: "leeseolranks.rank.b"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "rank_b.png"
+    scale_ratio: 9
+    y_position: 8
+  rank_c:
+    permission: "leeseolranks.rank.c"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "rank_c.png"
+    scale_ratio: 9
+    y_position: 8
+  rank_d:
+    permission: "leeseolranks.rank.d"
+    show_in_gui: true
+    suggest_in_command: false
+    path: "rank_d.png"
+    scale_ratio: 9
+    y_position: 8

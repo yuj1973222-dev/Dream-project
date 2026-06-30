@@ -1,0 +1,172 @@
+server-name: "LeeSeol Server"
+welcome-message-enabled: false
+welcome-message: "&aWelcome, {player}."
+
+enabled-worlds:
+  - world
+
+respawn-to-lobby:
+  enabled: false
+  target-server: "lobby"
+  delay-ticks: 20
+  message: "&b로비에서 다시 시작합니다."
+
+survival-respawn:
+  enabled: true
+  worlds:
+    - "world"
+    - "world_nether"
+    - "dungeon"
+  target-world: "world"
+  target-location:
+    enabled: false
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+
+survival-spawn-return:
+  enabled: true
+  worlds:
+    - "world"
+    - "world_nether"
+  target-world: "world"
+  target-location:
+    enabled: false
+    x: 0.5
+    y: 65.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+  warmup-seconds: 8
+  cancel-on-move: true
+  cancel-on-damage: true
+  particle:
+    type: "PORTAL"
+    interval-ticks: 10
+    count: 28
+    offset-x: 0.45
+    offset-y: 0.85
+    offset-z: 0.45
+    speed: 0.02
+  sound:
+    start: "BLOCK_BEACON_POWER_SELECT"
+    complete: "ENTITY_ENDERMAN_TELEPORT"
+  messages:
+    player-only: "&c게임 안에서만 사용할 수 있습니다."
+    disabled: "&c현재 사용할 수 없습니다."
+    no-permission: "&c권한이 없습니다."
+    wrong-world: "&c이 월드에서는 서바이벌 스폰 귀환을 사용할 수 없습니다."
+    already-returning: "&e이미 귀환 중입니다."
+    target-missing: "&c서바이벌 스폰 위치를 찾을 수 없습니다."
+    started: "&b%seconds%초 뒤 서바이벌 스폰으로 귀환합니다. 움직이거나 피해를 받으면 취소됩니다."
+    cancelled-move: "&c움직여서 귀환이 취소되었습니다."
+    cancelled-damage: "&c피해를 받아 귀환이 취소되었습니다."
+    completed: "&a서바이벌 스폰으로 이동했습니다."
+
+dimension-gate:
+  enabled: false
+  # disabled, lobby, survival
+  mode: "disabled"
+  bypass-permission: "leeseolcore.dimension.bypass"
+  survival:
+    main-worlds:
+      - "world"
+    nether-worlds:
+      - "world_nether"
+    dungeon-worlds:
+      - "dungeon"
+  messages:
+    lobby-blocked: "&c로비에서는 다른 차원으로 이동할 수 없습니다."
+    end-blocked: "&c서바이벌에서는 엔더 차원으로 이동할 수 없습니다."
+    dungeon-blocked: "&c던전 월드에서는 다른 차원으로 이동할 수 없습니다."
+    nether-blocked: "&c이 월드에서는 네더 차원으로 이동할 수 없습니다."
+
+portal-triggers:
+  enabled: false
+  portals: {}
+
+launch-pads:
+  enabled: false
+  pads: {}
+
+content-registry:
+  data-file: "contents.yml"
+  worldguard:
+    enabled: true
+    priority: 60
+    presets:
+      common:
+        flags:
+          build: "DENY"
+          block-break: "DENY"
+          block-place: "DENY"
+          pvp: "DENY"
+          mob-spawning: "DENY"
+          tnt: "DENY"
+          creeper-explosion: "DENY"
+          other-explosion: "DENY"
+          fire-spread: "DENY"
+          use: "ALLOW"
+          interact: "ALLOW"
+  bluemap:
+    enabled: true
+    marker-set-id: "leeseol-content-areas"
+    marker-set-label: "Content Areas"
+    default-hidden: false
+    sorting: 25
+    line-width: 2
+    depth-test: false
+    line-alpha: 0.9
+    fill-alpha: 0.16
+    map-overrides:
+      world: "overworld"
+    types:
+      casino:
+        label-prefix: "Casino"
+        line-color: "#FFD166"
+        fill-color: "#FFD166"
+      dungeon:
+        label-prefix: "Dungeon"
+        line-color: "#B976FF"
+        fill-color: "#B976FF"
+
+server-menu:
+  enabled: false
+  title: "&0서버 이동"
+  size: 9
+  shortcut:
+    enabled: true
+    require-sneak: true
+    cooldown-millis: 700
+  messages:
+    moving: "&a%server% 서버로 이동합니다."
+    no-permission: "&c권한이 없습니다."
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: " "
+  items:
+    survival:
+      slot: 4
+      server: "survival"
+      material: GRASS_BLOCK
+      name: "&a서바이벌 입장"
+      lore:
+        - "&7야생, 경제, 마을이 있는 메인 서버로 이동합니다."
+        - "&e클릭해서 이동"
+
+server-npcs:
+  enabled: false
+  default-target-server: "survival"
+  default-name: "&a서바이벌 입장"
+  default-skin: "lee_seol"
+  default-main-hand: "IRON_SWORD"
+  default-pose: "STANDING"
+  click-cooldown-millis: 1000
+  messages:
+    moving: "&a%server% 서버로 이동합니다."
+    no-permission: "&c권한이 없습니다."
+    citizens-missing: "&cCitizens 플러그인이 로비에 설치되어 있어야 합니다."
+  npcs: {}

@@ -1,0 +1,88 @@
+combat-tag:
+  enabled: true
+  duration-seconds: 15
+  enabled-worlds:
+    - world
+    - world_nether
+    - dungeon
+  notify-on-refresh: false
+
+combat-logout:
+  kill-during-combat: true
+
+logout-clone:
+  enabled: true
+  # Paper backend에서는 로비 이동과 일반 접속 종료가 모두 QuitEvent로 보인다.
+  # 그래서 아래 월드에서 서버를 나가면 전투 대역 NPC를 생성한다.
+  enabled-worlds:
+    - world
+    - world_nether
+  # lying-corpse: 플레이어 스킨/장비 NPC를 눕히고, 보이지 않는 Interaction 히트박스로 타격 판정을 넓힌다.
+  # stable-husk: Citizens HUSK NPC 자체를 전투 잔상으로 사용하는 예비 모드.
+  mode: lying-corpse
+  name-format: "&c%player%의 전투 잔상"
+  remove-on-owner-return: true
+  drop-inventory-on-kill: true
+  apply-death-on-next-join: true
+  show-health-in-name: true
+  hitbox:
+    enabled: true
+    # PLAYER는 접속 종료 시 플레이어가 보던 방향을 사용한다. NORTH/SOUTH/EAST/WEST로 고정할 수도 있다.
+    direction: PLAYER
+    # Interaction 히트박스는 중심 1개 + 실제 눕는 방향 보정용 측면 1개를 만든다.
+    length-blocks: 2
+    width: 1.15
+    height: 0.3
+    y-offset: 0.05
+    # 공중 접속 종료 시 가장 가까운 바닥으로 내려서 시체와 히트박스를 생성한다.
+    ground-on-spawn: true
+    max-ground-search-blocks: 48
+    # 반복 동기화는 SleepTrait 자세 흔들림을 만들 수 있어 기본 비활성화한다.
+    sync-to-npc: false
+    sync-interval-ticks: 2
+
+death-cleanup:
+  # 이전 방식의 죽음 화면 반복 문제를 막기 위해 접속 시 죽음 상태면 자동 복구한다.
+  respawn-dead-on-join: true
+  # 전투 잔상이 처치된 플레이어는 재접속 시 지정 월드의 스폰 지점으로 보낸다.
+  teleport-to-spawn-on-pending-death: true
+  spawn-world: world
+
+spectator-clone:
+  enabled: true
+
+pvp-rewards:
+  enabled: true
+  data-file: "/opt/minecraft/shared/combat/pvp.yml"
+  enabled-worlds:
+    - world
+    - world_nether
+  points-per-kill: 1
+  repeat-kill-cooldown-seconds: 600
+  ignore-same-town-or-nation: true
+  trophy:
+    enabled: true
+    name: "&c%victim%의 증표"
+    lore:
+      - "&7처치자: &f%killer%"
+      - "&7희생자: &f%victim%"
+      - "&7시간: &f%time%"
+
+messages:
+  prefix: "&7[&c전투&7] "
+  combat-start: "&c전투 상태에 진입했습니다. &f%seconds%초 동안 서버를 나가면 처벌됩니다."
+  combat-refresh: "&c전투 시간이 갱신되었습니다. &f%seconds%초"
+  combat-ended: "&a전투 상태가 종료되었습니다."
+  combat-logout: "&c전투 중 접속을 종료해 처벌 처리되었습니다."
+  clone-spawned: "&e%player%의 전투 잔상이 생성되었습니다."
+  clone-killed: "&c%player%의 전투 잔상이 처치되었습니다."
+  pending-death: "&c이전 전투 잔상이 처치되어 인벤토리가 정리되었습니다."
+  force-combat-admin: "&e%player1%와 %player2%를 강제로 전투 상태에 넣었습니다."
+  player-not-found: "&c대상 유저를 찾을 수 없습니다."
+  spectator-clone-on: "&a관전 모드 NPC 생성을 켰습니다."
+  spectator-clone-off: "&c관전 모드 NPC 생성을 껐습니다."
+  pvp-reward: "&e%victim% 처치 보상으로 PVP 포인트 &f%points%&e점을 획득했습니다. &7(현재 %total%점)"
+  pvp-repeat-cooldown: "&c같은 대상을 반복 처치했습니다. &f%seconds%초 &c후 다시 보상을 받을 수 있습니다."
+  pvp-same-affiliation: "&c같은 마을 또는 국가 소속 처치는 PVP 보상을 지급하지 않습니다."
+  reload: "&aLeeSeolCombat 설정을 다시 불러왔습니다."
+  no-permission: "&c권한이 없습니다."

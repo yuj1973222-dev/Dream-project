@@ -1,0 +1,63 @@
+name: LeeSeolTown
+version: 0.1.0
+main: me.leeseol.town.LeeSeolTownPlugin
+api-version: '26.1.2'
+description: Party, nation, claim, and chat system for LeeSeol Network.
+author: lee_seol
+softdepend:
+  - Vault
+  - LeeSeolEconomy
+  - LeeSeolCore
+  - PlaceholderAPI
+  - ItemsAdder
+  - WorldEdit
+  - WorldGuard
+  - BlueMap
+load: POSTWORLD
+commands:
+  town:
+    description: Manages parties, nations, claims, and chat.
+    usage: /party
+    aliases:
+      - party
+      - village
+      - towny
+  tc:
+    description: Sends or toggles party chat.
+    usage: /tc [message]
+    aliases:
+      - pc
+  nc:
+    description: Sends or toggles nation chat.
+    usage: /nc [message]
+permissions:
+  leeseoltown.use:
+    description: Allows using basic town commands.
+    default: true
+  leeseoltown.claim:
+    description: Allows claiming chunks for a recognized party.
+    default: true
+  leeseoltown.chat:
+    description: Allows using party and nation chat.
+    default: true
+  leeseoltown.admin:
+    description: Allows administrating LeeSeolTown.
+    default: op
+  leeseoltown.neutral.bypass:
+    description: Bypasses neutral-zone build, PvP, and claim restrictions.
+    default: op
+  leeseoltown.structure.admin:
+    description: Allows force placing configured structures.
+    default: op
+  leeseoltown.structure.undo:
+    description: Allows undoing your latest structure placement.
+    default: true
+  leeseoltown.structure.nation_core:
+    description: Allows selecting the nation core structure.
+    default: true
+  leeseoltown.structure.outpost:
+    description: Allows selecting the outpost structure.
+    default: true
+  leeseoltown.structure.supply_depot:
+    description: Allows selecting the supply depot structure.
+    default: true

@@ -1,0 +1,23 @@
+cleanup:
+  enabled: true
+  interval-minutes: 10
+  worlds:
+    - world
+    - world_nether
+    - dungeon
+  broadcast: true
+  minimum-age-seconds: 0
+  warning:
+    seconds: 10
+    actionbar: "&c곧 바닥 아이템이 삭제됩니다: &e%seconds%초"
+    sound:
+      enabled: true
+      name: "BLOCK_NOTE_BLOCK_PLING"
+
+messages:
+  prefix: "&7[&b청소&7] "
+  cleaned: "&f바닥 아이템 &e%count%개&f를 정리했습니다."
+  cleaned-manual: "&f수동 청소 완료: &e%count%개&f 정리."
+  reloaded: "&aLeeSeolCleanup 설정을 다시 불러왔습니다."
+  status: "&f상태: &e%enabled% &7/ 주기: &e%minutes%분 &7/ 월드: &e%worlds%"
+  no-permission: "&c권한이 없습니다."

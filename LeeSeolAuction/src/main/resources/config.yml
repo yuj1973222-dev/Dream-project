@@ -1,0 +1,41 @@
+settings:
+  enabled: true
+  data-file: "/opt/minecraft/shared/auction/data.yml"
+  default-starting-bid: 1000
+  bid-increment: 500
+  gui-refresh-ticks: 40
+  gui-size: 54
+  blocked-worlds:
+    - "dungeon"
+  blocked-world-bypass-permission: "leeseolauction.world-bypass"
+
+messages:
+  prefix: "&#FFD166[경매] &f"
+  no-permission: "&c권한이 없습니다."
+  player-only: "&c게임 안에서만 사용할 수 있습니다."
+  economy-missing: "&c경제 플러그인과 연결되지 않아 경매를 사용할 수 없습니다."
+  disabled: "&c이 서버에서는 경매장을 사용할 수 없습니다."
+  world-disabled: "&c이 월드에서는 경매장을 사용할 수 없습니다."
+  submitted: "&a아이템을 경매 보관함에 등록했습니다. 등록 수: &e%count%"
+  no-items-submitted: "&c등록할 아이템이 없습니다."
+  admin-only: "&c관리자만 사용할 수 있습니다."
+  auction-closed: "&c현재 열린 경매가 없습니다."
+  auction-opened: "&a경매를 열었습니다. &e%item% &7시작가: &e%starting% &7상승폭: &6%increment%"
+  auction-ended: "&a경매를 종료했습니다. 최고 입찰자를 낙찰 처리했습니다."
+  auction-cancelled: "&e경매를 취소했습니다."
+  no-active: "&c진행 중인 경매가 없습니다."
+  no-lot: "&c해당 경매 물품을 찾을 수 없습니다."
+  usage-open: "&c사용법: /auction open <등록번호> [시작가] [상승폭]"
+  usage-increment: "&c사용법: /auction increment <상승폭>"
+  increment-updated: "&a현재 경매의 입찰 상승폭을 &e%increment%&a 원으로 변경했습니다."
+  bid-too-low: "&c입찰 금액이 부족합니다. 최소 입찰: &e%amount%"
+  not-enough-money: "&c돈이 부족합니다. 필요 금액: &e%amount%"
+  bid-success: "&a입찰했습니다: &e%amount%"
+  bid-broadcast: "&#FFD166[경매] &f%player%님이 &e%amount%&f 입찰했습니다."
+  previous-bid-refunded: "&7이전 최고 입찰자에게 &e%amount%&7 원 반환했습니다."
+  won: "&a경매에서 낙찰되었습니다. &e%item% &7낙찰가: &e%amount%"
+  seller-paid: "&a등록한 아이템이 낙찰되었습니다. 정산 금액: &e%amount%"
+  no-bids: "&e입찰자가 없어 경매가 종료되었습니다. 아이템은 후보 목록에 남아 있습니다."
+  inventory-full: "&c인벤토리 공간이 부족해 일부 아이템이 바닥에 떨어졌습니다."
+  reloaded: "&aLeeSeolAuction 설정을 다시 불러왔습니다."
+  not-number: "&c금액은 0 이상의 숫자로 입력해주세요."

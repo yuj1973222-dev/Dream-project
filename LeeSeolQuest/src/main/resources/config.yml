@@ -1,0 +1,130 @@
+settings:
+  data-file: "/opt/minecraft/shared/quests/data.yml"
+  reset-time-zone: "Asia/Seoul"
+  auto-start-tutorial: true
+  allow-tutorial-skip: true
+
+messages:
+  prefix: "&b[퀘스트] "
+  no-permission: "&c권한이 없습니다."
+  reloaded: "&aLeeSeolQuest 설정을 다시 불러왔습니다."
+  unknown-quest: "&c존재하지 않는 퀘스트입니다: &f%quest%"
+  already-active: "&c이미 진행 중인 퀘스트가 있습니다: &f%quest%"
+  already-completed: "&e이미 완료한 퀘스트입니다: &f%quest%"
+  started: "&a퀘스트를 시작했습니다: &f%quest%"
+  abandoned: "&e퀘스트를 포기했습니다: &f%quest%"
+  no-active: "&7진행 중인 퀘스트가 없습니다."
+  progress: "&f%quest% &7- &f%stage%단계 &7진행도: &b%progress%&7/&b%required%"
+  stage-complete: "&a퀘스트 단계 완료: &f%quest% &7%stage%단계"
+  completed: "&6퀘스트 완료: &f%quest%"
+  reward-money: "&a보상으로 &f%amount%원&a을 받았습니다."
+  admin-set: "&a%player%의 퀘스트 단계를 설정했습니다."
+  admin-reset: "&a%player%의 퀘스트 데이터를 초기화했습니다."
+  tutorial-skipped: "&e튜토리얼을 스킵했습니다."
+
+quests:
+  tutorial_start:
+    display-name: "첫 여정"
+    auto-start: true
+    reset: once
+    stages:
+      1:
+        message: "&b/quest 명령어로 퀘스트 창을 열어보세요."
+        objective:
+          type: open-gui
+          target: quest
+          amount: 1
+      2:
+        message: "&b야생에서 석탄 원석을 3개 캐보세요."
+        objective:
+          type: mine-block
+          material: COAL_ORE
+          amount: 3
+      3:
+        message: "&b낚시에 한 번 성공해보세요."
+        objective:
+          type: fish
+          amount: 1
+    rewards:
+      money: 1000
+      commands: []
+
+  daily_check_in:
+    display-name: "일일 점검: 서버 메뉴"
+    reset: daily
+    stages:
+      1:
+        message: "&bShift+F 또는 /servermenu로 서버 메뉴를 한 번 열어보세요."
+        objective:
+          type: open-gui
+          target: server-menu
+          amount: 1
+    rewards:
+      money: 200
+      commands: []
+
+  daily_jobs_income:
+    display-name: "일일 활동: 5,000원 벌기"
+    reset: daily
+    stages:
+      1:
+        message: "&b광질, 농사, 낚시, 탐험 활동 보상으로 오늘 5,000원을 벌어보세요."
+        objective:
+          type: earn-money
+          target: jobs
+          amount: 5000
+    rewards:
+      money: 500
+      commands: []
+
+  daily_crafting_processing:
+    display-name: "일일 제작: 철 가공"
+    reset: daily
+    stages:
+      1:
+        message: "&b/process 또는 제작 GUI에서 원철을 철괴로 8번 가공해보세요."
+        objective:
+          type: craft-item
+          target: IRON_INGOT
+          amount: 8
+    rewards:
+      money: 300
+      commands: []
+
+  daily_fishing:
+    display-name: "일일 낚시: 10회 성공"
+    reset: daily
+    stages:
+      1:
+        message: "&b낚시를 10번 성공해보세요."
+        objective:
+          type: fish
+          amount: 10
+    rewards:
+      money: 500
+      commands: []
+
+  weekly_survival_routine:
+    display-name: "주간 생존 루틴"
+    reset: weekly
+    stages:
+      1:
+        message: "&b이번 주 활동 보상으로 30,000원을 벌어보세요."
+        objective:
+          type: earn-money
+          target: jobs
+          amount: 30000
+      2:
+        message: "&b이번 주 철괴 가공 또는 제작을 32번 완료해보세요."
+        objective:
+          type: craft-item
+          target: IRON_INGOT
+          amount: 32
+      3:
+        message: "&b이번 주 낚시를 20번 성공해보세요."
+        objective:
+          type: fish
+          amount: 20
+    rewards:
+      money: 3000
+      commands: []
