@@ -102,6 +102,21 @@ public final class CoreSharedContractSmokeTest {
         assertFalse(pluginSource.contains("new RespawnToLobbyListener"));
     }
 
+    @Test
+    public void bootstrapDelegatesDomainManagersToCoreServicesFacade() throws IOException {
+        String pluginSource = readText("src/main/java/me/leeseol/core/LeeSeolCorePlugin.java");
+        String servicesSource = readText("src/main/java/me/leeseol/core/CoreServices.java");
+
+        assertTrue(pluginSource.contains("private CoreServices services;"));
+        assertTrue(pluginSource.contains("services = new CoreServices(this);"));
+        assertTrue(pluginSource.contains("services.reloadAll();"));
+        assertTrue(servicesSource.contains("final class CoreServices"));
+        assertTrue(servicesSource.contains("void reloadAll()"));
+        assertTrue(servicesSource.contains("void disableAll()"));
+        assertTrue(servicesSource.contains("ContentService contentService()"));
+        assertTrue(servicesSource.contains("NetworkMovePort networkMovePort()"));
+    }
+
     private static YamlConfiguration loadYaml(String path) {
         return YamlConfiguration.loadConfiguration(projectPath(path).toFile());
     }
