@@ -15,7 +15,7 @@ public record ResourcePackSettings(
                 "http://34.64.126.179:8163/generated.zip",
                 "6484feef71105bfd2a2d6acdcc2af6a1bde2f598",
                 false,
-                "?듭뒪?섎뵒???쒕쾭 由ъ냼?ㅽ뙥???곸슜?⑸땲??"
+                "리소스팩을 적용하면 커스텀 아이템과 UI가 정상적으로 표시됩니다."
         );
     }
 
