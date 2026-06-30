@@ -4,20 +4,14 @@ import me.leeseol.core.command.CoreCommand;
 import me.leeseol.core.command.ContentCommand;
 import me.leeseol.core.command.ServerInfoCommand;
 import me.leeseol.core.content.BlueMapContentMarkers;
-import me.leeseol.core.config.ConfigManager;
 import me.leeseol.core.content.ContentService;
-import me.leeseol.core.content.WorldGuardContentRegionService;
 import me.leeseol.core.launchpad.LaunchPadListener;
-import me.leeseol.core.launchpad.LaunchPadManager;
 import me.leeseol.core.listener.DimensionGateListener;
 import me.leeseol.core.listener.JoinListener;
-import me.leeseol.core.menu.CoreServerMenuManager;
 import me.leeseol.core.networkmove.BungeeCordNetworkMovePort;
 import me.leeseol.core.networkmove.NetworkMovePort;
 import me.leeseol.core.portal.PortalListener;
-import me.leeseol.core.portal.PortalManager;
 import me.leeseol.core.servernpc.ServerNpcManager;
-import me.leeseol.core.spawn.SurvivalSpawnManager;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
@@ -25,57 +19,37 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LeeSeolCorePlugin extends JavaPlugin {
     private long enabledAtMillis;
-    private ConfigManager configManager;
-    private PortalManager portalManager;
-    private LaunchPadManager launchPadManager;
-    private CoreServerMenuManager serverMenuManager;
-    private ServerNpcManager serverNpcManager;
-    private SurvivalSpawnManager survivalSpawnManager;
-    private ContentService contentService;
-    private BlueMapContentMarkers blueMapContentMarkers;
-    private NetworkMovePort networkMovePort;
+    private CoreServices services;
 
     @Override
     public void onEnable() {
         enabledAtMillis = System.currentTimeMillis();
         saveDefaultConfig();
-        configManager = new ConfigManager(this);
-        portalManager = new PortalManager(this);
-        launchPadManager = new LaunchPadManager(this);
-        serverMenuManager = new CoreServerMenuManager(this);
-        serverNpcManager = new ServerNpcManager(this);
-        survivalSpawnManager = new SurvivalSpawnManager(this);
-        networkMovePort = new BungeeCordNetworkMovePort(this);
-        contentService = new ContentService(this, new WorldGuardContentRegionService(this));
-        blueMapContentMarkers = new BlueMapContentMarkers(this, contentService);
-        contentService.setAfterChange(blueMapContentMarkers::refreshLater);
+        services = new CoreServices(this);
 
         reloadCoreConfig();
         getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeCordNetworkMovePort.CHANNEL);
 
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new DimensionGateListener(this), this);
-        getServer().getPluginManager().registerEvents(new PortalListener(configManager, portalManager), this);
-        getServer().getPluginManager().registerEvents(new LaunchPadListener(configManager, launchPadManager), this);
-        getServer().getPluginManager().registerEvents(serverMenuManager, this);
-        getServer().getPluginManager().registerEvents(survivalSpawnManager, this);
-        registerCommand("serverinfo", new ServerInfoCommand(this));
-        registerCommand("survivalspawn", survivalSpawnManager);
-        CoreCommand coreCommand = new CoreCommand(this);
+        getServer().getPluginManager().registerEvents(new PortalListener(services.configManager(), services.portalManager()), this);
+        getServer().getPluginManager().registerEvents(new LaunchPadListener(services.configManager(), services.launchPadManager()), this);
+        getServer().getPluginManager().registerEvents(services.serverMenuManager(), this);
+        getServer().getPluginManager().registerEvents(services.survivalSpawnManager(), this);
+        registerCommand("serverinfo", new ServerInfoCommand(services.serverStatusService()));
+        registerCommand("survivalspawn", services.survivalSpawnManager());
+        CoreCommand coreCommand = new CoreCommand(this, services.configWriter());
         registerCommand("lscore", coreCommand);
         registerCommand("leeseolcore", coreCommand);
-        registerCommand("content", new ContentCommand(this, contentService));
+        registerCommand("content", new ContentCommand(this, services.contentService()));
 
         getLogger().info("LeeSeolCore enabled.");
     }
 
     @Override
     public void onDisable() {
-        if (serverNpcManager != null) {
-            org.bukkit.event.HandlerList.unregisterAll(serverNpcManager);
-        }
-        if (blueMapContentMarkers != null) {
-            blueMapContentMarkers.clear();
+        if (services != null) {
+            services.disableAll();
         }
         getServer().getMessenger().unregisterOutgoingPluginChannel(this, BungeeCordNetworkMovePort.CHANNEL);
         getLogger().info("LeeSeolCore disabled.");
@@ -86,39 +60,27 @@ public final class LeeSeolCorePlugin extends JavaPlugin {
     }
 
     public void reloadCoreConfig() {
-        reloadConfig();
-        getConfig().options().copyDefaults(true);
-        saveConfig();
-
-        configManager.reload();
-        portalManager.reload();
-        launchPadManager.reload();
-        serverMenuManager.reload();
-        serverNpcManager.reload();
-        survivalSpawnManager.reload();
-        contentService.reload();
-        blueMapContentMarkers.refreshLater();
-        getLogger().info("Enabled worlds: " + String.join(", ", configManager.getEnabledWorlds()));
+        services.reloadAll();
     }
 
     public ServerNpcManager serverNpcManager() {
-        return serverNpcManager;
+        return services.serverNpcManager();
     }
 
     public ContentService contentService() {
-        return contentService;
+        return services.contentService();
     }
 
     public BlueMapContentMarkers blueMapContentMarkers() {
-        return blueMapContentMarkers;
+        return services.blueMapContentMarkers();
     }
 
     public void sendPlayerToServer(Player player, String targetServer) {
-        networkMovePort.requestMove(player, targetServer);
+        services.networkMoveService().move(player, targetServer);
     }
 
     public NetworkMovePort networkMovePort() {
-        return networkMovePort;
+        return services.networkMovePort();
     }
 
     private void registerCommand(String name, org.bukkit.command.CommandExecutor executor) {

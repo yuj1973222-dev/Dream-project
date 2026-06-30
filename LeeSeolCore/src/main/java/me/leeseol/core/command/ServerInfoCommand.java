@@ -1,17 +1,15 @@
 package me.leeseol.core.command;
 
-import java.time.Duration;
-import me.leeseol.core.LeeSeolCorePlugin;
-import org.bukkit.Bukkit;
+import me.leeseol.core.status.ServerStatusService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public final class ServerInfoCommand implements CommandExecutor {
-    private final LeeSeolCorePlugin plugin;
+    private final ServerStatusService statusService;
 
-    public ServerInfoCommand(LeeSeolCorePlugin plugin) {
-        this.plugin = plugin;
+    public ServerInfoCommand(ServerStatusService statusService) {
+        this.statusService = statusService;
     }
 
     @Override
@@ -21,29 +19,10 @@ public final class ServerInfoCommand implements CommandExecutor {
             String label,
             String[] args
     ) {
-        String serverName = plugin.getConfig().getString("server-name", "LeeSeol Server");
-        int onlinePlayers = Bukkit.getOnlinePlayers().size();
-        int maxPlayers = Bukkit.getMaxPlayers();
-        Duration uptime = Duration.ofMillis(System.currentTimeMillis() - plugin.getEnabledAtMillis());
-
-        sender.sendMessage("=== " + serverName + " ===");
-        sender.sendMessage("Online: " + onlinePlayers + " / " + maxPlayers);
-        sender.sendMessage("Minecraft: " + Bukkit.getMinecraftVersion());
-        sender.sendMessage("Uptime: " + formatDuration(uptime));
+        sender.sendMessage("=== " + statusService.serverName() + " ===");
+        sender.sendMessage("Online: " + statusService.onlinePlayers() + " / " + statusService.maxPlayers());
+        sender.sendMessage("Minecraft: " + statusService.minecraftVersion());
+        sender.sendMessage("Uptime: " + statusService.formattedUptime());
         return true;
-    }
-
-    private String formatDuration(Duration duration) {
-        long hours = duration.toHours();
-        long minutes = duration.toMinutesPart();
-        long seconds = duration.toSecondsPart();
-
-        if (hours > 0) {
-            return hours + "h " + minutes + "m " + seconds + "s";
-        }
-        if (minutes > 0) {
-            return minutes + "m " + seconds + "s";
-        }
-        return seconds + "s";
     }
 }
